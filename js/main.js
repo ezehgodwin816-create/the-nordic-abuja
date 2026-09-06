@@ -1,19 +1,18 @@
-const header=document.getElementById("siteHeader");const mobileMenu=document.getElementById("mobileMenu");const menuButtons=document.querySelectorAll(".menu-toggle");const toast=document.getElementById("toast");const year=document.getElementById("year");if(year)year.textContent=new Date().getFullYear();
 
-window.addEventListener("scroll",()=>{header?.classList.toggle("scrolled",window.scrollY>50);document.getElementById("backTop")?.classList.toggle("show",window.scrollY>500)});
-
-menuButtons.forEach(btn=>btn.addEventListener("click",()=>{const open=!mobileMenu.classList.contains("open");mobileMenu.classList.toggle("open",open);mobileMenu.setAttribute("aria-hidden",String(!open));document.querySelector(".menu-toggle")?.setAttribute("aria-expanded",String(open));document.body.style.overflow=open?"hidden":""}));
-mobileMenu?.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{mobileMenu.classList.remove("open");mobileMenu.setAttribute("aria-hidden","true");document.body.style.overflow=""}));
-
-const checkin=document.getElementById("checkin"),checkout=document.getElementById("checkout");const today=new Date();const iso=d=>d.toISOString().split("T")[0];if(checkin){checkin.min=iso(today);const tomorrow=new Date(today);tomorrow.setDate(today.getDate()+1);checkout.min=iso(tomorrow);checkin.addEventListener("change",()=>{const d=new Date(checkin.value+"T00:00:00");d.setDate(d.getDate()+1);checkout.min=iso(d);if(checkout.value&&checkout.value<=checkin.value)checkout.value=iso(d)})}
-document.getElementById("bookingButton")?.addEventListener("click",()=>{if(!checkin.value||!checkout.value){showToast("Choose your check-in and check-out dates first.");return}showToast("Booking engine connection will be added when the hotel's live reservation system is connected.")});
-
-const lightbox=document.getElementById("lightbox"),lbImg=document.getElementById("lightboxImage"),lbCaption=document.getElementById("lightboxCaption");document.querySelectorAll("[data-lightbox]").forEach(item=>item.addEventListener("click",()=>{lbImg.src=item.dataset.lightbox;lbCaption.textContent=item.dataset.caption||"";lightbox.classList.add("open");lightbox.setAttribute("aria-hidden","false");document.body.style.overflow="hidden"}));document.querySelector(".lightbox-close")?.addEventListener("click",closeLightbox);lightbox?.addEventListener("click",e=>{if(e.target===lightbox)closeLightbox()});function closeLightbox(){lightbox.classList.remove("open");lightbox.setAttribute("aria-hidden","true");document.body.style.overflow=""}
-
-const concierge=document.getElementById("conciergePanel");document.getElementById("conciergeOpen")?.addEventListener("click",()=>{concierge.classList.add("open");concierge.setAttribute("aria-hidden","false")});document.getElementById("conciergeClose")?.addEventListener("click",()=>{concierge.classList.remove("open");concierge.setAttribute("aria-hidden","true")});
-
-document.getElementById("backTop")?.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));function showToast(message){toast.textContent=message;toast.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>toast.classList.remove("show"),4200)}
-
-const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add("visible")}),{threshold:.12});document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
-
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeLightbox();concierge?.classList.remove("open");mobileMenu?.classList.remove("open");document.body.style.overflow=""}});
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const toast=(msg)=>{const t=$('#toast');if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)};
+const today=new Date().toISOString().slice(0,10);
+const ci=$('#checkin'),co=$('#checkout'); if(ci){ci.min=today;ci.addEventListener('change',()=>{if(co){co.min=ci.value; if(co.value&&co.value<=ci.value)co.value=''}})}
+const bookingBtn=$('#bookingButton'); if(bookingBtn)bookingBtn.addEventListener('click',()=>{const a=ci?.value,b=co?.value,g=$('#guests')?.value||'2 guests';if(!a||!b){toast('Please select your check-in and check-out dates.');return}location.href=`booking.html?checkin=${encodeURIComponent(a)}&checkout=${encodeURIComponent(b)}&guests=${encodeURIComponent(g)}`});
+const header=$('#siteHeader');addEventListener('scroll',()=>{if(header)header.classList.toggle('scrolled',scrollY>40)});
+const menu=$('#mobileMenu'); $$('.menu-toggle').forEach(b=>b.addEventListener('click',()=>{menu?.classList.toggle('open')}));
+const lb=$('#lightbox'); $$('.gallery-item').forEach(i=>i.addEventListener('click',()=>{if(!lb)return;$('#lightboxImage').src=i.dataset.lightbox;$('#lightboxCaption').textContent=i.dataset.caption||'';lb.classList.add('open');lb.setAttribute('aria-hidden','false')})); $('#lightbox')?.addEventListener('click',e=>{if(e.target===lb||e.target.classList.contains('lightbox-close')){lb.classList.remove('open');lb.setAttribute('aria-hidden','true')}});
+$('#backTop')?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
+const cp=$('#conciergePanel');$('#conciergeOpen')?.addEventListener('click',()=>cp?.classList.add('open'));$('#conciergeClose')?.addEventListener('click',()=>cp?.classList.remove('open'));
+$('#year')&&( $('#year').textContent=new Date().getFullYear() );
+// Demo booking flow: keeps selections locally until Supabase/payment is connected.
+function params(){return new URLSearchParams(location.search)}
+if($('#bookingForm')){const p=params(); const set=(id,v)=>{const e=$('#'+id);if(e&&v)e.value=v};set('bookingCheckin',p.get('checkin'));set('bookingCheckout',p.get('checkout'));set('bookingGuests',p.get('guests'));
+const form=$('#bookingForm');form.addEventListener('submit',e=>{e.preventDefault();const data=Object.fromEntries(new FormData(form));localStorage.setItem('nordic_booking_draft',JSON.stringify(data));location.href='booking-success.html'})}
+$$('[data-book-room]').forEach(b=>b.addEventListener('click',()=>{const room=b.dataset.bookRoom;location.href=`booking.html?room=${encodeURIComponent(room)}`}));
+$$('[data-demo-submit]').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();toast('Request saved on this device. Connect Supabase to receive it in the hotel dashboard.');f.reset()}));
