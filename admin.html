@@ -1,0 +1,2383 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <title>Admin Dashboard — The Nordic Abuja</title>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f3f0;
+      color: #151515;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* =====================================================
+       LOGIN
+       ===================================================== */
+
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        linear-gradient(rgba(0,0,0,.58), rgba(0,0,0,.58)),
+        url("images/hero.jpg") center/cover no-repeat;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(255,255,255,.97);
+      padding: 38px;
+      border-radius: 18px;
+      box-shadow: 0 25px 70px rgba(0,0,0,.28);
+    }
+
+    .brand {
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .brand-subtitle {
+      color: #777;
+      margin-bottom: 30px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid #d7d4cf;
+      background: #fff;
+      border-radius: 10px;
+      padding: 13px 14px;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: #111;
+    }
+
+    .primary-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      background: #111;
+      color: #fff;
+      padding: 14px 18px;
+      font-weight: 700;
+      transition: .2s;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      opacity: .9;
+    }
+
+    .primary-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .login-error {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 9px;
+      background: #fff0f0;
+      color: #b42318;
+      font-size: 13px;
+    }
+
+    /* =====================================================
+       APP
+       ===================================================== */
+
+    #adminApp {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 72px;
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .topbar-logo {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    .admin-label {
+      font-size: 12px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    .logout-btn {
+      border: 1px solid #555;
+      background: transparent;
+      color: #fff;
+      padding: 9px 15px;
+      border-radius: 8px;
+    }
+
+    .logout-btn:hover {
+      background: #222;
+    }
+
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 72px);
+    }
+
+    /* =====================================================
+       SIDEBAR
+       ===================================================== */
+
+    .sidebar {
+      width: 245px;
+      background: #181818;
+      color: #fff;
+      padding: 22px 14px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-title {
+      padding: 8px 12px 16px;
+      color: #777;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+    }
+
+    .nav-btn {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #ccc;
+      padding: 12px;
+      text-align: left;
+      border-radius: 8px;
+      margin-bottom: 4px;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: #292929;
+      color: #fff;
+    }
+
+    /* =====================================================
+       MAIN
+       ===================================================== */
+
+    .main {
+      flex: 1;
+      padding: 30px;
+      min-width: 0;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .page-title {
+      margin: 0 0 6px;
+      font-size: 30px;
+    }
+
+    .page-description {
+      margin: 0;
+      color: #777;
+    }
+
+    .refresh-btn {
+      border: 1px solid #ccc;
+      background: #fff;
+      padding: 11px 16px;
+      border-radius: 9px;
+    }
+
+    /* =====================================================
+       STAT CARDS
+       ===================================================== */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid #e2e0dc;
+      border-radius: 13px;
+      padding: 20px;
+    }
+
+    .stat-label {
+      color: #777;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    /* =====================================================
+       TOOLBAR
+       ===================================================== */
+
+    .panel {
+      background: #fff;
+      border: 1px solid #e2e0dc;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 190px 170px;
+      gap: 12px;
+      border-bottom: 1px solid #e8e6e2;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      width: 100%;
+      border: 1px solid #d7d4cf;
+      border-radius: 9px;
+      padding: 11px 12px;
+      background: #fff;
+    }
+
+    /* =====================================================
+       TABLE
+       ===================================================== */
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 15px 17px;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #faf9f7;
+      color: #777;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+
+    td {
+      font-size: 13px;
+    }
+
+    tbody tr:hover {
+      background: #fafafa;
+    }
+
+    .reference {
+      font-weight: 800;
+      letter-spacing: .03em;
+    }
+
+    .guest-name {
+      font-weight: 700;
+    }
+
+    .muted {
+      color: #777;
+    }
+
+    /* =====================================================
+       STATUS
+       ===================================================== */
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-pending {
+      background: #fff4d6;
+      color: #8a5a00;
+    }
+
+    .status-confirmed {
+      background: #e4f7e8;
+      color: #18733a;
+    }
+
+    .status-cancelled {
+      background: #ffe5e5;
+      color: #a21b1b;
+    }
+
+    .status-completed {
+      background: #e8e8e8;
+      color: #444;
+    }
+
+    .status-unpaid {
+      background: #fff4d6;
+      color: #8a5a00;
+    }
+
+    .status-paid {
+      background: #e4f7e8;
+      color: #18733a;
+    }
+
+    .action-btn {
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+
+    .action-btn:hover {
+      background: #f4f4f4;
+    }
+
+    /* =====================================================
+       EMPTY / LOADING
+       ===================================================== */
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #777;
+    }
+
+    .loading {
+      padding: 50px;
+      text-align: center;
+      color: #777;
+    }
+
+    .error-box {
+      margin: 18px;
+      padding: 14px;
+      border-radius: 9px;
+      background: #fff0f0;
+      color: #a21b1b;
+      font-size: 13px;
+    }
+
+    /* =====================================================
+       MODAL
+       ===================================================== */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.3);
+    }
+
+    .modal-header {
+      padding: 22px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .close-btn {
+      width: 35px;
+      height: 35px;
+      border: 0;
+      background: #f3f3f3;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    .modal-body {
+      padding: 22px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .detail-item {
+      background: #f8f7f5;
+      border-radius: 9px;
+      padding: 13px;
+    }
+
+    .detail-label {
+      font-size: 10px;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 5px;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .detail-full {
+      grid-column: 1 / -1;
+    }
+
+    .modal-actions {
+      padding: 18px 22px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .modal-actions button {
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 15px;
+      font-weight: 700;
+    }
+
+    .confirm-action {
+      background: #111;
+      color: #fff;
+    }
+
+    .cancel-action {
+      background: #ffe5e5;
+      color: #a21b1b;
+    }
+
+    .paid-action {
+      background: #e4f7e8;
+      color: #18733a;
+    }
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (max-width: 1100px) {
+      .stats {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .sidebar {
+        width: 210px;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .topbar {
+        padding: 0 15px;
+      }
+
+      .admin-label {
+        display: none;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 8px;
+        display: flex;
+        overflow-x: auto;
+        gap: 5px;
+      }
+
+      .sidebar-title {
+        display: none;
+      }
+
+      .nav-btn {
+        width: auto;
+        white-space: nowrap;
+        margin: 0;
+      }
+
+      .main {
+        padding: 18px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .login-card {
+        padding: 25px;
+      }
+
+      .page-title {
+        font-size: 24px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stat-value {
+        font-size: 23px;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-full {
+        grid-column: auto;
+      }
+    }
+  </style></head><body>  <!-- =====================================================
+       LOGIN SCREEN
+       ===================================================== -->  <section id="loginScreen"><div class="login-card">
+
+  <div class="brand">
+    THE NORDIC ABUJA
+  </div>
+
+  <div class="brand-subtitle">
+    Secure administration
+  </div>
+
+  <form id="loginForm">
+
+    <div class="field">
+      <label for="loginEmail">Admin email</label>
+      <input
+        id="loginEmail"
+        type="email"
+        autocomplete="username"
+        required
+        placeholder="admin@example.com"
+      >
+    </div>
+
+    <div class="field">
+      <label for="loginPassword">Password</label>
+      <input
+        id="loginPassword"
+        type="password"
+        autocomplete="current-password"
+        required
+        placeholder="••••••••"
+      >
+    </div>
+
+    <button
+      class="primary-btn"
+      id="loginButton"
+      type="submit"
+    >
+      Sign in
+    </button>
+
+    <div
+      id="loginError"
+      class="login-error hidden"
+    ></div>
+
+  </form>
+
+</div>
+
+  </section>  <!-- =====================================================
+       ADMIN APP
+       ===================================================== -->  <section id="adminApp" class="hidden"><header class="topbar">
+
+  <div class="topbar-left">
+
+    <div class="topbar-logo">
+      THE NORDIC ABUJA
+    </div>
+
+    <div class="admin-label">
+      Administration
+    </div>
+
+  </div>
+
+  <button
+    class="logout-btn"
+    id="logoutButton"
+    type="button"
+  >
+    Sign out
+  </button>
+
+</header>
+
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar">
+
+    <div class="sidebar-title">
+      Management
+    </div>
+
+    <button
+      class="nav-btn active"
+      type="button"
+      data-section="reservations"
+    >
+      Reservations
+    </button>
+
+    <button
+      class="nav-btn"
+      type="button"
+      data-section="rooms"
+    >
+      Rooms
+    </button>
+
+    <button
+      class="nav-btn"
+      type="button"
+      data-section="requests"
+    >
+      Hotel requests
+    </button>
+
+    <button
+      class="nav-btn"
+      type="button"
+      data-section="reviews"
+    >
+      Reviews
+    </button>
+
+    <button
+      class="nav-btn"
+      type="button"
+      data-section="settings"
+    >
+      Site settings
+    </button>
+
+  </aside>
+
+
+  <!-- MAIN CONTENT -->
+
+  <main class="main">
+
+    <section id="reservationsSection">
+
+      <div class="page-header">
+
+        <div>
+          <h1 class="page-title">
+            Reservations
+          </h1>
+
+          <p class="page-description">
+            Manage guest reservations and booking status.
+          </p>
+        </div>
+
+        <button
+          class="refresh-btn"
+          id="refreshReservations"
+          type="button"
+        >
+          Refresh
+        </button>
+
+      </div>
+
+
+      <!-- STATS -->
+
+      <div class="stats">
+
+        <div class="stat-card">
+          <div class="stat-label">
+            Total
+          </div>
+          <div
+            class="stat-value"
+            id="statTotal"
+          >
+            0
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            Pending
+          </div>
+          <div
+            class="stat-value"
+            id="statPending"
+          >
+            0
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            Confirmed
+          </div>
+          <div
+            class="stat-value"
+            id="statConfirmed"
+          >
+            0
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            Cancelled
+          </div>
+          <div
+            class="stat-value"
+            id="statCancelled"
+          >
+            0
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            Unpaid
+          </div>
+          <div
+            class="stat-value"
+            id="statUnpaid"
+          >
+            0
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- RESERVATIONS -->
+
+      <div class="panel">
+
+        <div class="toolbar">
+
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search name, email or confirmation number..."
+          >
+
+          <select id="statusFilter">
+
+            <option value="all">
+              All reservation statuses
+            </option>
+
+            <option value="pending">
+              Pending
+            </option>
+
+            <option value="confirmed">
+              Confirmed
+            </option>
+
+            <option value="cancelled">
+              Cancelled
+            </option>
+
+            <option value="completed">
+              Completed
+            </option>
+
+          </select>
+
+          <select id="paymentFilter">
+
+            <option value="all">
+              All payments
+            </option>
+
+            <option value="unpaid">
+              Unpaid
+            </option>
+
+            <option value="paid">
+              Paid
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div id="tableContainer">
+
+          <div class="loading">
+            Loading reservations...
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PLACEHOLDER SECTIONS -->
+
+    <section
+      id="roomsSection"
+      class="hidden"
+    >
+
+      <div class="page-header">
+
+        <div>
+          <h1 class="page-title">
+            Rooms
+          </h1>
+
+          <p class="page-description">
+            Room inventory management will be connected here.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <div class="empty-state">
+          Room management is the next module.
+        </div>
+      </div>
+
+    </section>
+
+
+    <section
+      id="requestsSection"
+      class="hidden"
+    >
+
+      <div class="page-header">
+
+        <div>
+          <h1 class="page-title">
+            Hotel requests
+          </h1>
+
+          <p class="page-description">
+            Guest concierge and hotel requests.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <div class="empty-state">
+          Hotel request management is the next module.
+        </div>
+      </div>
+
+    </section>
+
+
+    <section
+      id="reviewsSection"
+      class="hidden"
+    >
+
+      <div class="page-header">
+
+        <div>
+          <h1 class="page-title">
+            Reviews
+          </h1>
+
+          <p class="page-description">
+            Review moderation and publishing.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <div class="empty-state">
+          Review management is the next module.
+        </div>
+      </div>
+
+    </section>
+
+
+    <section
+      id="settingsSection"
+      class="hidden"
+    >
+
+      <div class="page-header">
+
+        <div>
+          <h1 class="page-title">
+            Site settings
+          </h1>
+
+          <p class="page-description">
+            Hotel website settings.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <div class="empty-state">
+          Site settings management is the next module.
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+  </section>  <!-- =====================================================
+       RESERVATION MODAL
+       ===================================================== -->  <div
+    id="reservationModal"
+    class="modal-backdrop hidden"
+  ><div class="modal">
+
+  <div class="modal-header">
+
+    <h2>
+      Reservation details
+    </h2>
+
+    <button
+      class="close-btn"
+      id="closeModal"
+      type="button"
+    >
+      ×
+    </button>
+
+  </div>
+
+  <div
+    class="modal-body"
+    id="reservationDetails"
+  ></div>
+
+  <div
+    class="modal-actions"
+    id="reservationActions"
+  ></div>
+
+</div>
+
+  </div>  <script>
+    /* =====================================================
+       SUPABASE CONFIGURATION
+       ===================================================== */
+
+    const SUPABASE_URL =
+      "https://rzjvhfnizwckzbdawrbn.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob";
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
+
+
+    /* =====================================================
+       ELEMENTS
+       ===================================================== */
+
+    const loginScreen =
+      document.getElementById("loginScreen");
+
+    const adminApp =
+      document.getElementById("adminApp");
+
+    const loginForm =
+      document.getElementById("loginForm");
+
+    const loginButton =
+      document.getElementById("loginButton");
+
+    const loginError =
+      document.getElementById("loginError");
+
+    const logoutButton =
+      document.getElementById("logoutButton");
+
+    const tableContainer =
+      document.getElementById("tableContainer");
+
+    const searchInput =
+      document.getElementById("searchInput");
+
+    const statusFilter =
+      document.getElementById("statusFilter");
+
+    const paymentFilter =
+      document.getElementById("paymentFilter");
+
+    const reservationModal =
+      document.getElementById("reservationModal");
+
+    const reservationDetails =
+      document.getElementById("reservationDetails");
+
+    const reservationActions =
+      document.getElementById("reservationActions");
+
+
+    /* =====================================================
+       STATE
+       ===================================================== */
+
+    let reservations = [];
+    let selectedReservation = null;
+
+
+    /* =====================================================
+       LOGIN ERROR
+       ===================================================== */
+
+    function showLoginError(message) {
+      loginError.textContent = message;
+      loginError.classList.remove("hidden");
+    }
+
+
+    function clearLoginError() {
+      loginError.textContent = "";
+      loginError.classList.add("hidden");
+    }
+
+
+    /* =====================================================
+       FORMATTERS
+       ===================================================== */
+
+    function escapeHtml(value) {
+      if (value === null || value === undefined) {
+        return "";
+      }
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+
+    function formatDate(value) {
+      if (!value) {
+        return "—";
+      }
+
+      const date =
+        new Date(value + "T00:00:00");
+
+      if (Number.isNaN(date.getTime())) {
+        return value;
+      }
+
+      return date.toLocaleDateString(
+        "en-GB",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        }
+      );
+    }
+
+
+    function formatStatus(value) {
+      return String(value || "unknown")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, letter =>
+          letter.toUpperCase()
+        );
+    }
+
+
+    function statusClass(value) {
+      const normalized =
+        String(value || "")
+          .toLowerCase();
+
+      if (
+        normalized === "confirmed"
+      ) {
+        return "status-confirmed";
+      }
+
+      if (
+        normalized === "cancelled" ||
+        normalized === "canceled"
+      ) {
+        return "status-cancelled";
+      }
+
+      if (
+        normalized === "completed"
+      ) {
+        return "status-completed";
+      }
+
+      return "status-pending";
+    }
+
+
+    function paymentClass(value) {
+      return String(value || "")
+        .toLowerCase() === "paid"
+        ? "status-paid"
+        : "status-unpaid";
+    }
+
+
+    /* =====================================================
+       AUTH SESSION
+       ===================================================== */
+
+    async function checkSession() {
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.auth.getSession();
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      if (data.session) {
+        await showAdmin();
+      } else {
+        showLogin();
+      }
+    }
+
+
+    function showLogin() {
+      loginScreen.classList.remove("hidden");
+      adminApp.classList.add("hidden");
+    }
+
+
+    async function showAdmin() {
+      loginScreen.classList.add("hidden");
+      adminApp.classList.remove("hidden");
+
+      await loadReservations();
+    }
+
+
+    /* =====================================================
+       LOGIN
+       ===================================================== */
+
+    loginForm.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+        clearLoginError();
+
+        loginButton.disabled = true;
+        loginButton.textContent =
+          "Signing in...";
+
+        const email =
+          document
+            .getElementById("loginEmail")
+            .value
+            .trim();
+
+        const password =
+          document
+            .getElementById("loginPassword")
+            .value;
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
+        if (error) {
+
+          console.error(error);
+
+          showLoginError(
+            error.message ||
+            "Unable to sign in."
+          );
+
+          loginButton.disabled = false;
+          loginButton.textContent =
+            "Sign in";
+
+          return;
+        }
+
+        if (!data.session) {
+
+          showLoginError(
+            "No active session was created."
+          );
+
+          loginButton.disabled = false;
+          loginButton.textContent =
+            "Sign in";
+
+          return;
+        }
+
+        loginButton.disabled = false;
+        loginButton.textContent =
+          "Sign in";
+
+        await showAdmin();
+      }
+    );
+
+
+    /* =====================================================
+       LOGOUT
+       ===================================================== */
+
+    logoutButton.addEventListener(
+      "click",
+      async function() {
+
+        await supabaseClient.auth.signOut();
+
+        reservations = [];
+
+        showLogin();
+
+      }
+    );
+
+
+    /* =====================================================
+       LOAD RESERVATIONS
+       ===================================================== */
+
+    async function loadReservations() {
+
+      tableContainer.innerHTML =
+        '<div class="loading">Loading reservations...</div>';
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("bookings")
+          .select(`
+            id,
+            booking_reference,
+            room_type_id,
+            room_id,
+            guest_first_name,
+            guest_last_name,
+            guest_email,
+            guest_phone,
+            adults,
+            children,
+            check_in,
+            check_out,
+            nights,
+            price_per_night,
+            total_amount,
+            status,
+            payment_status,
+            special_requests,
+            created_at
+          `)
+          .order(
+            "created_at",
+            {
+              ascending: false
+            }
+          );
+
+      if (error) {
+
+        console.error(
+          "Reservation loading error:",
+          error
+        );
+
+        tableContainer.innerHTML = `
+          <div class="error-box">
+            <strong>Unable to load reservations.</strong>
+            <br><br>
+            ${escapeHtml(error.message)}
+            <br><br>
+            If this is a permissions error, we need to configure the
+            Supabase admin RLS policy next.
+          </div>
+        `;
+
+        updateStats([]);
+
+        return;
+      }
+
+      reservations =
+        Array.isArray(data)
+          ? data
+          : [];
+
+      updateStats(reservations);
+      renderReservations();
+    }
+
+
+    /* =====================================================
+       STATS
+       ===================================================== */
+
+    function updateStats(list) {
+
+      const total =
+        list.length;
+
+      const pending =
+        list.filter(
+          item =>
+            String(item.status)
+              .toLowerCase() ===
+            "pending"
+        ).length;
+
+      const confirmed =
+        list.filter(
+          item =>
+            String(item.status)
+              .toLowerCase() ===
+            "confirmed"
+        ).length;
+
+      const cancelled =
+        list.filter(
+          item =>
+            ["cancelled", "canceled"]
+              .includes(
+                String(item.status)
+                  .toLowerCase()
+              )
+        ).length;
+
+      const unpaid =
+        list.filter(
+          item =>
+            String(item.payment_status)
+              .toLowerCase() !==
+            "paid"
+        ).length;
+
+      document.getElementById(
+        "statTotal"
+      ).textContent = total;
+
+      document.getElementById(
+        "statPending"
+      ).textContent = pending;
+
+      document.getElementById(
+        "statConfirmed"
+      ).textContent = confirmed;
+
+      document.getElementById(
+        "statCancelled"
+      ).textContent = cancelled;
+
+      document.getElementById(
+        "statUnpaid"
+      ).textContent = unpaid;
+    }
+
+
+    /* =====================================================
+       FILTERING
+       ===================================================== */
+
+    function getFilteredReservations() {
+
+      const search =
+        searchInput.value
+          .trim()
+          .toLowerCase();
+
+      const status =
+        statusFilter.value;
+
+      const payment =
+        paymentFilter.value;
+
+      return reservations.filter(
+        reservation => {
+
+          const fullName =
+            `${reservation.guest_first_name || ""} ${reservation.guest_last_name || ""}`
+              .trim()
+              .toLowerCase();
+
+          const email =
+            String(
+              reservation.guest_email || ""
+            ).toLowerCase();
+
+          const reference =
+            String(
+              reservation.booking_reference || ""
+            ).toLowerCase();
+
+          const matchesSearch =
+            !search ||
+            fullName.includes(search) ||
+            email.includes(search) ||
+            reference.includes(search);
+
+          const matchesStatus =
+            status === "all" ||
+            String(
+              reservation.status || ""
+            ).toLowerCase() === status;
+
+          const matchesPayment =
+            payment === "all" ||
+            String(
+              reservation.payment_status || ""
+            ).toLowerCase() === payment;
+
+          return (
+            matchesSearch &&
+            matchesStatus &&
+            matchesPayment
+          );
+        }
+      );
+    }
+
+
+    searchInput.addEventListener(
+      "input",
+      renderReservations
+    );
+
+    statusFilter.addEventListener(
+      "change",
+      renderReservations
+    );
+
+    paymentFilter.addEventListener(
+      "change",
+      renderReservations
+    );
+
+
+    /* =====================================================
+       RENDER TABLE
+       ===================================================== */
+
+    function renderReservations() {
+
+      const list =
+        getFilteredReservations();
+
+      if (!list.length) {
+
+        tableContainer.innerHTML = `
+          <div class="empty-state">
+            <strong>No reservations found.</strong>
+            <br><br>
+            Try changing your search or filters.
+          </div>
+        `;
+
+        return;
+      }
+
+      const rows =
+        list.map(
+          reservation => {
+
+            const fullName =
+              `${reservation.guest_first_name || ""} ${reservation.guest_last_name || ""}`
+                .trim() ||
+              "Guest";
+
+            const adults =
+              Number(
+                reservation.adults || 0
+              );
+
+            const children =
+              Number(
+                reservation.children || 0
+              );
+
+            return `
+              <tr>
+
+                <td>
+                  <div class="reference">
+                    ${escapeHtml(
+                      reservation.booking_reference ||
+                      "—"
+                    )}
+                  </div>
+                </td>
+
+                <td>
+                  <div class="guest-name">
+                    ${escapeHtml(fullName)}
+                  </div>
+
+                  <div class="muted">
+                    ${escapeHtml(
+                      reservation.guest_email ||
+                      "No email"
+                    )}
+                  </div>
+                </td>
+
+                <td>
+                  ${formatDate(
+                    reservation.check_in
+                  )}
+                  <br>
+                  <span class="muted">
+                    →
+                    ${formatDate(
+                      reservation.check_out
+                    )}
+                  </span>
+                </td>
+
+                <td>
+                  ${adults} adult${adults === 1 ? "" : "s"}
+                  ${
+                    children
+                      ? `<br>${children} child${children === 1 ? "" : "ren"}`
+                      : ""
+                  }
+                </td>
+
+                <td>
+                  <span class="status ${statusClass(
+                    reservation.status
+                  )}">
+                    ${escapeHtml(
+                      formatStatus(
+                        reservation.status
+                      )
+                    )}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="status ${paymentClass(
+                    reservation.payment_status
+                  )}">
+                    ${escapeHtml(
+                      formatStatus(
+                        reservation.payment_status
+                      )
+                    )}
+                  </span>
+                </td>
+
+                <td>
+                  <button
+                    class="action-btn"
+                    type="button"
+                    onclick="openReservation('${escapeHtml(
+                      reservation.id
+                    )}')"
+                  >
+                    View
+                  </button>
+                </td>
+
+              </tr>
+            `;
+          }
+        ).join("");
+
+      tableContainer.innerHTML = `
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Confirmation</th>
+                <th>Guest</th>
+                <th>Stay</th>
+                <th>Guests</th>
+                <th>Reservation</th>
+                <th>Payment</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${rows}
+            </tbody>
+
+          </table>
+
+        </div>
+      `;
+    }
+
+
+    /* =====================================================
+       OPEN RESERVATION
+       ===================================================== */
+
+    window.openReservation =
+      function(id) {
+
+        const reservation =
+          reservations.find(
+            item =>
+              String(item.id) ===
+              String(id)
+          );
+
+        if (!reservation) {
+          return;
+        }
+
+        selectedReservation =
+          reservation;
+
+        const fullName =
+          `${reservation.guest_first_name || ""} ${reservation.guest_last_name || ""}`
+            .trim() ||
+          "Guest";
+
+        const guestCount =
+          `${Number(reservation.adults || 0)} adult${Number(reservation.adults || 0) === 1 ? "" : "s"}` +
+          (
+            Number(reservation.children || 0)
+              ? `, ${Number(reservation.children)} child${Number(reservation.children) === 1 ? "" : "ren"}`
+              : ""
+          );
+
+        reservationDetails.innerHTML = `
+
+          <div class="detail-grid">
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Confirmation
+              </div>
+              <div class="detail-value">
+                ${escapeHtml(
+                  reservation.booking_reference ||
+                  "—"
+                )}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Reservation status
+              </div>
+              <div class="detail-value">
+                <span class="status ${statusClass(
+                  reservation.status
+                )}">
+                  ${escapeHtml(
+                    formatStatus(
+                      reservation.status
+                    )
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Guest
+              </div>
+              <div class="detail-value">
+                ${escapeHtml(fullName)}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Guests
+              </div>
+              <div class="detail-value">
+                ${escapeHtml(guestCount)}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Email
+              </div>
+              <div class="detail-value">
+                ${escapeHtml(
+                  reservation.guest_email ||
+                  "Not provided"
+                )}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Phone
+              </div>
+              <div class="detail-value">
+                ${escapeHtml(
+                  reservation.guest_phone ||
+                  "Not provided"
+                )}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Check-in
+              </div>
+              <div class="detail-value">
+                ${formatDate(
+                  reservation.check_in
+                )}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Check-out
+              </div>
+              <div class="detail-value">
+                ${formatDate(
+                  reservation.check_out
+                )}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Nights
+              </div>
+              <div class="detail-value">
+                ${escapeHtml(
+                  reservation.nights ||
+                  "—"
+                )}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Payment
+              </div>
+              <div class="detail-value">
+                <span class="status ${paymentClass(
+                  reservation.payment_status
+                )}">
+                  ${escapeHtml(
+                    formatStatus(
+                      reservation.payment_status
+                    )
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Room ID
+              </div>
+              <div class="detail-value">
+                ${escapeHtml(
+                  reservation.room_id ||
+                  "Not assigned"
+                )}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Room type ID
+              </div>
+              <div class="detail-value">
+                ${escapeHtml(
+                  reservation.room_type_id ||
+                  "—"
+                )}
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Price / night
+              </div>
+              <div class="detail-value">
+                ${
+                  reservation.price_per_night
+                    ? escapeHtml(
+                        reservation.price_per_night
+                      )
+                    : "Rate on request"
+                }
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                Total
+              </div>
+              <div class="detail-value">
+                ${
+                  reservation.total_amount
+                    ? escapeHtml(
+                        reservation.total_amount
+                      )
+                    : "Rate on request"
+                }
+              </div>
+            </div>
+
+            <div class="detail-item detail-full">
+              <div class="detail-label">
+                Special requests
+              </div>
+              <div class="detail-value">
+                ${escapeHtml(
+                  reservation.special_requests ||
+                  "No special requests."
+                )}
+              </div>
+            </div>
+
+            <div class="detail-item detail-full">
+              <div class="detail-label">
+                Created
+              </div>
+              <div class="detail-value">
+                ${
+                  reservation.created_at
+                    ? new Date(
+                        reservation.created_at
+                      ).toLocaleString()
+                    : "—"
+                }
+              </div>
+            </div>
+
+          </div>
+        `;
+
+
+        renderReservationActions(
+          reservation
+        );
+
+        reservationModal.classList.remove(
+          "hidden"
+        );
+      };
+
+
+    /* =====================================================
+       ACTION BUTTONS
+       ===================================================== */
+
+    function renderReservationActions(
+      reservation
+    ) {
+
+      let html = "";
+
+      const status =
+        String(
+          reservation.status || ""
+        ).toLowerCase();
+
+      const payment =
+        String(
+          reservation.payment_status || ""
+        ).toLowerCase();
+
+
+      if (
+        status === "pending"
+      ) {
+
+        html += `
+          <button
+            class="confirm-action"
+            type="button"
+            onclick="updateReservationStatus('confirmed')"
+          >
+            Confirm reservation
+          </button>
+        `;
+      }
+
+
+      if (
+        status !== "cancelled" &&
+        status !== "canceled"
+      ) {
+
+        html += `
+          <button
+            class="cancel-action"
+            type="button"
+            onclick="updateReservationStatus('cancelled')"
+          >
+            Cancel reservation
+          </button>
+        `;
+      }
+
+
+      if (
+        payment !== "paid"
+      ) {
+
+        html += `
+          <button
+            class="paid-action"
+            type="button"
+            onclick="updatePaymentStatus('paid')"
+          >
+            Mark as paid
+          </button>
+        `;
+      }
+
+
+      if (!html) {
+
+        html = `
+          <span class="muted">
+            No actions available.
+          </span>
+        `;
+      }
+
+
+      reservationActions.innerHTML =
+        html;
+    }
+
+
+    /* =====================================================
+       UPDATE RESERVATION STATUS
+       ===================================================== */
+
+    window.updateReservationStatus =
+      async function(newStatus) {
+
+        if (!selectedReservation) {
+          return;
+        }
+
+        const confirmation =
+          window.confirm(
+            `Change reservation ${selectedReservation.booking_reference} to ${newStatus}?`
+          );
+
+        if (!confirmation) {
+          return;
+        }
+
+        const {
+          error
+        } =
+          await supabaseClient
+            .from("bookings")
+            .update({
+              status: newStatus
+            })
+            .eq(
+              "id",
+              selectedReservation.id
+            );
+
+        if (error) {
+
+          console.error(error);
+
+          alert(
+            "Unable to update reservation: " +
+            error.message
+          );
+
+          return;
+        }
+
+        await loadReservations();
+
+        const updated =
+          reservations.find(
+            item =>
+              item.id ===
+              selectedReservation.id
+          );
+
+        if (updated) {
+
+          selectedReservation =
+            updated;
+
+          openReservation(
+            updated.id
+          );
+        }
+      };
+
+
+    /* =====================================================
+       UPDATE PAYMENT STATUS
+       ===================================================== */
+
+    window.updatePaymentStatus =
+      async function(newStatus) {
+
+        if (!selectedReservation) {
+          return;
+        }
+
+        const confirmation =
+          window.confirm(
+            `Mark reservation ${selectedReservation.booking_reference} as ${newStatus}?`
+          );
+
+        if (!confirmation) {
+          return;
+        }
+
+        const {
+          error
+        } =
+          await supabaseClient
+            .from("bookings")
+            .update({
+              payment_status:
+                newStatus
+            })
+            .eq(
+              "id",
+              selectedReservation.id
+            );
+
+        if (error) {
+
+          console.error(error);
+
+          alert(
+            "Unable to update payment status: " +
+            error.message
+          );
+
+          return;
+        }
+
+        await loadReservations();
+
+        const updated =
+          reservations.find(
+            item =>
+              item.id ===
+              selectedReservation.id
+          );
+
+        if (updated) {
+
+          selectedReservation =
+            updated;
+
+          openReservation(
+            updated.id
+          );
+        }
+      };
+
+
+    /* =====================================================
+       MODAL CLOSE
+       ===================================================== */
+
+    document.getElementById(
+      "closeModal"
+    ).addEventListener(
+      "click",
+      function() {
+
+        reservationModal.classList.add(
+          "hidden"
+        );
+
+        selectedReservation =
+          null;
+      }
+    );
+
+
+    reservationModal.addEventListener(
+      "click",
+      function(event) {
+
+        if (
+          event.target ===
+          reservationModal
+        ) {
+
+          reservationModal.classList.add(
+            "hidden"
+          );
+
+          selectedReservation =
+            null;
+        }
+      }
+    );
+
+
+    /* =====================================================
+       REFRESH
+       ===================================================== */
+
+    document.getElementById(
+      "refreshReservations"
+    ).addEventListener(
+      "click",
+      loadReservations
+    );
+
+
+    /* =====================================================
+       SIDEBAR NAVIGATION
+       ===================================================== */
+
+    document
+      .querySelectorAll(".nav-btn")
+      .forEach(
+        button => {
+
+          button.addEventListener(
+            "click",
+            function() {
+
+              document
+                .querySelectorAll(
+                  ".nav-btn"
+                )
+                .forEach(
+                  item =>
+                    item.classList.remove(
+                      "active"
+                    )
+                );
+
+              this.classList.add(
+                "active"
+              );
+
+              const section =
+                this.dataset.section;
+
+              document
+                .querySelectorAll(
+                  "main section"
+                )
+                .forEach(
+                  item =>
+                    item.classList.add(
+                      "hidden"
+                    )
+                );
+
+              const target =
+                document.getElementById(
+                  section +
+                  "Section"
+                );
+
+              if (target) {
+                target.classList.remove(
+                  "hidden"
+                );
+              }
+            }
+          );
+        }
+      );
+
+
+    /* =====================================================
+       AUTH STATE CHANGES
+       ===================================================== */
+
+    supabaseClient.auth.onAuthStateChange(
+      async function(event, session) {
+
+        if (
+          event === "SIGNED_OUT"
+        ) {
+          showLogin();
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       START
+       ===================================================== */
+
+    checkSession();
+
+  </script></body>
+</html>
