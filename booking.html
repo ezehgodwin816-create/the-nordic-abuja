@@ -1637,12 +1637,75 @@ Continue reservation →
       }
 
 
-      sessionStorage.setItem(
-        "nordic_booking_confirmation",
-        JSON.stringify(
-          booking
-        )
-      );
+      /* =========================================================
+   SAVE COMPLETE RESERVATION CONFIRMATION
+   ========================================================= */
+
+const confirmation = {
+  ...booking,
+
+  /* Guest information submitted on the form */
+  guest_first_name: firstName,
+  guest_last_name: lastName,
+  guest_email: email,
+  guest_phone: phone,
+
+  /* Guest count */
+  adults: guests,
+  children: 0,
+
+  /* Special requests */
+  special_requests:
+    requests || null,
+
+  /* Keep the real room information */
+  room_type_name:
+    booking.room_type_name ||
+    selectedRoomType.name,
+
+  /* Keep the real booking values */
+  booking_reference:
+    booking.booking_reference,
+
+  room_number:
+    booking.room_number,
+
+  check_in:
+    booking.check_in ||
+    checkinInput.value,
+
+  check_out:
+    booking.check_out ||
+    checkoutInput.value,
+
+  nights:
+    booking.nights ||
+    calculateNights(
+      checkinInput.value,
+      checkoutInput.value
+    ),
+
+  price_per_night:
+    booking.price_per_night ??
+    selectedRoomType.price_per_night,
+
+  total_amount:
+    booking.total_amount,
+
+  status:
+    booking.status,
+
+  payment_status:
+    booking.payment_status
+};
+
+
+sessionStorage.setItem(
+  "nordic_booking_confirmation",
+  JSON.stringify(
+    confirmation
+  )
+);
 
 
       showStatus(
