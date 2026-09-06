@@ -1,3 +1,683 @@
+/* =========================================================
+   THE NORDIC ABUJA
+   Page-specific styles
+   Booking + Rooms + Content + Responsive
+   ========================================================= */
 
-.page-hero{padding:180px 0 100px;background:#e8e4dc}.page-hero .container{display:flex;justify-content:space-between;align-items:end;gap:50px}.page-hero h1{max-width:850px}.page-hero-copy{max-width:450px;color:#66635c}.content-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:80px}.prose{font-size:17px}.prose p{margin:0 0 20px}.feature-list{display:grid;gap:0;border-top:1px solid var(--line)}.feature-list div{display:flex;justify-content:space-between;gap:30px;padding:16px 0;border-bottom:1px solid var(--line);font-size:13px}.muted{color:var(--muted)}.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.simple-card{background:#e9e5dd;padding:28px;min-height:220px}.simple-card img{height:220px;margin:-28px -28px 25px;width:calc(100% + 56px)}.room-list{display:grid;gap:14px}.room-row{display:grid;grid-template-columns:1fr 1.2fr .7fr;gap:30px;background:#e8e4dc}.room-row-image{height:360px}.room-row-info{padding:35px}.price{font:500 28px var(--serif)}.form-card{background:#fff;padding:35px;box-shadow:0 15px 45px rgba(0,0,0,.06)}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.form-field{display:flex;flex-direction:column;gap:7px}.form-field.full{grid-column:1/-1}.form-field label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.form-field input,.form-field select,.form-field textarea{border:1px solid var(--line);padding:13px;background:#fff;outline:0}.form-field textarea{min-height:120px;resize:vertical}.checklist{display:grid;gap:10px;padding:0;margin:20px 0;list-style:none}.checklist li:before{content:'✓';margin-right:10px}.notice{padding:15px;background:#ece8e0;font-size:12px}.booking-layout{display:grid;grid-template-columns:1.25fr .75fr;gap:35px}.summary{position:sticky;top:100px;background:#171715;color:#fff;padding:28px;height:max-content}.summary h3{font-size:27px}.summary-row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.13);padding:12px 0;font-size:12px}.summary-total{font-size:20px;font-weight:700;border-bottom:0}.steps{display:flex;gap:7px;margin-bottom:28px}.step{flex:1;height:5px;background:#ddd}.step.active{background:#171715}.faq-item{border-top:1px solid var(--line);padding:20px 0}.faq-item summary{cursor:pointer;font-weight:600}.faq-item p{color:var(--muted);max-width:750px}.contact-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.contact-card{background:#e9e5dd;padding:28px}.map-placeholder{height:350px;background:#d9d4cb;display:grid;place-items:center;color:#6d6b65}.legal{max-width:850px}.legal h2{font-size:34px;margin:50px 0 15px}.legal h3{font-size:20px;margin:30px 0 10px}
-@media(max-width:850px){.page-hero{padding:140px 0 70px}.page-hero .container,.content-grid,.booking-layout{grid-template-columns:1fr;display:grid}.cards-grid,.contact-cards{grid-template-columns:1fr}.room-row{grid-template-columns:1fr}.room-row-image{height:300px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.summary{position:static}}
+/* ---------- PAGE HERO ---------- */
+
+.page-hero {
+  padding: 180px 0 100px;
+  background: #e8e4dc;
+}
+
+.page-hero .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 50px;
+}
+
+.page-hero h1 {
+  max-width: 850px;
+}
+
+.page-hero-copy {
+  max-width: 450px;
+  color: #66635c;
+}
+
+
+/* ---------- CONTENT ---------- */
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 80px;
+}
+
+.prose {
+  font-size: 17px;
+}
+
+.prose p {
+  margin: 0 0 20px;
+}
+
+.feature-list {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.feature-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+
+/* ---------- CARDS ---------- */
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.simple-card {
+  background: #e9e5dd;
+  padding: 28px;
+  min-height: 220px;
+}
+
+.simple-card img {
+  height: 220px;
+  margin: -28px -28px 25px;
+  width: calc(100% + 56px);
+}
+
+
+/* ---------- ROOMS ---------- */
+
+.room-list {
+  display: grid;
+  gap: 14px;
+}
+
+.room-row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 0.7fr;
+  gap: 30px;
+  background: #e8e4dc;
+}
+
+.room-row-image {
+  height: 360px;
+}
+
+.room-row-info {
+  padding: 35px;
+}
+
+.price {
+  font: 500 28px var(--serif);
+}
+
+
+/* =========================================================
+   FORM SYSTEM
+   ========================================================= */
+
+.form-card {
+  background: #fff;
+  padding: 35px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.06);
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.form-field.full {
+  grid-column: 1 / -1;
+}
+
+.form-field label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  padding: 13px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+  border-radius: 0;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 2px rgba(23, 23, 21, 0.06);
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #9a9790;
+}
+
+.form-field select {
+  cursor: pointer;
+}
+
+.form-field textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   BOOKING PAGE
+   ========================================================= */
+
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 35px;
+  align-items: start;
+  width: 100%;
+}
+
+
+/* ---------- BOOKING FORM ---------- */
+
+.booking-layout form {
+  width: 100%;
+}
+
+.booking-layout .form-card {
+  position: relative;
+}
+
+.booking-layout .form-grid + * {
+  margin-top: 20px;
+}
+
+
+/* ---------- BOOKING STEPS ---------- */
+
+.steps {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 28px;
+  width: 100%;
+}
+
+.step {
+  flex: 1;
+  height: 5px;
+  background: #ddd;
+  transition: background 0.2s ease;
+}
+
+.step.active {
+  background: #171715;
+}
+
+
+/* ---------- AVAILABILITY / NOTICE ---------- */
+
+.notice {
+  padding: 15px;
+  background: #ece8e0;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 15px 0;
+}
+
+.booking-layout .notice:empty {
+  display: none;
+}
+
+
+/* ---------- CHECKLIST ---------- */
+
+.checklist {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 20px 0;
+  list-style: none;
+}
+
+.checklist li {
+  font-size: 13px;
+}
+
+.checklist li::before {
+  content: "✓";
+  margin-right: 10px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   IMPORTANT BOOKING BUTTON FIX
+   ========================================================= */
+
+/*
+   The HTML already contains:
+   #bookingSubmit.button.button-dark
+
+   These rules deliberately make the button visible,
+   full-width and easy to tap on mobile.
+*/
+
+#bookingSubmit {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 5 !important;
+
+  width: 100%;
+  min-height: 54px;
+  margin: 24px 0 0;
+  padding: 16px 22px;
+
+  align-items: center;
+  justify-content: center;
+
+  background: #171715 !important;
+  color: #ffffff !important;
+
+  border: 1px solid #171715 !important;
+  border-radius: 0;
+
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+
+  cursor: pointer;
+  pointer-events: auto !important;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#bookingSubmit:hover {
+  background: #2a2926 !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+#bookingSubmit:active {
+  transform: translateY(0);
+}
+
+#bookingSubmit:disabled {
+  opacity: 0.65 !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ---------- BUTTON ROWS INSIDE BOOKING ---------- */
+
+.booking-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.booking-actions .button {
+  width: 100%;
+}
+
+
+/* ---------- BOOKING SUMMARY ---------- */
+
+.summary {
+  position: sticky;
+  top: 100px;
+  background: #171715;
+  color: #fff;
+  padding: 28px;
+  height: max-content;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.summary h3 {
+  font-size: 27px;
+}
+
+.summary p {
+  color: #c8c5bd;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+  padding: 12px 0;
+
+  font-size: 12px;
+}
+
+.summary-row span:last-child {
+  text-align: right;
+}
+
+.summary-total {
+  font-size: 20px;
+  font-weight: 700;
+  border-bottom: 0;
+  margin-top: 5px;
+  padding-top: 18px;
+}
+
+.summary .button {
+  width: 100%;
+  margin-top: 18px;
+}
+
+
+/* =========================================================
+   BOOKING STATUS / DIAGNOSTICS
+   ========================================================= */
+
+#bookingStatus,
+#availabilityStatus,
+#bookingMessage,
+.booking-status {
+  width: 100%;
+  margin-top: 15px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.booking-success {
+  padding: 15px;
+  background: #e7eee5;
+  color: #294329;
+}
+
+.booking-error {
+  padding: 15px;
+  background: #f2e4e1;
+  color: #682d25;
+}
+
+.booking-loading {
+  padding: 15px;
+  background: #ece8e0;
+  color: #5e5b54;
+}
+
+
+/* =========================================================
+   FAQ
+   ========================================================= */
+
+.faq-item {
+  border-top: 1px solid var(--line);
+  padding: 20px 0;
+}
+
+.faq-item:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: "+";
+  float: right;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.faq-item[open] summary::after {
+  content: "−";
+}
+
+.faq-item p {
+  color: var(--muted);
+  max-width: 750px;
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   CONTACT
+   ========================================================= */
+
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.contact-card {
+  background: #e9e5dd;
+  padding: 28px;
+}
+
+.map-placeholder {
+  height: 350px;
+  background: #d9d4cb;
+  display: grid;
+  place-items: center;
+  color: #6d6b65;
+}
+
+
+/* =========================================================
+   LEGAL PAGES
+   ========================================================= */
+
+.legal {
+  max-width: 850px;
+}
+
+.legal h2 {
+  font-size: 34px;
+  margin: 50px 0 15px;
+}
+
+.legal h3 {
+  font-size: 20px;
+  margin: 30px 0 10px;
+}
+
+.legal p {
+  color: #55534d;
+}
+
+.legal ul,
+.legal ol {
+  padding-left: 22px;
+}
+
+.legal li {
+  margin-bottom: 8px;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+  .page-hero {
+    padding: 140px 0 70px;
+  }
+
+  .page-hero .container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .booking-layout {
+    grid-template-columns: 1fr;
+    display: grid;
+    gap: 25px;
+  }
+
+  .cards-grid,
+  .contact-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .room-row {
+    grid-template-columns: 1fr;
+  }
+
+  .room-row-image {
+    height: 300px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-field.full {
+    grid-column: auto;
+  }
+
+  .summary {
+    position: static;
+  }
+
+  #bookingSubmit {
+    width: 100%;
+    min-height: 56px;
+    margin-top: 24px;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 520px) {
+
+  .page-hero {
+    padding: 125px 0 60px;
+  }
+
+  .page-hero h1 {
+    font-size: 48px;
+  }
+
+  .form-card {
+    padding: 24px 18px;
+  }
+
+  .form-grid {
+    gap: 14px;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    padding: 14px 12px;
+    font-size: 16px;
+  }
+
+  .booking-layout {
+    gap: 20px;
+  }
+
+  .summary {
+    padding: 23px 20px;
+  }
+
+  .summary h3 {
+    font-size: 25px;
+  }
+
+  #bookingSubmit {
+    min-height: 58px;
+    padding: 17px 18px;
+    font-size: 13px;
+    margin-top: 22px;
+  }
+
+  .notice {
+    padding: 13px;
+  }
+
+  .faq-item {
+    padding: 18px 0;
+  }
+
+  .contact-card {
+    padding: 23px;
+  }
+}
+
+
+/* =========================================================
+   SAFETY OVERRIDES
+   ========================================================= */
+
+/*
+   Prevent accidental hiding of important booking controls
+   from inherited styles or future page changes.
+*/
+
+.booking-layout,
+.booking-layout .form-card,
+.booking-layout form,
+.booking-layout #bookingSubmit {
+  overflow: visible;
+}
+
+.booking-layout #bookingSubmit.button {
+  display: flex !important;
+}
+
+.booking-layout #bookingSubmit.button-dark {
+  background: #171715 !important;
+  color: #fff !important;
+}
