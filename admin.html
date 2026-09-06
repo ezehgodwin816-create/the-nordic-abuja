@@ -34,10 +34,6 @@
       display: none !important;
     }
 
-    /* =====================================================
-       LOGIN
-       ===================================================== */
-
     #loginScreen {
       min-height: 100vh;
       display: flex;
@@ -129,10 +125,6 @@
       font-size: 13px;
     }
 
-    /* =====================================================
-       APP
-       ===================================================== */
-
     #adminApp {
       min-height: 100vh;
     }
@@ -186,10 +178,6 @@
       min-height: calc(100vh - 72px);
     }
 
-    /* =====================================================
-       SIDEBAR
-       ===================================================== */
-
     .sidebar {
       width: 245px;
       background: #181818;
@@ -223,10 +211,6 @@
       color: #fff;
     }
 
-    /* =====================================================
-       MAIN
-       ===================================================== */
-
     .main {
       flex: 1;
       padding: 30px;
@@ -258,10 +242,6 @@
       border-radius: 9px;
     }
 
-    /* =====================================================
-       STAT CARDS
-       ===================================================== */
-
     .stats {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -289,10 +269,6 @@
       font-weight: 800;
     }
 
-    /* =====================================================
-       TOOLBAR
-       ===================================================== */
-
     .panel {
       background: #fff;
       border: 1px solid #e2e0dc;
@@ -316,10 +292,6 @@
       padding: 11px 12px;
       background: #fff;
     }
-
-    /* =====================================================
-       TABLE
-       ===================================================== */
 
     .table-wrap {
       overflow-x: auto;
@@ -367,10 +339,6 @@
     .muted {
       color: #777;
     }
-
-    /* =====================================================
-       STATUS
-       ===================================================== */
 
     .status {
       display: inline-flex;
@@ -424,10 +392,6 @@
       background: #f4f4f4;
     }
 
-    /* =====================================================
-       EMPTY / LOADING
-       ===================================================== */
-
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -449,10 +413,6 @@
       font-size: 13px;
     }
 
-    /* =====================================================
-       MODAL
-       ===================================================== */
-
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -466,7 +426,7 @@
 
     .modal {
       width: 100%;
-      max-width: 720px;
+      max-width: 760px;
       max-height: 90vh;
       overflow-y: auto;
       background: #fff;
@@ -530,6 +490,11 @@
       grid-column: 1 / -1;
     }
 
+    .money {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
     .modal-actions {
       padding: 18px 22px;
       border-top: 1px solid #eee;
@@ -559,10 +524,6 @@
       background: #e4f7e8;
       color: #18733a;
     }
-
-    /* =====================================================
-       RESPONSIVE
-       ===================================================== */
 
     @media (max-width: 1100px) {
       .stats {
@@ -643,1190 +604,1032 @@
         grid-column: auto;
       }
     }
-  </style></head><body>  <!-- =====================================================
-       LOGIN SCREEN
-       ===================================================== -->  <section id="loginScreen"><div class="login-card">
-
-  <div class="brand">
-    THE NORDIC ABUJA
-  </div>
-
-  <div class="brand-subtitle">
-    Secure administration
-  </div>
-
-  <form id="loginForm">
-
-    <div class="field">
-      <label for="loginEmail">Admin email</label>
-      <input
-        id="loginEmail"
-        type="email"
-        autocomplete="username"
-        required
-        placeholder="admin@example.com"
-      >
-    </div>
-
-    <div class="field">
-      <label for="loginPassword">Password</label>
-      <input
-        id="loginPassword"
-        type="password"
-        autocomplete="current-password"
-        required
-        placeholder="••••••••"
-      >
-    </div>
-
-    <button
-      class="primary-btn"
-      id="loginButton"
-      type="submit"
-    >
-      Sign in
-    </button>
-
-    <div
-      id="loginError"
-      class="login-error hidden"
-    ></div>
-
-  </form>
-
+  </style></head><body><section id="loginScreen">
+  <div class="login-card"><div class="brand">
+  THE NORDIC ABUJA
 </div>
 
-  </section>  <!-- =====================================================
-       ADMIN APP
-       ===================================================== -->  <section id="adminApp" class="hidden"><header class="topbar">
+<div class="brand-subtitle">
+  Secure administration
+</div>
 
-  <div class="topbar-left">
+<form id="loginForm">
 
-    <div class="topbar-logo">
-      THE NORDIC ABUJA
-    </div>
+  <div class="field">
+    <label for="loginEmail">Admin email</label>
+    <input
+      id="loginEmail"
+      type="email"
+      autocomplete="username"
+      required
+      placeholder="admin@example.com"
+    >
+  </div>
 
-    <div class="admin-label">
-      Administration
-    </div>
-
+  <div class="field">
+    <label for="loginPassword">Password</label>
+    <input
+      id="loginPassword"
+      type="password"
+      autocomplete="current-password"
+      required
+      placeholder="••••••••"
+    >
   </div>
 
   <button
-    class="logout-btn"
-    id="logoutButton"
-    type="button"
+    class="primary-btn"
+    id="loginButton"
+    type="submit"
   >
-    Sign out
+    Sign in
   </button>
 
-</header>
+  <div id="loginError" class="login-error hidden"></div>
 
-
-<div class="layout">
-
-  <!-- SIDEBAR -->
-
-  <aside class="sidebar">
-
-    <div class="sidebar-title">
-      Management
-    </div>
-
-    <button
-      class="nav-btn active"
-      type="button"
-      data-section="reservations"
-    >
-      Reservations
-    </button>
-
-    <button
-      class="nav-btn"
-      type="button"
-      data-section="rooms"
-    >
-      Rooms
-    </button>
-
-    <button
-      class="nav-btn"
-      type="button"
-      data-section="requests"
-    >
-      Hotel requests
-    </button>
-
-    <button
-      class="nav-btn"
-      type="button"
-      data-section="reviews"
-    >
-      Reviews
-    </button>
-
-    <button
-      class="nav-btn"
-      type="button"
-      data-section="settings"
-    >
-      Site settings
-    </button>
-
-  </aside>
-
-
-  <!-- MAIN CONTENT -->
-
-  <main class="main">
-
-    <section id="reservationsSection">
-
-      <div class="page-header">
-
-        <div>
-          <h1 class="page-title">
-            Reservations
-          </h1>
-
-          <p class="page-description">
-            Manage guest reservations and booking status.
-          </p>
-        </div>
-
-        <button
-          class="refresh-btn"
-          id="refreshReservations"
-          type="button"
-        >
-          Refresh
-        </button>
-
-      </div>
-
-
-      <!-- STATS -->
-
-      <div class="stats">
-
-        <div class="stat-card">
-          <div class="stat-label">
-            Total
-          </div>
-          <div
-            class="stat-value"
-            id="statTotal"
-          >
-            0
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            Pending
-          </div>
-          <div
-            class="stat-value"
-            id="statPending"
-          >
-            0
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            Confirmed
-          </div>
-          <div
-            class="stat-value"
-            id="statConfirmed"
-          >
-            0
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            Cancelled
-          </div>
-          <div
-            class="stat-value"
-            id="statCancelled"
-          >
-            0
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            Unpaid
-          </div>
-          <div
-            class="stat-value"
-            id="statUnpaid"
-          >
-            0
-          </div>
-        </div>
-
-      </div>
-
-
-      <!-- RESERVATIONS -->
-
-      <div class="panel">
-
-        <div class="toolbar">
-
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Search name, email or confirmation number..."
-          >
-
-          <select id="statusFilter">
-
-            <option value="all">
-              All reservation statuses
-            </option>
-
-            <option value="pending">
-              Pending
-            </option>
-
-            <option value="confirmed">
-              Confirmed
-            </option>
-
-            <option value="cancelled">
-              Cancelled
-            </option>
-
-            <option value="completed">
-              Completed
-            </option>
-
-          </select>
-
-          <select id="paymentFilter">
-
-            <option value="all">
-              All payments
-            </option>
-
-            <option value="unpaid">
-              Unpaid
-            </option>
-
-            <option value="paid">
-              Paid
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <div id="tableContainer">
-
-          <div class="loading">
-            Loading reservations...
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- PLACEHOLDER SECTIONS -->
-
-    <section
-      id="roomsSection"
-      class="hidden"
-    >
-
-      <div class="page-header">
-
-        <div>
-          <h1 class="page-title">
-            Rooms
-          </h1>
-
-          <p class="page-description">
-            Room inventory management will be connected here.
-          </p>
-        </div>
-
-      </div>
-
-      <div class="panel">
-        <div class="empty-state">
-          Room management is the next module.
-        </div>
-      </div>
-
-    </section>
-
-
-    <section
-      id="requestsSection"
-      class="hidden"
-    >
-
-      <div class="page-header">
-
-        <div>
-          <h1 class="page-title">
-            Hotel requests
-          </h1>
-
-          <p class="page-description">
-            Guest concierge and hotel requests.
-          </p>
-        </div>
-
-      </div>
-
-      <div class="panel">
-        <div class="empty-state">
-          Hotel request management is the next module.
-        </div>
-      </div>
-
-    </section>
-
-
-    <section
-      id="reviewsSection"
-      class="hidden"
-    >
-
-      <div class="page-header">
-
-        <div>
-          <h1 class="page-title">
-            Reviews
-          </h1>
-
-          <p class="page-description">
-            Review moderation and publishing.
-          </p>
-        </div>
-
-      </div>
-
-      <div class="panel">
-        <div class="empty-state">
-          Review management is the next module.
-        </div>
-      </div>
-
-    </section>
-
-
-    <section
-      id="settingsSection"
-      class="hidden"
-    >
-
-      <div class="page-header">
-
-        <div>
-          <h1 class="page-title">
-            Site settings
-          </h1>
-
-          <p class="page-description">
-            Hotel website settings.
-          </p>
-        </div>
-
-      </div>
-
-      <div class="panel">
-        <div class="empty-state">
-          Site settings management is the next module.
-        </div>
-      </div>
-
-    </section>
-
-  </main>
-
-</div>
-
-  </section>  <!-- =====================================================
-       RESERVATION MODAL
-       ===================================================== -->  <div
-    id="reservationModal"
-    class="modal-backdrop hidden"
-  ><div class="modal">
-
-  <div class="modal-header">
-
-    <h2>
-      Reservation details
-    </h2>
-
-    <button
-      class="close-btn"
-      id="closeModal"
-      type="button"
-    >
-      ×
-    </button>
+</form>
 
   </div>
+</section><section id="adminApp" class="hidden">  <header class="topbar"><div class="topbar-left">
 
-  <div
-    class="modal-body"
-    id="reservationDetails"
-  ></div>
+  <div class="topbar-logo">
+    THE NORDIC ABUJA
+  </div>
 
-  <div
-    class="modal-actions"
-    id="reservationActions"
-  ></div>
+  <div class="admin-label">
+    Administration
+  </div>
 
 </div>
 
-  </div>  <script>
-    /* =====================================================
-       SUPABASE CONFIGURATION
-       ===================================================== */
+<button
+  class="logout-btn"
+  id="logoutButton"
+  type="button"
+>
+  Sign out
+</button>
 
-    const SUPABASE_URL =
-      "https://rzjvhfnizwckzbdawrbn.supabase.co";
+  </header>  <div class="layout"><aside class="sidebar">
 
-    const SUPABASE_ANON_KEY =
-      "sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob";
+  <div class="sidebar-title">
+    Management
+  </div>
 
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
+  <button
+    class="nav-btn active"
+    type="button"
+    data-section="reservations"
+  >
+    Reservations
+  </button>
+
+  <button
+    class="nav-btn"
+    type="button"
+    data-section="rooms"
+  >
+    Rooms
+  </button>
+
+  <button
+    class="nav-btn"
+    type="button"
+    data-section="requests"
+  >
+    Hotel requests
+  </button>
+
+  <button
+    class="nav-btn"
+    type="button"
+    data-section="reviews"
+  >
+    Reviews
+  </button>
+
+  <button
+    class="nav-btn"
+    type="button"
+    data-section="settings"
+  >
+    Site settings
+  </button>
+
+</aside>
+
+
+<main class="main">
+
+  <section id="reservationsSection">
+
+    <div class="page-header">
+
+      <div>
+        <h1 class="page-title">
+          Reservations
+        </h1>
+
+        <p class="page-description">
+          Manage guest reservations and booking status.
+        </p>
+      </div>
+
+      <button
+        class="refresh-btn"
+        id="refreshReservations"
+        type="button"
+      >
+        Refresh
+      </button>
+
+    </div>
+
+
+    <div class="stats">
+
+      <div class="stat-card">
+        <div class="stat-label">Total</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value" id="statPending">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Confirmed</div>
+        <div class="stat-value" id="statConfirmed">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Cancelled</div>
+        <div class="stat-value" id="statCancelled">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Unpaid</div>
+        <div class="stat-value" id="statUnpaid">0</div>
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="toolbar">
+
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search name, email or confirmation number..."
+        >
+
+        <select id="statusFilter">
+
+          <option value="all">
+            All reservation statuses
+          </option>
+
+          <option value="pending">
+            Pending
+          </option>
+
+          <option value="confirmed">
+            Confirmed
+          </option>
+
+          <option value="cancelled">
+            Cancelled
+          </option>
+
+          <option value="completed">
+            Completed
+          </option>
+
+        </select>
+
+        <select id="paymentFilter">
+
+          <option value="all">
+            All payments
+          </option>
+
+          <option value="unpaid">
+            Unpaid
+          </option>
+
+          <option value="paid">
+            Paid
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div id="tableContainer">
+        <div class="loading">
+          Loading reservations...
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section id="roomsSection" class="hidden">
+
+    <div class="page-header">
+
+      <div>
+        <h1 class="page-title">
+          Rooms
+        </h1>
+
+        <p class="page-description">
+          Room inventory management will be connected here.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="panel">
+      <div class="empty-state">
+        Room management is the next module.
+      </div>
+    </div>
+
+  </section>
+
+
+  <section id="requestsSection" class="hidden">
+
+    <div class="page-header">
+
+      <div>
+        <h1 class="page-title">
+          Hotel requests
+        </h1>
+
+        <p class="page-description">
+          Guest concierge and hotel requests.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="panel">
+      <div class="empty-state">
+        Hotel request management is the next module.
+      </div>
+    </div>
+
+  </section>
+
+
+  <section id="reviewsSection" class="hidden">
+
+    <div class="page-header">
+
+      <div>
+        <h1 class="page-title">
+          Reviews
+        </h1>
+
+        <p class="page-description">
+          Review moderation and publishing.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="panel">
+      <div class="empty-state">
+        Review management is the next module.
+      </div>
+    </div>
+
+  </section>
+
+
+  <section id="settingsSection" class="hidden">
+
+    <div class="page-header">
+
+      <div>
+        <h1 class="page-title">
+          Site settings
+        </h1>
+
+        <p class="page-description">
+          Hotel website settings.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="panel">
+      <div class="empty-state">
+        Site settings management is the next module.
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+  </div></section><div id="reservationModal" class="modal-backdrop hidden">  <div class="modal"><div class="modal-header">
+
+  <h2>
+    Reservation details
+  </h2>
+
+  <button
+    class="close-btn"
+    id="closeModal"
+    type="button"
+  >
+    ×
+  </button>
+
+</div>
+
+<div
+  class="modal-body"
+  id="reservationDetails"
+></div>
+
+<div
+  class="modal-actions"
+  id="reservationActions"
+></div>
+
+  </div></div><script>
+
+  /* =====================================================
+     SUPABASE
+     ===================================================== */
+
+  const SUPABASE_URL =
+    "https://rzjvhfnizwckzbdawrbn.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+  /* =====================================================
+     ELEMENTS
+     ===================================================== */
+
+  const loginScreen =
+    document.getElementById("loginScreen");
+
+  const adminApp =
+    document.getElementById("adminApp");
+
+  const loginForm =
+    document.getElementById("loginForm");
+
+  const loginButton =
+    document.getElementById("loginButton");
+
+  const loginError =
+    document.getElementById("loginError");
+
+  const logoutButton =
+    document.getElementById("logoutButton");
+
+  const tableContainer =
+    document.getElementById("tableContainer");
+
+  const searchInput =
+    document.getElementById("searchInput");
+
+  const statusFilter =
+    document.getElementById("statusFilter");
+
+  const paymentFilter =
+    document.getElementById("paymentFilter");
+
+  const reservationModal =
+    document.getElementById("reservationModal");
+
+  const reservationDetails =
+    document.getElementById("reservationDetails");
+
+  const reservationActions =
+    document.getElementById("reservationActions");
+
+
+  /* =====================================================
+     STATE
+     ===================================================== */
+
+  let reservations = [];
+  let selectedReservation = null;
+
+
+  /* =====================================================
+     HELPERS
+     ===================================================== */
+
+  function showLoginError(message) {
+    loginError.textContent = message;
+    loginError.classList.remove("hidden");
+  }
+
+  function clearLoginError() {
+    loginError.textContent = "";
+    loginError.classList.add("hidden");
+  }
+
+
+  function escapeHtml(value) {
+
+    if (
+      value === null ||
+      value === undefined
+    ) {
+      return "";
+    }
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+
+  function formatDate(value) {
+
+    if (!value) {
+      return "—";
+    }
+
+    const date =
+      new Date(value + "T00:00:00");
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleDateString(
+      "en-GB",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      }
+    );
+  }
+
+
+  function formatStatus(value) {
+
+    return String(value || "unknown")
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, letter =>
+        letter.toUpperCase()
       );
+  }
 
 
-    /* =====================================================
-       ELEMENTS
-       ===================================================== */
+  function statusClass(value) {
 
-    const loginScreen =
-      document.getElementById("loginScreen");
+    const normalized =
+      String(value || "")
+        .toLowerCase();
 
-    const adminApp =
-      document.getElementById("adminApp");
-
-    const loginForm =
-      document.getElementById("loginForm");
-
-    const loginButton =
-      document.getElementById("loginButton");
-
-    const loginError =
-      document.getElementById("loginError");
-
-    const logoutButton =
-      document.getElementById("logoutButton");
-
-    const tableContainer =
-      document.getElementById("tableContainer");
-
-    const searchInput =
-      document.getElementById("searchInput");
-
-    const statusFilter =
-      document.getElementById("statusFilter");
-
-    const paymentFilter =
-      document.getElementById("paymentFilter");
-
-    const reservationModal =
-      document.getElementById("reservationModal");
-
-    const reservationDetails =
-      document.getElementById("reservationDetails");
-
-    const reservationActions =
-      document.getElementById("reservationActions");
-
-
-    /* =====================================================
-       STATE
-       ===================================================== */
-
-    let reservations = [];
-    let selectedReservation = null;
-
-
-    /* =====================================================
-       LOGIN ERROR
-       ===================================================== */
-
-    function showLoginError(message) {
-      loginError.textContent = message;
-      loginError.classList.remove("hidden");
+    if (normalized === "confirmed") {
+      return "status-confirmed";
     }
 
-
-    function clearLoginError() {
-      loginError.textContent = "";
-      loginError.classList.add("hidden");
+    if (
+      normalized === "cancelled" ||
+      normalized === "canceled"
+    ) {
+      return "status-cancelled";
     }
 
-
-    /* =====================================================
-       FORMATTERS
-       ===================================================== */
-
-    function escapeHtml(value) {
-      if (value === null || value === undefined) {
-        return "";
-      }
-
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    if (normalized === "completed") {
+      return "status-completed";
     }
 
+    return "status-pending";
+  }
 
-    function formatDate(value) {
-      if (!value) {
-        return "—";
-      }
 
-      const date =
-        new Date(value + "T00:00:00");
+  function paymentClass(value) {
 
-      if (Number.isNaN(date.getTime())) {
-        return value;
-      }
+    return String(value || "")
+      .toLowerCase() === "paid"
+      ? "status-paid"
+      : "status-unpaid";
+  }
 
-      return date.toLocaleDateString(
-        "en-GB",
+
+  function formatMoney(value) {
+
+    const amount =
+      Number(value);
+
+    if (
+      !Number.isFinite(amount) ||
+      amount === 0
+    ) {
+      return "Rate on request";
+    }
+
+    return "₦" +
+      amount.toLocaleString(
+        "en-NG",
         {
-          day: "2-digit",
-          month: "short",
-          year: "numeric"
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
         }
       );
+  }
+
+
+  /* =====================================================
+     AUTH
+     ===================================================== */
+
+  async function checkSession() {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.getSession();
+
+    if (error) {
+
+      console.error(error);
+
+      showLogin();
+
+      return;
     }
 
-
-    function formatStatus(value) {
-      return String(value || "unknown")
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, letter =>
-          letter.toUpperCase()
-        );
+    if (data.session) {
+      await showAdmin();
+    } else {
+      showLogin();
     }
+  }
 
 
-    function statusClass(value) {
-      const normalized =
-        String(value || "")
-          .toLowerCase();
+  function showLogin() {
 
-      if (
-        normalized === "confirmed"
-      ) {
-        return "status-confirmed";
-      }
-
-      if (
-        normalized === "cancelled" ||
-        normalized === "canceled"
-      ) {
-        return "status-cancelled";
-      }
-
-      if (
-        normalized === "completed"
-      ) {
-        return "status-completed";
-      }
-
-      return "status-pending";
-    }
+    loginScreen.classList.remove("hidden");
+    adminApp.classList.add("hidden");
+  }
 
 
-    function paymentClass(value) {
-      return String(value || "")
-        .toLowerCase() === "paid"
-        ? "status-paid"
-        : "status-unpaid";
-    }
+  async function showAdmin() {
+
+    loginScreen.classList.add("hidden");
+    adminApp.classList.remove("hidden");
+
+    await loadReservations();
+  }
 
 
-    /* =====================================================
-       AUTH SESSION
-       ===================================================== */
+  /* =====================================================
+     LOGIN
+     ===================================================== */
 
-    async function checkSession() {
+  loginForm.addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+      clearLoginError();
+
+      loginButton.disabled = true;
+      loginButton.textContent =
+        "Signing in...";
+
+      const email =
+        document
+          .getElementById("loginEmail")
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById("loginPassword")
+          .value;
 
       const {
         data,
         error
       } =
-        await supabaseClient.auth.getSession();
+        await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
 
       if (error) {
+
         console.error(error);
-        return;
-      }
 
-      if (data.session) {
-        await showAdmin();
-      } else {
-        showLogin();
-      }
-    }
-
-
-    function showLogin() {
-      loginScreen.classList.remove("hidden");
-      adminApp.classList.add("hidden");
-    }
-
-
-    async function showAdmin() {
-      loginScreen.classList.add("hidden");
-      adminApp.classList.remove("hidden");
-
-      await loadReservations();
-    }
-
-
-    /* =====================================================
-       LOGIN
-       ===================================================== */
-
-    loginForm.addEventListener(
-      "submit",
-      async function(event) {
-
-        event.preventDefault();
-
-        clearLoginError();
-
-        loginButton.disabled = true;
-        loginButton.textContent =
-          "Signing in...";
-
-        const email =
-          document
-            .getElementById("loginEmail")
-            .value
-            .trim();
-
-        const password =
-          document
-            .getElementById("loginPassword")
-            .value;
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-          });
-
-        if (error) {
-
-          console.error(error);
-
-          showLoginError(
-            error.message ||
-            "Unable to sign in."
-          );
-
-          loginButton.disabled = false;
-          loginButton.textContent =
-            "Sign in";
-
-          return;
-        }
-
-        if (!data.session) {
-
-          showLoginError(
-            "No active session was created."
-          );
-
-          loginButton.disabled = false;
-          loginButton.textContent =
-            "Sign in";
-
-          return;
-        }
+        showLoginError(
+          error.message ||
+          "Unable to sign in."
+        );
 
         loginButton.disabled = false;
         loginButton.textContent =
           "Sign in";
 
-        await showAdmin();
+        return;
       }
-    );
 
+      if (!data.session) {
 
-    /* =====================================================
-       LOGOUT
-       ===================================================== */
-
-    logoutButton.addEventListener(
-      "click",
-      async function() {
-
-        await supabaseClient.auth.signOut();
-
-        reservations = [];
-
-        showLogin();
-
-      }
-    );
-
-
-    /* =====================================================
-       LOAD RESERVATIONS
-       ===================================================== */
-
-    async function loadReservations() {
-
-      tableContainer.innerHTML =
-        '<div class="loading">Loading reservations...</div>';
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient
-          .from("bookings")
-          .select(`
-            id,
-            booking_reference,
-            room_type_id,
-            room_id,
-            guest_first_name,
-            guest_last_name,
-            guest_email,
-            guest_phone,
-            adults,
-            children,
-            check_in,
-            check_out,
-            nights,
-            price_per_night,
-            total_amount,
-            status,
-            payment_status,
-            special_requests,
-            created_at
-          `)
-          .order(
-            "created_at",
-            {
-              ascending: false
-            }
-          );
-
-      if (error) {
-
-        console.error(
-          "Reservation loading error:",
-          error
+        showLoginError(
+          "No active session was created."
         );
 
-        tableContainer.innerHTML = `
-          <div class="error-box">
-            <strong>Unable to load reservations.</strong>
-            <br><br>
-            ${escapeHtml(error.message)}
-            <br><br>
-            If this is a permissions error, we need to configure the
-            Supabase admin RLS policy next.
-          </div>
-        `;
-
-        updateStats([]);
+        loginButton.disabled = false;
+        loginButton.textContent =
+          "Sign in";
 
         return;
       }
 
-      reservations =
-        Array.isArray(data)
-          ? data
-          : [];
+      loginButton.disabled = false;
+      loginButton.textContent =
+        "Sign in";
 
-      updateStats(reservations);
-      renderReservations();
+      await showAdmin();
+    }
+  );
+
+
+  /* =====================================================
+     LOGOUT
+     ===================================================== */
+
+  logoutButton.addEventListener(
+    "click",
+    async function() {
+
+      await supabaseClient.auth.signOut();
+
+      reservations = [];
+
+      showLogin();
+    }
+  );
+
+
+  /* =====================================================
+     LOAD RESERVATIONS
+     IMPORTANT:
+     bookings uses room_price, NOT price_per_night.
+     ===================================================== */
+
+  async function loadReservations() {
+
+    tableContainer.innerHTML =
+      '<div class="loading">Loading reservations...</div>';
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("bookings")
+        .select(`
+          id,
+          booking_reference,
+          room_type_id,
+          room_id,
+          guest_first_name,
+          guest_last_name,
+          guest_email,
+          guest_phone,
+          adults,
+          children,
+          check_in,
+          check_out,
+          nights,
+          room_price,
+          extras_total,
+          discount_total,
+          total_amount,
+          special_requests,
+          status,
+          payment_status,
+          payment_reference,
+          created_at,
+          updated_at
+        `)
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
+
+
+    if (error) {
+
+      console.error(
+        "Reservation loading error:",
+        error
+      );
+
+      tableContainer.innerHTML = `
+        <div class="error-box">
+          <strong>Unable to load reservations.</strong>
+          <br><br>
+          ${escapeHtml(error.message)}
+        </div>
+      `;
+
+      updateStats([]);
+
+      return;
     }
 
 
-    /* =====================================================
-       STATS
-       ===================================================== */
+    reservations =
+      Array.isArray(data)
+        ? data
+        : [];
 
-    function updateStats(list) {
+    updateStats(reservations);
 
-      const total =
-        list.length;
+    renderReservations();
+  }
 
-      const pending =
-        list.filter(
-          item =>
-            String(item.status)
-              .toLowerCase() ===
-            "pending"
-        ).length;
 
-      const confirmed =
-        list.filter(
-          item =>
-            String(item.status)
-              .toLowerCase() ===
-            "confirmed"
-        ).length;
+  /* =====================================================
+     STATS
+     ===================================================== */
 
-      const cancelled =
-        list.filter(
-          item =>
-            ["cancelled", "canceled"]
-              .includes(
-                String(item.status)
-                  .toLowerCase()
-              )
-        ).length;
+  function updateStats(list) {
 
-      const unpaid =
-        list.filter(
-          item =>
-            String(item.payment_status)
-              .toLowerCase() !==
-            "paid"
-        ).length;
+    const total =
+      list.length;
 
-      document.getElementById(
-        "statTotal"
-      ).textContent = total;
+    const pending =
+      list.filter(
+        item =>
+          String(item.status)
+            .toLowerCase() ===
+          "pending"
+      ).length;
 
-      document.getElementById(
-        "statPending"
-      ).textContent = pending;
+    const confirmed =
+      list.filter(
+        item =>
+          String(item.status)
+            .toLowerCase() ===
+          "confirmed"
+      ).length;
 
-      document.getElementById(
-        "statConfirmed"
-      ).textContent = confirmed;
+    const cancelled =
+      list.filter(
+        item =>
+          ["cancelled", "canceled"]
+            .includes(
+              String(item.status)
+                .toLowerCase()
+            )
+      ).length;
 
-      document.getElementById(
-        "statCancelled"
-      ).textContent = cancelled;
+    const unpaid =
+      list.filter(
+        item =>
+          String(item.payment_status)
+            .toLowerCase() !==
+          "paid"
+      ).length;
 
-      document.getElementById(
-        "statUnpaid"
-      ).textContent = unpaid;
+
+    document.getElementById(
+      "statTotal"
+    ).textContent = total;
+
+    document.getElementById(
+      "statPending"
+    ).textContent = pending;
+
+    document.getElementById(
+      "statConfirmed"
+    ).textContent = confirmed;
+
+    document.getElementById(
+      "statCancelled"
+    ).textContent = cancelled;
+
+    document.getElementById(
+      "statUnpaid"
+    ).textContent = unpaid;
+  }
+
+
+  /* =====================================================
+     FILTERING
+     ===================================================== */
+
+  function getFilteredReservations() {
+
+    const search =
+      searchInput.value
+        .trim()
+        .toLowerCase();
+
+    const status =
+      statusFilter.value;
+
+    const payment =
+      paymentFilter.value;
+
+
+    return reservations.filter(
+      reservation => {
+
+        const fullName =
+          `${reservation.guest_first_name || ""} ${reservation.guest_last_name || ""}`
+            .trim()
+            .toLowerCase();
+
+        const email =
+          String(
+            reservation.guest_email || ""
+          ).toLowerCase();
+
+        const reference =
+          String(
+            reservation.booking_reference || ""
+          ).toLowerCase();
+
+
+        const matchesSearch =
+          !search ||
+          fullName.includes(search) ||
+          email.includes(search) ||
+          reference.includes(search);
+
+
+        const matchesStatus =
+          status === "all" ||
+          String(
+            reservation.status || ""
+          ).toLowerCase() === status;
+
+
+        const matchesPayment =
+          payment === "all" ||
+          String(
+            reservation.payment_status || ""
+          ).toLowerCase() === payment;
+
+
+        return (
+          matchesSearch &&
+          matchesStatus &&
+          matchesPayment
+        );
+      }
+    );
+  }
+
+
+  searchInput.addEventListener(
+    "input",
+    renderReservations
+  );
+
+  statusFilter.addEventListener(
+    "change",
+    renderReservations
+  );
+
+  paymentFilter.addEventListener(
+    "change",
+    renderReservations
+  );
+
+
+  /* =====================================================
+     RENDER TABLE
+     ===================================================== */
+
+  function renderReservations() {
+
+    const list =
+      getFilteredReservations();
+
+
+    if (!list.length) {
+
+      tableContainer.innerHTML = `
+        <div class="empty-state">
+          <strong>No reservations found.</strong>
+          <br><br>
+          Try changing your search or filters.
+        </div>
+      `;
+
+      return;
     }
 
 
-    /* =====================================================
-       FILTERING
-       ===================================================== */
-
-    function getFilteredReservations() {
-
-      const search =
-        searchInput.value
-          .trim()
-          .toLowerCase();
-
-      const status =
-        statusFilter.value;
-
-      const payment =
-        paymentFilter.value;
-
-      return reservations.filter(
+    const rows =
+      list.map(
         reservation => {
 
           const fullName =
             `${reservation.guest_first_name || ""} ${reservation.guest_last_name || ""}`
-              .trim()
-              .toLowerCase();
-
-          const email =
-            String(
-              reservation.guest_email || ""
-            ).toLowerCase();
-
-          const reference =
-            String(
-              reservation.booking_reference || ""
-            ).toLowerCase();
-
-          const matchesSearch =
-            !search ||
-            fullName.includes(search) ||
-            email.includes(search) ||
-            reference.includes(search);
-
-          const matchesStatus =
-            status === "all" ||
-            String(
-              reservation.status || ""
-            ).toLowerCase() === status;
-
-          const matchesPayment =
-            payment === "all" ||
-            String(
-              reservation.payment_status || ""
-            ).toLowerCase() === payment;
-
-          return (
-            matchesSearch &&
-            matchesStatus &&
-            matchesPayment
-          );
-        }
-      );
-    }
+              .trim() ||
+            "Guest";
 
 
-    searchInput.addEventListener(
-      "input",
-      renderReservations
-    );
+          const adults =
+            Number(
+              reservation.adults || 0
+            );
 
-    statusFilter.addEventListener(
-      "change",
-      renderReservations
-    );
-
-    paymentFilter.addEventListener(
-      "change",
-      renderReservations
-    );
+          const children =
+            Number(
+              reservation.children || 0
+            );
 
 
-    /* =====================================================
-       RENDER TABLE
-       ===================================================== */
+          return `
+            <tr>
 
-    function renderReservations() {
-
-      const list =
-        getFilteredReservations();
-
-      if (!list.length) {
-
-        tableContainer.innerHTML = `
-          <div class="empty-state">
-            <strong>No reservations found.</strong>
-            <br><br>
-            Try changing your search or filters.
-          </div>
-        `;
-
-        return;
-      }
-
-      const rows =
-        list.map(
-          reservation => {
-
-            const fullName =
-              `${reservation.guest_first_name || ""} ${reservation.guest_last_name || ""}`
-                .trim() ||
-              "Guest";
-
-            const adults =
-              Number(
-                reservation.adults || 0
-              );
-
-            const children =
-              Number(
-                reservation.children || 0
-              );
-
-            return `
-              <tr>
-
-                <td>
-                  <div class="reference">
-                    ${escapeHtml(
-                      reservation.booking_reference ||
-                      "—"
-                    )}
-                  </div>
-                </td>
-
-                <td>
-                  <div class="guest-name">
-                    ${escapeHtml(fullName)}
-                  </div>
-
-                  <div class="muted">
-                    ${escapeHtml(
-                      reservation.guest_email ||
-                      "No email"
-                    )}
-                  </div>
-                </td>
-
-                <td>
-                  ${formatDate(
-                    reservation.check_in
+              <td>
+                <div class="reference">
+                  ${escapeHtml(
+                    reservation.booking_reference ||
+                    "—"
                   )}
-                  <br>
-                  <span class="muted">
-                    →
-                    ${formatDate(
-                      reservation.check_out
-                    )}
-                  </span>
-                </td>
-
-                <td>
-                  ${adults} adult${adults === 1 ? "" : "s"}
-                  ${
-                    children
-                      ? `<br>${children} child${children === 1 ? "" : "ren"}`
-                      : ""
-                  }
-                </td>
-
-                <td>
-                  <span class="status ${statusClass(
-                    reservation.status
-                  )}">
-                    ${escapeHtml(
-                      formatStatus(
-                        reservation.status
-                      )
-                    )}
-                  </span>
-                </td>
-
-                <td>
-                  <span class="status ${paymentClass(
-                    reservation.payment_status
-                  )}">
-                    ${escapeHtml(
-                      formatStatus(
-                        reservation.payment_status
-                      )
-                    )}
-                  </span>
-                </td>
-
-                <td>
-                  <button
-                    class="action-btn"
-                    type="button"
-                    onclick="openReservation('${escapeHtml(
-                      reservation.id
-                    )}')"
-                  >
-                    View
-                  </button>
-                </td>
-
-              </tr>
-            `;
-          }
-        ).join("");
-
-      tableContainer.innerHTML = `
-        <div class="table-wrap">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Confirmation</th>
-                <th>Guest</th>
-                <th>Stay</th>
-                <th>Guests</th>
-                <th>Reservation</th>
-                <th>Payment</th>
-                <th></th>
-              </tr>
-            </thead>
-
-            <tbody>
-              ${rows}
-            </tbody>
-
-          </table>
-
-        </div>
-      `;
-    }
+                </div>
+              </td>
 
 
-    /* =====================================================
-       OPEN RESERVATION
-       ===================================================== */
+              <td>
+                <div class="guest-name">
+                  ${escapeHtml(fullName)}
+                </div>
 
-    window.openReservation =
-      function(id) {
+                <div class="muted">
+                  ${escapeHtml(
+                    reservation.guest_email ||
+                    "No email"
+                  )}
+                </div>
+              </td>
 
-        const reservation =
-          reservations.find(
-            item =>
-              String(item.id) ===
-              String(id)
-          );
 
-        if (!reservation) {
-          return;
-        }
-
-        selectedReservation =
-          reservation;
-
-        const fullName =
-          `${reservation.guest_first_name || ""} ${reservation.guest_last_name || ""}`
-            .trim() ||
-          "Guest";
-
-        const guestCount =
-          `${Number(reservation.adults || 0)} adult${Number(reservation.adults || 0) === 1 ? "" : "s"}` +
-          (
-            Number(reservation.children || 0)
-              ? `, ${Number(reservation.children)} child${Number(reservation.children) === 1 ? "" : "ren"}`
-              : ""
-          );
-
-        reservationDetails.innerHTML = `
-
-          <div class="detail-grid">
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Confirmation
-              </div>
-              <div class="detail-value">
-                ${escapeHtml(
-                  reservation.booking_reference ||
-                  "—"
+              <td>
+                ${formatDate(
+                  reservation.check_in
                 )}
-              </div>
-            </div>
+                <br>
 
-            <div class="detail-item">
-              <div class="detail-label">
-                Reservation status
-              </div>
-              <div class="detail-value">
+                <span class="muted">
+                  →
+                  ${formatDate(
+                    reservation.check_out
+                  )}
+                </span>
+              </td>
+
+
+              <td>
+                ${adults}
+                adult${adults === 1 ? "" : "s"}
+
+                ${
+                  children
+                    ? `<br>${children} child${children === 1 ? "" : "ren"}`
+                    : ""
+                }
+              </td>
+
+
+              <td>
                 <span class="status ${statusClass(
                   reservation.status
                 )}">
@@ -1836,90 +1639,10 @@
                     )
                   )}
                 </span>
-              </div>
-            </div>
+              </td>
 
-            <div class="detail-item">
-              <div class="detail-label">
-                Guest
-              </div>
-              <div class="detail-value">
-                ${escapeHtml(fullName)}
-              </div>
-            </div>
 
-            <div class="detail-item">
-              <div class="detail-label">
-                Guests
-              </div>
-              <div class="detail-value">
-                ${escapeHtml(guestCount)}
-              </div>
-            </div>
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Email
-              </div>
-              <div class="detail-value">
-                ${escapeHtml(
-                  reservation.guest_email ||
-                  "Not provided"
-                )}
-              </div>
-            </div>
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Phone
-              </div>
-              <div class="detail-value">
-                ${escapeHtml(
-                  reservation.guest_phone ||
-                  "Not provided"
-                )}
-              </div>
-            </div>
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Check-in
-              </div>
-              <div class="detail-value">
-                ${formatDate(
-                  reservation.check_in
-                )}
-              </div>
-            </div>
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Check-out
-              </div>
-              <div class="detail-value">
-                ${formatDate(
-                  reservation.check_out
-                )}
-              </div>
-            </div>
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Nights
-              </div>
-              <div class="detail-value">
-                ${escapeHtml(
-                  reservation.nights ||
-                  "—"
-                )}
-              </div>
-            </div>
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Payment
-              </div>
-              <div class="detail-value">
+              <td>
                 <span class="status ${paymentClass(
                   reservation.payment_status
                 )}">
@@ -1929,331 +1652,663 @@
                     )
                   )}
                 </span>
-              </div>
+              </td>
+
+
+              <td>
+                <button
+                  class="action-btn"
+                  type="button"
+                  onclick="openReservation('${reservation.id}')"
+                >
+                  View
+                </button>
+              </td>
+
+            </tr>
+          `;
+        }
+      ).join("");
+
+
+    tableContainer.innerHTML = `
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Confirmation</th>
+              <th>Guest</th>
+              <th>Stay</th>
+              <th>Guests</th>
+              <th>Reservation</th>
+              <th>Payment</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${rows}
+          </tbody>
+
+        </table>
+
+      </div>
+    `;
+  }
+
+
+  /* =====================================================
+     OPEN RESERVATION
+     ===================================================== */
+
+  window.openReservation =
+    function(id) {
+
+      const reservation =
+        reservations.find(
+          item =>
+            String(item.id) ===
+            String(id)
+        );
+
+
+      if (!reservation) {
+        return;
+      }
+
+
+      selectedReservation =
+        reservation;
+
+
+      const fullName =
+        `${reservation.guest_first_name || ""} ${reservation.guest_last_name || ""}`
+          .trim() ||
+        "Guest";
+
+
+      const adults =
+        Number(
+          reservation.adults || 0
+        );
+
+      const children =
+        Number(
+          reservation.children || 0
+        );
+
+
+      const guestCount =
+        `${adults} adult${adults === 1 ? "" : "s"}` +
+        (
+          children
+            ? `, ${children} child${children === 1 ? "" : "ren"}`
+            : ""
+        );
+
+
+      reservationDetails.innerHTML = `
+
+        <div class="detail-grid">
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Confirmation
             </div>
 
-            <div class="detail-item">
-              <div class="detail-label">
-                Room ID
-              </div>
-              <div class="detail-value">
-                ${escapeHtml(
-                  reservation.room_id ||
-                  "Not assigned"
-                )}
-              </div>
+            <div class="detail-value">
+              ${escapeHtml(
+                reservation.booking_reference ||
+                "—"
+              )}
             </div>
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Room type ID
-              </div>
-              <div class="detail-value">
-                ${escapeHtml(
-                  reservation.room_type_id ||
-                  "—"
-                )}
-              </div>
-            </div>
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Price / night
-              </div>
-              <div class="detail-value">
-                ${
-                  reservation.price_per_night
-                    ? escapeHtml(
-                        reservation.price_per_night
-                      )
-                    : "Rate on request"
-                }
-              </div>
-            </div>
-
-            <div class="detail-item">
-              <div class="detail-label">
-                Total
-              </div>
-              <div class="detail-value">
-                ${
-                  reservation.total_amount
-                    ? escapeHtml(
-                        reservation.total_amount
-                      )
-                    : "Rate on request"
-                }
-              </div>
-            </div>
-
-            <div class="detail-item detail-full">
-              <div class="detail-label">
-                Special requests
-              </div>
-              <div class="detail-value">
-                ${escapeHtml(
-                  reservation.special_requests ||
-                  "No special requests."
-                )}
-              </div>
-            </div>
-
-            <div class="detail-item detail-full">
-              <div class="detail-label">
-                Created
-              </div>
-              <div class="detail-value">
-                ${
-                  reservation.created_at
-                    ? new Date(
-                        reservation.created_at
-                      ).toLocaleString()
-                    : "—"
-                }
-              </div>
-            </div>
-
           </div>
-        `;
 
 
-        renderReservationActions(
-          reservation
-        );
+          <div class="detail-item">
+            <div class="detail-label">
+              Reservation status
+            </div>
 
-        reservationModal.classList.remove(
-          "hidden"
-        );
-      };
-
-
-    /* =====================================================
-       ACTION BUTTONS
-       ===================================================== */
-
-    function renderReservationActions(
-      reservation
-    ) {
-
-      let html = "";
-
-      const status =
-        String(
-          reservation.status || ""
-        ).toLowerCase();
-
-      const payment =
-        String(
-          reservation.payment_status || ""
-        ).toLowerCase();
+            <div class="detail-value">
+              <span class="status ${statusClass(
+                reservation.status
+              )}">
+                ${escapeHtml(
+                  formatStatus(
+                    reservation.status
+                  )
+                )}
+              </span>
+            </div>
+          </div>
 
 
-      if (
-        status === "pending"
-      ) {
+          <div class="detail-item">
+            <div class="detail-label">
+              Guest
+            </div>
 
-        html += `
-          <button
-            class="confirm-action"
-            type="button"
-            onclick="updateReservationStatus('confirmed')"
-          >
-            Confirm reservation
-          </button>
-        `;
-      }
+            <div class="detail-value">
+              ${escapeHtml(fullName)}
+            </div>
+          </div>
 
 
-      if (
-        status !== "cancelled" &&
-        status !== "canceled"
-      ) {
+          <div class="detail-item">
+            <div class="detail-label">
+              Guests
+            </div>
 
-        html += `
-          <button
-            class="cancel-action"
-            type="button"
-            onclick="updateReservationStatus('cancelled')"
-          >
-            Cancel reservation
-          </button>
-        `;
-      }
+            <div class="detail-value">
+              ${escapeHtml(guestCount)}
+            </div>
+          </div>
 
 
-      if (
-        payment !== "paid"
-      ) {
+          <div class="detail-item">
+            <div class="detail-label">
+              Email
+            </div>
 
-        html += `
-          <button
-            class="paid-action"
-            type="button"
-            onclick="updatePaymentStatus('paid')"
-          >
-            Mark as paid
-          </button>
-        `;
-      }
+            <div class="detail-value">
+              ${escapeHtml(
+                reservation.guest_email ||
+                "Not provided"
+              )}
+            </div>
+          </div>
 
 
-      if (!html) {
+          <div class="detail-item">
+            <div class="detail-label">
+              Phone
+            </div>
 
-        html = `
-          <span class="muted">
-            No actions available.
-          </span>
-        `;
-      }
+            <div class="detail-value">
+              ${escapeHtml(
+                reservation.guest_phone ||
+                "Not provided"
+              )}
+            </div>
+          </div>
 
 
-      reservationActions.innerHTML =
-        html;
+          <div class="detail-item">
+            <div class="detail-label">
+              Check-in
+            </div>
+
+            <div class="detail-value">
+              ${formatDate(
+                reservation.check_in
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Check-out
+            </div>
+
+            <div class="detail-value">
+              ${formatDate(
+                reservation.check_out
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Nights
+            </div>
+
+            <div class="detail-value">
+              ${escapeHtml(
+                reservation.nights ||
+                "—"
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Payment
+            </div>
+
+            <div class="detail-value">
+              <span class="status ${paymentClass(
+                reservation.payment_status
+              )}">
+                ${escapeHtml(
+                  formatStatus(
+                    reservation.payment_status
+                  )
+                )}
+              </span>
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Room ID
+            </div>
+
+            <div class="detail-value">
+              ${escapeHtml(
+                reservation.room_id ||
+                "Not assigned"
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Room type ID
+            </div>
+
+            <div class="detail-value">
+              ${escapeHtml(
+                reservation.room_type_id ||
+                "—"
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Room price
+            </div>
+
+            <div class="detail-value money">
+              ${formatMoney(
+                reservation.room_price
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Extras total
+            </div>
+
+            <div class="detail-value">
+              ${formatMoney(
+                reservation.extras_total
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Discount
+            </div>
+
+            <div class="detail-value">
+              ${formatMoney(
+                reservation.discount_total
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Total amount
+            </div>
+
+            <div class="detail-value money">
+              ${formatMoney(
+                reservation.total_amount
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Payment reference
+            </div>
+
+            <div class="detail-value">
+              ${escapeHtml(
+                reservation.payment_reference ||
+                "Not provided"
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item detail-full">
+            <div class="detail-label">
+              Special requests
+            </div>
+
+            <div class="detail-value">
+              ${escapeHtml(
+                reservation.special_requests ||
+                "No special requests."
+              )}
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Created
+            </div>
+
+            <div class="detail-value">
+              ${
+                reservation.created_at
+                  ? new Date(
+                      reservation.created_at
+                    ).toLocaleString()
+                  : "—"
+              }
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-label">
+              Last updated
+            </div>
+
+            <div class="detail-value">
+              ${
+                reservation.updated_at
+                  ? new Date(
+                      reservation.updated_at
+                    ).toLocaleString()
+                  : "—"
+              }
+            </div>
+          </div>
+
+        </div>
+      `;
+
+
+      renderReservationActions(
+        reservation
+      );
+
+
+      reservationModal.classList.remove(
+        "hidden"
+      );
+    };
+
+
+  /* =====================================================
+     RESERVATION ACTIONS
+     ===================================================== */
+
+  function renderReservationActions(
+    reservation
+  ) {
+
+    let html = "";
+
+
+    const status =
+      String(
+        reservation.status || ""
+      ).toLowerCase();
+
+
+    const payment =
+      String(
+        reservation.payment_status || ""
+      ).toLowerCase();
+
+
+    if (status === "pending") {
+
+      html += `
+        <button
+          class="confirm-action"
+          type="button"
+          onclick="updateReservationStatus('confirmed')"
+        >
+          Confirm reservation
+        </button>
+      `;
     }
 
 
-    /* =====================================================
-       UPDATE RESERVATION STATUS
-       ===================================================== */
+    if (
+      status !== "cancelled" &&
+      status !== "canceled"
+    ) {
 
-    window.updateReservationStatus =
-      async function(newStatus) {
+      html += `
+        <button
+          class="cancel-action"
+          type="button"
+          onclick="updateReservationStatus('cancelled')"
+        >
+          Cancel reservation
+        </button>
+      `;
+    }
 
-        if (!selectedReservation) {
-          return;
-        }
 
-        const confirmation =
-          window.confirm(
-            `Change reservation ${selectedReservation.booking_reference} to ${newStatus}?`
+    if (payment !== "paid") {
+
+      html += `
+        <button
+          class="paid-action"
+          type="button"
+          onclick="updatePaymentStatus('paid')"
+        >
+          Mark as paid
+        </button>
+      `;
+    }
+
+
+    if (!html) {
+
+      html = `
+        <span class="muted">
+          No actions available.
+        </span>
+      `;
+    }
+
+
+    reservationActions.innerHTML =
+      html;
+  }
+
+
+  /* =====================================================
+     UPDATE RESERVATION STATUS
+     ===================================================== */
+
+  window.updateReservationStatus =
+    async function(newStatus) {
+
+      if (!selectedReservation) {
+        return;
+      }
+
+
+      const confirmation =
+        window.confirm(
+          `Change reservation ${selectedReservation.booking_reference} to ${newStatus}?`
+        );
+
+
+      if (!confirmation) {
+        return;
+      }
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("bookings")
+          .update({
+            status: newStatus
+          })
+          .eq(
+            "id",
+            selectedReservation.id
           );
 
-        if (!confirmation) {
-          return;
-        }
 
-        const {
-          error
-        } =
-          await supabaseClient
-            .from("bookings")
-            .update({
-              status: newStatus
-            })
-            .eq(
-              "id",
-              selectedReservation.id
-            );
+      if (error) {
 
-        if (error) {
+        console.error(error);
 
-          console.error(error);
+        alert(
+          "Unable to update reservation: " +
+          error.message
+        );
 
-          alert(
-            "Unable to update reservation: " +
-            error.message
+        return;
+      }
+
+
+      await loadReservations();
+
+
+      const updated =
+        reservations.find(
+          item =>
+            item.id ===
+            selectedReservation.id
+        );
+
+
+      if (updated) {
+
+        selectedReservation =
+          updated;
+
+        openReservation(
+          updated.id
+        );
+      }
+    };
+
+
+  /* =====================================================
+     UPDATE PAYMENT STATUS
+     ===================================================== */
+
+  window.updatePaymentStatus =
+    async function(newStatus) {
+
+      if (!selectedReservation) {
+        return;
+      }
+
+
+      const confirmation =
+        window.confirm(
+          `Mark reservation ${selectedReservation.booking_reference} as ${newStatus}?`
+        );
+
+
+      if (!confirmation) {
+        return;
+      }
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("bookings")
+          .update({
+            payment_status:
+              newStatus
+          })
+          .eq(
+            "id",
+            selectedReservation.id
           );
 
-          return;
-        }
 
-        await loadReservations();
+      if (error) {
 
-        const updated =
-          reservations.find(
-            item =>
-              item.id ===
-              selectedReservation.id
-          );
+        console.error(error);
 
-        if (updated) {
+        alert(
+          "Unable to update payment status: " +
+          error.message
+        );
 
-          selectedReservation =
-            updated;
-
-          openReservation(
-            updated.id
-          );
-        }
-      };
+        return;
+      }
 
 
-    /* =====================================================
-       UPDATE PAYMENT STATUS
-       ===================================================== */
-
-    window.updatePaymentStatus =
-      async function(newStatus) {
-
-        if (!selectedReservation) {
-          return;
-        }
-
-        const confirmation =
-          window.confirm(
-            `Mark reservation ${selectedReservation.booking_reference} as ${newStatus}?`
-          );
-
-        if (!confirmation) {
-          return;
-        }
-
-        const {
-          error
-        } =
-          await supabaseClient
-            .from("bookings")
-            .update({
-              payment_status:
-                newStatus
-            })
-            .eq(
-              "id",
-              selectedReservation.id
-            );
-
-        if (error) {
-
-          console.error(error);
-
-          alert(
-            "Unable to update payment status: " +
-            error.message
-          );
-
-          return;
-        }
-
-        await loadReservations();
-
-        const updated =
-          reservations.find(
-            item =>
-              item.id ===
-              selectedReservation.id
-          );
-
-        if (updated) {
-
-          selectedReservation =
-            updated;
-
-          openReservation(
-            updated.id
-          );
-        }
-      };
+      await loadReservations();
 
 
-    /* =====================================================
-       MODAL CLOSE
-       ===================================================== */
+      const updated =
+        reservations.find(
+          item =>
+            item.id ===
+            selectedReservation.id
+        );
 
-    document.getElementById(
-      "closeModal"
-    ).addEventListener(
-      "click",
-      function() {
+
+      if (updated) {
+
+        selectedReservation =
+          updated;
+
+        openReservation(
+          updated.id
+        );
+      }
+    };
+
+
+  /* =====================================================
+     CLOSE MODAL
+     ===================================================== */
+
+  document.getElementById(
+    "closeModal"
+  ).addEventListener(
+    "click",
+    function() {
+
+      reservationModal.classList.add(
+        "hidden"
+      );
+
+      selectedReservation =
+        null;
+    }
+  );
+
+
+  reservationModal.addEventListener(
+    "click",
+    function(event) {
+
+      if (
+        event.target ===
+        reservationModal
+      ) {
 
         reservationModal.classList.add(
           "hidden"
@@ -2262,122 +2317,108 @@
         selectedReservation =
           null;
       }
-    );
+    }
+  );
 
 
-    reservationModal.addEventListener(
-      "click",
-      function(event) {
+  /* =====================================================
+     REFRESH
+     ===================================================== */
 
-        if (
-          event.target ===
-          reservationModal
-        ) {
-
-          reservationModal.classList.add(
-            "hidden"
-          );
-
-          selectedReservation =
-            null;
-        }
-      }
-    );
+  document.getElementById(
+    "refreshReservations"
+  ).addEventListener(
+    "click",
+    loadReservations
+  );
 
 
-    /* =====================================================
-       REFRESH
-       ===================================================== */
+  /* =====================================================
+     SIDEBAR
+     ===================================================== */
 
-    document.getElementById(
-      "refreshReservations"
-    ).addEventListener(
-      "click",
-      loadReservations
-    );
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(
+      button => {
 
+        button.addEventListener(
+          "click",
+          function() {
 
-    /* =====================================================
-       SIDEBAR NAVIGATION
-       ===================================================== */
-
-    document
-      .querySelectorAll(".nav-btn")
-      .forEach(
-        button => {
-
-          button.addEventListener(
-            "click",
-            function() {
-
-              document
-                .querySelectorAll(
-                  ".nav-btn"
-                )
-                .forEach(
-                  item =>
-                    item.classList.remove(
-                      "active"
-                    )
-                );
-
-              this.classList.add(
-                "active"
+            document
+              .querySelectorAll(
+                ".nav-btn"
+              )
+              .forEach(
+                item =>
+                  item.classList.remove(
+                    "active"
+                  )
               );
 
-              const section =
-                this.dataset.section;
 
-              document
-                .querySelectorAll(
-                  "main section"
-                )
-                .forEach(
-                  item =>
-                    item.classList.add(
-                      "hidden"
-                    )
-                );
+            this.classList.add(
+              "active"
+            );
 
-              const target =
-                document.getElementById(
-                  section +
-                  "Section"
-                );
 
-              if (target) {
-                target.classList.remove(
-                  "hidden"
-                );
-              }
+            const section =
+              this.dataset.section;
+
+
+            document
+              .querySelectorAll(
+                "main section"
+              )
+              .forEach(
+                item =>
+                  item.classList.add(
+                    "hidden"
+                  )
+              );
+
+
+            const target =
+              document.getElementById(
+                section +
+                "Section"
+              );
+
+
+            if (target) {
+              target.classList.remove(
+                "hidden"
+              );
             }
-          );
-        }
-      );
 
-
-    /* =====================================================
-       AUTH STATE CHANGES
-       ===================================================== */
-
-    supabaseClient.auth.onAuthStateChange(
-      async function(event, session) {
-
-        if (
-          event === "SIGNED_OUT"
-        ) {
-          showLogin();
-        }
-
+          }
+        );
       }
     );
 
 
-    /* =====================================================
-       START
-       ===================================================== */
+  /* =====================================================
+     AUTH STATE
+     ===================================================== */
 
-    checkSession();
+  supabaseClient.auth.onAuthStateChange(
+    async function(event) {
 
-  </script></body>
+      if (
+        event === "SIGNED_OUT"
+      ) {
+        showLogin();
+      }
+    }
+  );
+
+
+  /* =====================================================
+     START
+     ===================================================== */
+
+  checkSession();
+
+</script></body>
 </html>
