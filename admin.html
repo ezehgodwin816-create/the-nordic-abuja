@@ -9,42 +9,33 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
 :root{
-  --bg:#f5f5f2;
-  --card:#ffffff;
-  --text:#17201d;
-  --muted:#707773;
-  --line:#e5e7e3;
-  --dark:#18221e;
-  --dark2:#25312b;
-  --accent:#b78b55;
-  --success:#287a50;
-  --danger:#b63d3d;
-  --warning:#a66d20;
-  --shadow:0 12px 35px rgba(20,30,25,.08);
+  --bg:#f5f6f8;
+  --card:#fff;
+  --text:#17202a;
+  --muted:#718096;
+  --line:#e5e7eb;
+  --dark:#111827;
+  --accent:#9b7653;
+  --accent-dark:#795b3e;
+  --green:#15803d;
+  --red:#dc2626;
+  --orange:#d97706;
+  --blue:#2563eb;
+  --sidebar:250px;
   --radius:16px;
 }
 
-html,body{
-  min-height:100%;
-}
+*{box-sizing:border-box}
 
 body{
-  font-family:Arial,Helvetica,sans-serif;
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:var(--bg);
   color:var(--text);
 }
 
-button,
-input,
-select,
-textarea{
+button,input,select,textarea{
   font:inherit;
 }
 
@@ -52,217 +43,210 @@ button{
   cursor:pointer;
 }
 
-.hidden{
-  display:none!important;
-}
+.hidden{display:none!important}
 
-/* LOGIN */
-
-#login{
+.login-page{
   min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:24px;
+  padding:20px;
   background:
-    radial-gradient(circle at top left,rgba(183,139,85,.16),transparent 35%),
-    linear-gradient(135deg,#eef0eb,#f9f9f6);
+    linear-gradient(rgba(10,15,20,.72),rgba(10,15,20,.72)),
+    url("images/hero.jpg") center/cover;
 }
 
 .login-card{
   width:100%;
   max-width:430px;
   background:#fff;
-  border:1px solid var(--line);
+  padding:36px;
   border-radius:22px;
-  padding:38px;
-  box-shadow:0 25px 70px rgba(20,30,25,.12);
+  box-shadow:0 25px 80px rgba(0,0,0,.25);
 }
 
 .brand{
   font-size:25px;
   font-weight:800;
-  letter-spacing:2px;
-  color:var(--dark);
+  letter-spacing:.04em;
 }
 
-.sub{
-  margin-top:8px;
+.brand small{
+  display:block;
+  margin-top:5px;
   color:var(--muted);
-  font-size:14px;
-  margin-bottom:30px;
+  font-size:13px;
+  font-weight:500;
 }
 
 .field{
-  margin-bottom:18px;
+  margin-bottom:16px;
 }
 
 .field label{
   display:block;
-  margin-bottom:8px;
+  margin-bottom:7px;
   font-size:13px;
   font-weight:700;
 }
 
 .field input,
 .field select,
-.field textarea,
-.search input,
-.filter select{
+.field textarea{
   width:100%;
-  border:1px solid #d9ddd8;
-  background:#fff;
+  border:1px solid var(--line);
   border-radius:10px;
   padding:12px 13px;
   outline:none;
-  color:var(--text);
+  background:#fff;
 }
 
 .field input:focus,
 .field select:focus,
-.field textarea:focus,
-.search input:focus,
-.filter select:focus{
+.field textarea:focus{
   border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(183,139,85,.12);
+  box-shadow:0 0 0 3px rgba(155,118,83,.1);
 }
 
-.primary{
+.field textarea{
+  min-height:105px;
+  resize:vertical;
+}
+
+.btn{
   border:0;
+  border-radius:10px;
+  padding:11px 15px;
+  font-weight:700;
+  transition:.2s;
+}
+
+.btn:hover{transform:translateY(-1px)}
+
+.btn-primary{
   background:var(--dark);
   color:#fff;
-  padding:12px 16px;
-  border-radius:10px;
-  font-weight:700;
 }
 
-.primary:hover{
-  background:#26352e;
+.btn-accent{
+  background:var(--accent);
+  color:#fff;
 }
 
-.primary:disabled{
-  opacity:.6;
-  cursor:not-allowed;
+.btn-danger{
+  background:#fee2e2;
+  color:#991b1b;
 }
+
+.btn-success{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.btn-light{
+  background:#f3f4f6;
+  color:#374151;
+}
+
+.full{width:100%}
 
 .login-error{
-  margin-top:15px;
-  padding:12px;
+  margin:12px 0;
+  padding:11px;
   border-radius:10px;
-  background:#fff0f0;
-  color:var(--danger);
+  background:#fee2e2;
+  color:#991b1b;
   font-size:13px;
-  line-height:1.5;
 }
 
-/* APP */
+.app{
+  display:none;
+  min-height:100vh;
+}
 
-#app{
+.sidebar{
+  position:fixed;
+  inset:0 auto 0 0;
+  width:var(--sidebar);
+  background:#111827;
+  color:#fff;
+  z-index:100;
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar-top{
+  padding:25px 20px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.sidebar .brand{
+  font-size:18px;
+}
+
+.sidebar .brand small{
+  color:#9ca3af;
+}
+
+.nav{
+  padding:15px 10px;
+  flex:1;
+}
+
+.nav button{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:12px 13px;
+  margin-bottom:5px;
+  background:transparent;
+  border:0;
+  color:#cbd5e1;
+  border-radius:10px;
+  text-align:left;
+  font-weight:650;
+}
+
+.nav button:hover,
+.nav button.active{
+  background:rgba(255,255,255,.1);
+  color:#fff;
+}
+
+.sidebar-bottom{
+  padding:15px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+
+.main{
+  margin-left:var(--sidebar);
   min-height:100vh;
 }
 
 .topbar{
-  height:72px;
-  background:#fff;
+  position:sticky;
+  top:0;
+  z-index:50;
+  height:70px;
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 26px;
-  position:sticky;
-  top:0;
-  z-index:20;
+  padding:0 28px;
 }
 
-.top-brand{
-  display:flex;
-  align-items:center;
-  gap:13px;
-}
-
-.logo-mark{
-  width:40px;
-  height:40px;
-  border-radius:11px;
-  background:var(--dark);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
-  font-size:14px;
-}
-
-.top-title{
-  font-size:15px;
-  font-weight:800;
-  letter-spacing:1.2px;
-}
-
-.top-sub{
-  font-size:11px;
-  color:var(--muted);
-  margin-top:3px;
-}
-
-.logout{
-  border:1px solid var(--line);
-  background:#fff;
-  padding:9px 14px;
-  border-radius:9px;
-  font-weight:700;
-  color:var(--dark);
-}
-
-.logout:hover{
-  background:#f5f6f3;
-}
-
-.layout{
-  display:flex;
-  min-height:calc(100vh - 72px);
-}
-
-.sidebar{
-  width:240px;
-  background:var(--dark);
-  color:#fff;
-  padding:22px 14px;
-  flex-shrink:0;
-}
-
-.side-label{
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:1.5px;
-  color:#9da8a2;
-  margin:8px 12px 12px;
-}
-
-.nav-btn{
-  width:100%;
-  text-align:left;
+.menu-btn{
+  display:none;
   border:0;
-  background:transparent;
-  color:#dce2de;
-  padding:12px 13px;
-  border-radius:10px;
-  margin-bottom:4px;
-  font-weight:600;
+  background:#f3f4f6;
+  border-radius:9px;
+  padding:9px 12px;
 }
 
-.nav-btn:hover{
-  background:rgba(255,255,255,.07);
-}
-
-.nav-btn.active{
-  background:#fff;
-  color:var(--dark);
-}
-
-.main{
-  flex:1;
-  min-width:0;
+.content{
   padding:28px;
 }
 
@@ -274,96 +258,80 @@ button{
   display:block;
 }
 
-.page-head{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:20px;
-  margin-bottom:22px;
-}
-
 .page-title{
+  margin:0 0 5px;
   font-size:27px;
-  font-weight:800;
 }
 
-.page-description{
-  margin-top:7px;
+.page-subtitle{
+  margin:0 0 24px;
   color:var(--muted);
-  font-size:14px;
 }
-
-.refresh{
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:10px;
-  padding:10px 14px;
-  font-weight:700;
-}
-
-.refresh:hover{
-  background:#f0f2ef;
-}
-
-/* STATS */
 
 .stats{
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:14px;
-  margin-bottom:20px;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:25px;
 }
 
 .stat{
-  background:#fff;
+  background:var(--card);
   border:1px solid var(--line);
-  border-radius:14px;
-  padding:18px;
-  box-shadow:0 5px 20px rgba(20,30,25,.035);
+  border-radius:var(--radius);
+  padding:20px;
 }
 
 .stat-label{
   color:var(--muted);
-  font-size:12px;
+  font-size:13px;
   font-weight:700;
 }
 
 .stat-value{
   margin-top:8px;
-  font-size:28px;
+  font-size:29px;
   font-weight:800;
 }
 
-/* TOOLBAR */
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+
+.card-head{
+  padding:18px 20px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.card-title{
+  font-size:16px;
+  font-weight:800;
+}
+
+.card-body{
+  padding:20px;
+}
 
 .toolbar{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:14px;
   display:flex;
-  gap:10px;
   flex-wrap:wrap;
-  margin-bottom:15px;
+  gap:10px;
+  margin-bottom:18px;
 }
 
-.search{
-  flex:1;
-  min-width:220px;
-}
-
-.filter{
-  width:180px;
-}
-
-/* TABLE */
-
-.table-card{
-  background:#fff;
+.toolbar input,
+.toolbar select{
   border:1px solid var(--line);
-  border-radius:15px;
-  overflow:hidden;
-  box-shadow:var(--shadow);
+  padding:10px 12px;
+  border-radius:9px;
+  background:#fff;
 }
 
 .table-wrap{
@@ -376,287 +344,224 @@ table{
   min-width:850px;
 }
 
-th{
-  background:#f7f8f5;
-  color:#69716d;
+th,td{
+  padding:13px 14px;
+  border-bottom:1px solid var(--line);
   text-align:left;
-  padding:13px 15px;
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.7px;
-  white-space:nowrap;
-}
-
-td{
-  padding:15px;
-  border-top:1px solid var(--line);
   font-size:13px;
   vertical-align:middle;
 }
 
-tr:hover td{
-  background:#fcfcfa;
+th{
+  background:#f9fafb;
+  color:#6b7280;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
 }
 
-.empty{
-  text-align:center;
-  padding:45px 20px;
-  color:var(--muted);
+tr:last-child td{
+  border-bottom:0;
 }
-
-.loading{
-  text-align:center;
-  padding:35px;
-  color:var(--muted);
-}
-
-/* BADGES */
 
 .badge{
   display:inline-flex;
   align-items:center;
-  border-radius:999px;
   padding:5px 9px;
-  font-size:10px;
+  border-radius:999px;
+  font-size:11px;
   font-weight:800;
-  text-transform:uppercase;
-  letter-spacing:.4px;
+  text-transform:capitalize;
 }
 
-.badge.pending{
-  background:#fff4df;
-  color:var(--warning);
-}
-
-.badge.confirmed,
-.badge.paid,
-.badge.available,
-.badge.published{
-  background:#e7f6ed;
-  color:var(--success);
-}
-
-.badge.cancelled,
-.badge.unpaid,
-.badge.unavailable,
-.badge.rejected{
-  background:#ffeded;
-  color:var(--danger);
-}
-
-.badge.neutral{
-  background:#edf0ee;
-  color:#59625e;
-}
-
-/* ACTIONS */
+.badge.green{background:#dcfce7;color:#166534}
+.badge.red{background:#fee2e2;color:#991b1b}
+.badge.orange{background:#fef3c7;color:#92400e}
+.badge.blue{background:#dbeafe;color:#1d4ed8}
+.badge.gray{background:#f3f4f6;color:#4b5563}
 
 .actions{
   display:flex;
   flex-wrap:wrap;
-  gap:7px;
+  gap:6px;
 }
 
-.btn{
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:8px;
-  padding:7px 10px;
+.actions .btn{
+  padding:7px 9px;
   font-size:11px;
-  font-weight:700;
 }
 
-.btn:hover{
-  background:#f3f4f1;
-}
-
-.btn.dark{
-  background:var(--dark);
-  color:#fff;
-  border-color:var(--dark);
-}
-
-.btn.green{
-  color:var(--success);
-  border-color:#cce5d6;
-}
-
-.btn.red{
-  color:var(--danger);
-  border-color:#efd0d0;
-}
-
-/* INVENTORY */
-
-.inventory-grid{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px;
-  margin-bottom:20px;
-}
-
-.inventory-card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:18px;
-}
-
-.inventory-card h3{
-  font-size:15px;
-  margin-bottom:10px;
-}
-
-.inventory-number{
-  font-size:27px;
-  font-weight:800;
-}
-
-.inventory-small{
+.empty{
+  padding:45px 20px;
+  text-align:center;
   color:var(--muted);
-  font-size:12px;
-  margin-top:5px;
 }
 
-/* SETTINGS */
-
-.settings-list{
-  display:grid;
-  gap:12px;
-}
-
-.setting-row{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-}
-
-.setting-key{
-  font-weight:800;
-  font-size:14px;
-}
-
-.setting-value{
+.loading{
+  padding:35px;
+  text-align:center;
   color:var(--muted);
-  margin-top:5px;
-  font-size:13px;
-  word-break:break-word;
 }
 
-.setting-edit{
-  min-width:110px;
+.grid-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
 }
 
-/* MODAL */
+.grid-3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.form-grid .full-field{
+  grid-column:1/-1;
+}
 
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(15,20,18,.55);
+  background:rgba(0,0,0,.58);
+  z-index:300;
   display:none;
   align-items:center;
   justify-content:center;
   padding:20px;
-  z-index:100;
 }
 
-.modal.show{
+.modal.open{
   display:flex;
 }
 
-.modal-card{
+.modal-box{
+  background:#fff;
   width:100%;
-  max-width:720px;
+  max-width:850px;
   max-height:90vh;
   overflow:auto;
-  background:#fff;
   border-radius:18px;
-  box-shadow:0 25px 80px rgba(0,0,0,.22);
 }
 
 .modal-head{
-  padding:20px 22px;
+  padding:18px 20px;
   border-bottom:1px solid var(--line);
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:15px;
-}
-
-.modal-title{
-  font-size:18px;
-  font-weight:800;
-}
-
-.close{
-  border:0;
-  background:#f0f2ef;
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  font-size:20px;
 }
 
 .modal-body{
-  padding:22px;
+  padding:20px;
+}
+
+.modal-close{
+  border:0;
+  background:#f3f4f6;
+  border-radius:8px;
+  width:34px;
+  height:34px;
 }
 
 .detail-grid{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:1fr 1fr;
   gap:12px;
 }
 
 .detail{
-  border:1px solid var(--line);
-  border-radius:11px;
-  padding:12px;
+  background:#f9fafb;
+  padding:13px;
+  border-radius:10px;
 }
 
-.detail.full{
-  grid-column:1/-1;
-}
-
-.detail-label{
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:.7px;
+.detail small{
+  display:block;
   color:var(--muted);
-  font-weight:800;
+  margin-bottom:4px;
 }
 
-.detail-value{
-  margin-top:5px;
-  font-size:13px;
+.detail strong{
   word-break:break-word;
 }
 
-.modal-actions{
-  margin-top:18px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
+.room-card{
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
 }
 
-/* TOAST */
+.room-image{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  background:#eee;
+}
+
+.room-info{
+  padding:15px;
+}
+
+.room-info h3{
+  margin:0 0 5px;
+}
+
+.room-info p{
+  color:var(--muted);
+  font-size:13px;
+  margin:4px 0;
+}
+
+.review-box{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:17px;
+}
+
+.stars{
+  letter-spacing:2px;
+}
+
+.setting-row{
+  display:grid;
+  grid-template-columns:220px 1fr auto;
+  gap:15px;
+  align-items:center;
+  padding:15px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.setting-row:last-child{
+  border-bottom:0;
+}
+
+.setting-key{
+  font-weight:800;
+  font-size:13px;
+}
+
+.setting-value{
+  color:#4b5563;
+  word-break:break-word;
+  font-size:13px;
+}
 
 .toast{
   position:fixed;
-  right:22px;
-  bottom:22px;
-  z-index:200;
-  background:var(--dark);
+  right:20px;
+  bottom:20px;
+  z-index:500;
+  background:#111827;
   color:#fff;
-  padding:13px 16px;
+  padding:13px 17px;
   border-radius:10px;
-  box-shadow:0 15px 35px rgba(0,0,0,.2);
-  font-size:13px;
-  max-width:350px;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
   display:none;
 }
 
@@ -664,113 +569,70 @@ tr:hover td{
   display:block;
 }
 
-.toast.error{
-  background:#8f2929;
-}
-
-/* MOBILE */
-
-.mobile-menu{
-  display:none;
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:9px;
-  padding:9px 11px;
-  font-weight:800;
-}
-
-@media(max-width:1100px){
+@media(max-width:1000px){
   .stats{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .inventory-grid{
     grid-template-columns:repeat(2,1fr);
   }
+
+  .grid-3{
+    grid-template-columns:1fr 1fr;
+  }
 }
 
-@media(max-width:800px){
+@media(max-width:760px){
+  :root{
+    --sidebar:0px;
+  }
+
+  .sidebar{
+    width:260px;
+    transform:translateX(-100%);
+    transition:.25s;
+  }
+
+  .sidebar.open{
+    transform:translateX(0);
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+
   .topbar{
     padding:0 15px;
   }
 
-  .mobile-menu{
-    display:block;
-  }
-
-  .layout{
-    display:block;
-  }
-
-  .sidebar{
-    display:none;
-    width:100%;
-    position:fixed;
-    top:72px;
-    left:0;
-    right:0;
-    z-index:50;
-    max-height:calc(100vh - 72px);
-    overflow:auto;
-  }
-
-  .sidebar.open{
-    display:block;
-  }
-
-  .main{
+  .content{
     padding:18px 14px;
   }
 
-  .page-head{
-    flex-direction:column;
-  }
-
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .detail-grid{
-    grid-template-columns:1fr;
-  }
-
-  .detail.full{
-    grid-column:auto;
-  }
-
-  .login-card{
-    padding:27px 22px;
-  }
-}
-
-@media(max-width:480px){
   .stats{
     grid-template-columns:1fr 1fr;
   }
 
-  .stat{
-    padding:14px;
-  }
-
-  .stat-value{
-    font-size:23px;
-  }
-
-  .top-title{
-    font-size:13px;
-  }
-
-  .top-sub{
-    display:none;
-  }
-
-  .logout{
-    padding:8px 10px;
-    font-size:11px;
-  }
-
-  .inventory-grid{
+  .grid-2,
+  .grid-3,
+  .form-grid,
+  .detail-grid{
     grid-template-columns:1fr;
+  }
+
+  .setting-row{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:450px){
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .login-card{
+    padding:25px;
   }
 }
 </style>
@@ -778,336 +640,240 @@ tr:hover td{
 
 <body>
 
-<!-- =========================================================
-     LOGIN
-========================================================= -->
-
-<div id="login">
-
+<!-- LOGIN -->
+<section id="loginPage" class="login-page">
   <div class="login-card">
-
-    <div class="brand">THE NORDIC ABUJA</div>
-
-    <div class="sub">
-      Secure administration
+    <div class="brand">
+      THE NORDIC ABUJA
+      <small>Administration Portal</small>
     </div>
+
+    <div style="height:25px"></div>
 
     <form id="loginForm">
-
       <div class="field">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          autocomplete="username"
-          required
-        >
+        <label>Email</label>
+        <input id="loginEmail" type="email" required autocomplete="username">
       </div>
 
       <div class="field">
-        <label for="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          autocomplete="current-password"
-          required
-        >
+        <label>Password</label>
+        <input id="loginPassword" type="password" required autocomplete="current-password">
       </div>
 
-      <button
-        class="primary"
-        id="loginBtn"
-        type="submit"
-        style="width:100%"
-      >
+      <div id="loginError" class="login-error hidden"></div>
+
+      <button class="btn btn-primary full" type="submit">
         Sign in
       </button>
-
-      <div
-        id="loginError"
-        class="login-error hidden"
-      ></div>
-
     </form>
-
   </div>
+</section>
 
-</div>
 
+<!-- APP -->
+<div id="app" class="app">
 
-<!-- =========================================================
-     APP
-========================================================= -->
+  <aside id="sidebar" class="sidebar">
 
-<div id="app" class="hidden">
-
-  <header class="topbar">
-
-    <div class="top-brand">
-
-      <button
-        class="mobile-menu"
-        id="mobileMenu"
-        type="button"
-      >
-        ☰
-      </button>
-
-      <div class="logo-mark">
-        N
+    <div class="sidebar-top">
+      <div class="brand">
+        THE NORDIC ABUJA
+        <small>Admin Dashboard</small>
       </div>
-
-      <div>
-        <div class="top-title">
-          THE NORDIC ABUJA
-        </div>
-
-        <div class="top-sub">
-          Administration dashboard
-        </div>
-      </div>
-
     </div>
 
-    <button
-      class="logout"
-      id="logout"
-      type="button"
-    >
-      Sign out
-    </button>
+    <nav class="nav">
 
-  </header>
+      <button class="nav-btn active" data-page="dashboard">
+        📊 Dashboard
+      </button>
+
+      <button class="nav-btn" data-page="reservations">
+        📋 Reservations
+      </button>
+
+      <button class="nav-btn" data-page="roomTypes">
+        🛏️ Room Types
+      </button>
+
+      <button class="nav-btn" data-page="rooms">
+        🚪 Rooms
+      </button>
+
+      <button class="nav-btn" data-page="requests">
+        📨 Hotel Requests
+      </button>
+
+      <button class="nav-btn" data-page="reviews">
+        ⭐ Reviews
+      </button>
+
+      <button class="nav-btn" data-page="settings">
+        ⚙️ Site Settings
+      </button>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+      <button id="logoutBtn" class="btn btn-light full">
+        Sign out
+      </button>
+    </div>
+
+  </aside>
 
 
-  <div class="layout">
+  <main class="main">
 
-    <!-- SIDEBAR -->
+    <header class="topbar">
+      <button id="menuBtn" class="menu-btn">☰</button>
 
-    <aside class="sidebar" id="sidebar">
+      <strong id="topTitle">Dashboard</strong>
 
-      <div class="side-label">
-        Management
+      <div style="font-size:12px;color:#718096">
+        Admin
       </div>
-
-      <button
-        class="nav-btn active"
-        data-page="reservations"
-        type="button"
-      >
-        Reservations
-      </button>
-
-      <button
-        class="nav-btn"
-        data-page="rooms"
-        type="button"
-      >
-        Rooms
-      </button>
-
-      <button
-        class="nav-btn"
-        data-page="requests"
-        type="button"
-      >
-        Hotel requests
-      </button>
-
-      <button
-        class="nav-btn"
-        data-page="reviews"
-        type="button"
-      >
-        Reviews
-      </button>
-
-      <button
-        class="nav-btn"
-        data-page="settings"
-        type="button"
-      >
-        Site settings
-      </button>
-
-    </aside>
+    </header>
 
 
-    <!-- MAIN -->
-
-    <main class="main">
+    <div class="content">
 
 
-      <!-- =====================================================
-           RESERVATIONS
-      ====================================================== -->
+      <!-- DASHBOARD -->
+      <section id="page-dashboard" class="page active">
 
-      <section
-        class="page active"
-        id="page-reservations"
-      >
-
-        <div class="page-head">
-
-          <div>
-            <div class="page-title">
-              Reservations
-            </div>
-
-            <div class="page-description">
-              Manage hotel reservations, guest information,
-              payment status and booking status.
-            </div>
-          </div>
-
-          <button
-            class="refresh"
-            type="button"
-            onclick="loadBookings()"
-          >
-            Refresh
-          </button>
-
-        </div>
-
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">
+          Overview of The Nordic Abuja operations.
+        </p>
 
         <div class="stats">
 
           <div class="stat">
-            <div class="stat-label">
-              Total
-            </div>
-            <div
-              class="stat-value"
-              id="statTotal"
-            >
-              0
-            </div>
+            <div class="stat-label">Total Reservations</div>
+            <div id="statTotal" class="stat-value">—</div>
           </div>
 
           <div class="stat">
-            <div class="stat-label">
-              Pending
-            </div>
-            <div
-              class="stat-value"
-              id="statPending"
-            >
-              0
-            </div>
+            <div class="stat-label">Pending</div>
+            <div id="statPending" class="stat-value">—</div>
           </div>
 
           <div class="stat">
-            <div class="stat-label">
-              Confirmed
-            </div>
-            <div
-              class="stat-value"
-              id="statConfirmed"
-            >
-              0
-            </div>
+            <div class="stat-label">Confirmed</div>
+            <div id="statConfirmed" class="stat-value">—</div>
           </div>
 
           <div class="stat">
-            <div class="stat-label">
-              Cancelled
-            </div>
-            <div
-              class="stat-value"
-              id="statCancelled"
-            >
-              0
-            </div>
+            <div class="stat-label">Unpaid</div>
+            <div id="statUnpaid" class="stat-value">—</div>
           </div>
 
           <div class="stat">
-            <div class="stat-label">
-              Unpaid
-            </div>
-            <div
-              class="stat-value"
-              id="statUnpaid"
-            >
-              0
-            </div>
+            <div class="stat-label">Available Rooms</div>
+            <div id="statRooms" class="stat-value">—</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">New Requests</div>
+            <div id="statRequests" class="stat-value">—</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Published Reviews</div>
+            <div id="statReviews" class="stat-value">—</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Room Types</div>
+            <div id="statRoomTypes" class="stat-value">—</div>
           </div>
 
         </div>
 
-
-        <div class="toolbar">
-
-          <div class="search">
-            <input
-              id="bookingSearch"
-              type="search"
-              placeholder="Search guest, email or booking reference..."
-            >
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Recent Reservations</span>
+            <button class="btn btn-light" onclick="loadReservations()">Refresh</button>
           </div>
 
-          <div class="filter">
-            <select id="bookingStatusFilter">
-              <option value="">All statuses</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
+          <div id="dashboardReservations" class="card-body">
+            <div class="loading">Loading...</div>
           </div>
-
-          <div class="filter">
-            <select id="bookingPaymentFilter">
-              <option value="">All payments</option>
-              <option value="paid">Paid</option>
-              <option value="unpaid">Unpaid</option>
-            </select>
-          </div>
-
         </div>
 
+      </section>
 
-        <div class="table-card">
 
-          <div
-            id="bookingLoading"
-            class="loading"
-          >
-            Loading reservations...
+      <!-- RESERVATIONS -->
+      <section id="page-reservations" class="page">
+
+        <h1 class="page-title">Reservations</h1>
+        <p class="page-subtitle">
+          Manage hotel reservations and guest bookings.
+        </p>
+
+        <div class="card">
+
+          <div class="card-head">
+            <span class="card-title">All Reservations</span>
+            <button class="btn btn-light" onclick="loadReservations()">Refresh</button>
           </div>
 
-          <div
-            id="bookingEmpty"
-            class="empty hidden"
-          >
-            No reservations found.
+          <div class="card-body">
+
+            <div class="toolbar">
+
+              <input
+                id="reservationSearch"
+                placeholder="Search guest, email or reference..."
+                oninput="renderReservations()"
+              >
+
+              <select id="reservationStatus" onchange="renderReservations()">
+                <option value="">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+
+              <select id="reservationPayment" onchange="renderReservations()">
+                <option value="">All payments</option>
+                <option value="unpaid">Unpaid</option>
+                <option value="paid">Paid</option>
+              </select>
+
+            </div>
+
+            <div id="reservationsTable"></div>
+
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ROOM TYPES -->
+      <section id="page-roomTypes" class="page">
+
+        <h1 class="page-title">Room Types</h1>
+        <p class="page-subtitle">
+          Manage the hotel room categories shown on the website.
+        </p>
+
+        <div class="card">
+
+          <div class="card-head">
+            <span class="card-title">Room Categories</span>
+
+            <button class="btn btn-accent" onclick="openRoomTypeModal()">
+              + Add Room Type
+            </button>
           </div>
 
-          <div
-            class="table-wrap hidden"
-            id="bookingTableWrap"
-          >
-
-            <table>
-
-              <thead>
-
-                <tr>
-                  <th>Reference</th>
-                  <th>Guest</th>
-                  <th>Room</th>
-                  <th>Stay</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Payment</th>
-                  <th>Action</th>
-                </tr>
-
-              </thead>
-
-              <tbody id="bookingTable"></tbody>
-
-            </table>
-
+          <div id="roomTypesList" class="card-body">
+            <div class="loading">Loading...</div>
           </div>
 
         </div>
@@ -1115,3540 +881,2635 @@ tr:hover td{
       </section>
 
 
-      <!-- =====================================================
-           ROOMS
-      ====================================================== -->
+      <!-- ROOMS -->
+      <section id="page-rooms" class="page">
 
-      <section
-        class="page"
-        id="page-rooms"
-      >
+        <h1 class="page-title">Rooms</h1>
+        <p class="page-subtitle">
+          Manage individual physical room inventory.
+        </p>
 
-        <div class="page-head">
+        <div class="card">
 
-          <div>
-            <div class="page-title">
-              Rooms
+          <div class="card-head">
+            <span class="card-title">Room Inventory</span>
+
+            <button class="btn btn-accent" onclick="openRoomModal()">
+              + Add Room
+            </button>
+          </div>
+
+          <div class="card-body">
+
+            <div class="toolbar">
+              <select id="roomStatusFilter" onchange="renderRooms()">
+                <option value="">All statuses</option>
+                <option value="available">Available</option>
+                <option value="occupied">Occupied</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="out_of_service">Out of service</option>
+              </select>
             </div>
 
-            <div class="page-description">
-              View room types and physical room inventory
-              currently stored in Supabase.
-            </div>
-          </div>
-
-          <button
-            class="refresh"
-            type="button"
-            onclick="loadRooms()"
-          >
-            Refresh
-          </button>
-
-        </div>
-
-
-        <div
-          class="inventory-grid"
-          id="inventoryGrid"
-        >
-          <div class="loading">
-            Loading room inventory...
-          </div>
-        </div>
-
-
-        <div class="table-card">
-
-          <div
-            id="roomsLoading"
-            class="loading"
-          >
-            Loading rooms...
-          </div>
-
-          <div
-            id="roomsEmpty"
-            class="empty hidden"
-          >
-            No room records found.
-          </div>
-
-          <div
-            class="table-wrap hidden"
-            id="roomsTableWrap"
-          >
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>Room</th>
-                  <th>Room type</th>
-                  <th>Status</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-
-              <tbody id="roomsTable"></tbody>
-
-            </table>
+            <div id="roomsList"></div>
 
           </div>
-
         </div>
 
       </section>
 
 
-      <!-- =====================================================
-           HOTEL REQUESTS
-      ====================================================== -->
+      <!-- HOTEL REQUESTS -->
+      <section id="page-requests" class="page">
 
-      <section
-        class="page"
-        id="page-requests"
-      >
+        <h1 class="page-title">Hotel Requests</h1>
+        <p class="page-subtitle">
+          Manage guest enquiries, transfers, events and other requests.
+        </p>
 
-        <div class="page-head">
+        <div class="card">
 
-          <div>
-            <div class="page-title">
-              Hotel requests
+          <div class="card-head">
+            <span class="card-title">Requests</span>
+
+            <button class="btn btn-light" onclick="loadRequests()">
+              Refresh
+            </button>
+          </div>
+
+          <div class="card-body">
+
+            <div class="toolbar">
+
+              <input
+                id="requestSearch"
+                placeholder="Search requests..."
+                oninput="renderRequests()"
+              >
+
+              <select id="requestStatus" onchange="renderRequests()">
+                <option value="">All statuses</option>
+                <option value="new">New</option>
+                <option value="in_progress">In progress</option>
+                <option value="resolved">Resolved</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+
             </div>
 
-            <div class="page-description">
-              Guest requests submitted through the hotel website.
-            </div>
-          </div>
-
-          <button
-            class="refresh"
-            type="button"
-            onclick="loadRequests()"
-          >
-            Refresh
-          </button>
-
-        </div>
-
-
-        <div class="toolbar">
-
-          <div class="search">
-            <input
-              id="requestSearch"
-              type="search"
-              placeholder="Search requests..."
-            >
-          </div>
-
-          <div class="filter">
-            <select id="requestStatusFilter">
-              <option value="">All statuses</option>
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-
-        </div>
-
-
-        <div class="table-card">
-
-          <div
-            id="requestsLoading"
-            class="loading"
-          >
-            Loading hotel requests...
-          </div>
-
-          <div
-            id="requestsEmpty"
-            class="empty hidden"
-          >
-            No hotel requests found.
-          </div>
-
-          <div
-            class="table-wrap hidden"
-            id="requestsTableWrap"
-          >
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Guest</th>
-                  <th>Type</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
-              <tbody id="requestsTable"></tbody>
-
-            </table>
+            <div id="requestsList"></div>
 
           </div>
-
         </div>
 
       </section>
 
 
-      <!-- =====================================================
-           REVIEWS
-      ====================================================== -->
+      <!-- REVIEWS -->
+      <section id="page-reviews" class="page">
 
-      <section
-        class="page"
-        id="page-reviews"
-      >
+        <h1 class="page-title">Reviews</h1>
+        <p class="page-subtitle">
+          Manage guest reviews and homepage publishing.
+        </p>
 
-        <div class="page-head">
+        <div class="card">
 
-          <div>
-            <div class="page-title">
-              Reviews
+          <div class="card-head">
+            <span class="card-title">Guest Reviews</span>
+
+            <button class="btn btn-light" onclick="loadReviews()">
+              Refresh
+            </button>
+          </div>
+
+          <div class="card-body">
+
+            <div class="toolbar">
+
+              <select id="reviewPublished" onchange="renderReviews()">
+                <option value="">All reviews</option>
+                <option value="published">Published</option>
+                <option value="unpublished">Unpublished</option>
+              </select>
+
+              <select id="reviewFeatured" onchange="renderReviews()">
+                <option value="">All</option>
+                <option value="featured">Featured</option>
+                <option value="not_featured">Not featured</option>
+              </select>
+
             </div>
 
-            <div class="page-description">
-              Review and moderate guest review records.
-            </div>
-          </div>
-
-          <button
-            class="refresh"
-            type="button"
-            onclick="loadReviews()"
-          >
-            Refresh
-          </button>
-
-        </div>
-
-
-        <div class="toolbar">
-
-          <div class="search">
-            <input
-              id="reviewSearch"
-              type="search"
-              placeholder="Search reviews..."
-            >
-          </div>
-
-        </div>
-
-
-        <div class="table-card">
-
-          <div
-            id="reviewsLoading"
-            class="loading"
-          >
-            Loading reviews...
-          </div>
-
-          <div
-            id="reviewsEmpty"
-            class="empty hidden"
-          >
-            No reviews found.
-          </div>
-
-          <div
-            class="table-wrap hidden"
-            id="reviewsTableWrap"
-          >
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>Guest</th>
-                  <th>Rating</th>
-                  <th>Review</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
-              <tbody id="reviewsTable"></tbody>
-
-            </table>
+            <div id="reviewsList"></div>
 
           </div>
-
         </div>
 
       </section>
 
 
-      <!-- =====================================================
-           SITE SETTINGS
-      ====================================================== -->
+      <!-- SETTINGS -->
+      <section id="page-settings" class="page">
 
-      <section
-        class="page"
-        id="page-settings"
-      >
+        <h1 class="page-title">Site Settings</h1>
+        <p class="page-subtitle">
+          Manage the hotel's editable website settings.
+        </p>
 
-        <div class="page-head">
+        <div class="card">
 
-          <div>
-            <div class="page-title">
-              Site settings
-            </div>
+          <div class="card-head">
+            <span class="card-title">Website Configuration</span>
 
-            <div class="page-description">
-              Manage existing site settings stored in Supabase.
-            </div>
+            <button class="btn btn-light" onclick="loadSettings()">
+              Refresh
+            </button>
           </div>
 
-          <button
-            class="refresh"
-            type="button"
-            onclick="loadSettings()"
-          >
-            Refresh
-          </button>
+          <div id="settingsList" class="card-body">
+            <div class="loading">Loading...</div>
+          </div>
 
         </div>
-
-
-        <div
-          id="settingsLoading"
-          class="loading"
-        >
-          Loading site settings...
-        </div>
-
-        <div
-          id="settingsEmpty"
-          class="empty hidden"
-        >
-          No site settings found.
-        </div>
-
-        <div
-          class="settings-list"
-          id="settingsList"
-        ></div>
 
       </section>
-
-    </main>
-
-  </div>
-
-</div>
-
-
-<!-- =========================================================
-     MODAL
-========================================================= -->
-
-<div
-  class="modal"
-  id="modal"
->
-
-  <div class="modal-card">
-
-    <div class="modal-head">
-
-      <div
-        class="modal-title"
-        id="modalTitle"
-      >
-        Details
-      </div>
-
-      <button
-        class="close"
-        type="button"
-        onclick="closeModal()"
-      >
-        ×
-      </button>
 
     </div>
 
-    <div
-      class="modal-body"
-      id="modalBody"
-    ></div>
-
-  </div>
-
+  </main>
 </div>
 
 
-<div
-  class="toast"
-  id="toast"
-></div>
+<!-- GENERIC MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <strong id="modalTitle">Details</strong>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <div id="modalBody" class="modal-body"></div>
+
+  </div>
+</div>
+
+
+<div id="toast" class="toast"></div>
 
 
 <script>
 /* =========================================================
    SUPABASE
-========================================================= */
+   ========================================================= */
 
 const SUPABASE_URL =
-  'https://rzjvhfnizwckzbdawrbn.supabase.co';
+  "https://rzjvhfnizwckzbdawrbn.supabase.co";
 
 const SUPABASE_KEY =
-  'sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob';
+  "sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob";
 
-const sb =
-  window.supabase.createClient(
+const supabaseClient =
+  supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
   );
 
 
 /* =========================================================
-   HELPERS
-========================================================= */
+   STATE
+   ========================================================= */
 
-const $ = id => document.getElementById(id);
+let currentUser = null;
 
-let bookings = [];
-let rooms = [];
+let reservations = [];
 let roomTypes = [];
+let rooms = [];
 let requests = [];
 let reviews = [];
 let settings = [];
 
-let currentModalType = null;
-let currentModalId = null;
 
+/* =========================================================
+   HELPERS
+   ========================================================= */
 
-function escapeHTML(value){
-
-  if(value === null || value === undefined){
-    return '';
-  }
-
+function esc(value){
+  if(value === null || value === undefined) return "";
   return String(value)
-    .replaceAll('&','&amp;')
-    .replaceAll('<','&lt;')
-    .replaceAll('>','&gt;')
-    .replaceAll('"','&quot;')
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
 }
 
+function money(value){
+  const n = Number(value || 0);
 
-function formatDate(value){
-
-  if(!value){
-    return '—';
+  if(!n){
+    return "Rate on request";
   }
+
+  return "₦" + n.toLocaleString(
+    "en-NG",
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
+}
+
+function dateFormat(value){
+  if(!value) return "—";
 
   const d = new Date(value);
 
   if(Number.isNaN(d.getTime())){
-    return String(value);
+    return value;
   }
 
   return d.toLocaleDateString(
-    'en-GB',
+    "en-GB",
     {
-      day:'2-digit',
-      month:'short',
-      year:'numeric'
+      day:"2-digit",
+      month:"short",
+      year:"numeric"
     }
   );
 }
 
+function badge(value){
+  const v = String(value || "unknown").toLowerCase();
 
-function formatDateTime(value){
-
-  if(!value){
-    return '—';
-  }
-
-  const d = new Date(value);
-
-  if(Number.isNaN(d.getTime())){
-    return String(value);
-  }
-
-  return d.toLocaleString(
-    'en-GB',
-    {
-      day:'2-digit',
-      month:'short',
-      year:'numeric',
-      hour:'2-digit',
-      minute:'2-digit'
-    }
-  );
-}
-
-
-function formatMoney(value){
-
-  const number =
-    Number(value);
-
-  if(!Number.isFinite(number) || number === 0){
-    return 'Rate on request';
-  }
-
-  return '₦' +
-    number.toLocaleString(
-      'en-NG',
-      {
-        minimumFractionDigits:2,
-        maximumFractionDigits:2
-      }
-    );
-}
-
-
-function titleCase(value){
-
-  if(!value){
-    return '—';
-  }
-
-  return String(value)
-    .replaceAll('_',' ')
-    .replaceAll('-',' ')
-    .replace(/\b\w/g,char => char.toUpperCase());
-}
-
-
-function statusBadge(value){
-
-  const v =
-    String(value || 'unknown')
-      .toLowerCase();
-
-  let cls = 'neutral';
+  let cls = "gray";
 
   if(
-    v === 'pending' ||
-    v === 'processing'
+    ["confirmed","paid","available","resolved","published"].includes(v)
   ){
-    cls = 'pending';
+    cls = "green";
   }
 
   if(
-    v === 'confirmed' ||
-    v === 'paid' ||
-    v === 'available' ||
-    v === 'published' ||
-    v === 'approved' ||
-    v === 'completed'
+    ["cancelled","unpaid","maintenance","out_of_service"].includes(v)
   ){
-    cls = 'confirmed';
+    cls = "red";
   }
 
   if(
-    v === 'cancelled' ||
-    v === 'canceled' ||
-    v === 'unpaid' ||
-    v === 'unavailable' ||
-    v === 'rejected'
+    ["pending","new","in_progress","occupied"].includes(v)
   ){
-    cls = 'cancelled';
+    cls = "orange";
   }
 
-  return `
-    <span class="badge ${cls}">
-      ${escapeHTML(titleCase(v))}
-    </span>
-  `;
+  return `<span class="badge ${cls}">${esc(v.replaceAll("_"," "))}</span>`;
 }
 
+function toast(message){
+  const el = document.getElementById("toast");
 
-function showToast(message,error=false){
+  el.textContent = message;
+  el.classList.add("show");
 
-  const toast =
-    $('toast');
-
-  toast.textContent =
-    message;
-
-  toast.className =
-    'toast show' +
-    (error ? ' error' : '');
-
-  clearTimeout(
-    showToast.timer
-  );
-
-  showToast.timer =
-    setTimeout(
-      () => {
-        toast.className='toast';
-      },
-      3500
-    );
+  setTimeout(()=>{
+    el.classList.remove("show");
+  },3000);
 }
-
 
 function openModal(title,body){
-
-  $('modalTitle').textContent =
-    title;
-
-  $('modalBody').innerHTML =
-    body;
-
-  $('modal').classList.add('show');
-
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalBody").innerHTML = body;
+  document.getElementById("modal").classList.add("open");
 }
-
 
 function closeModal(){
-
-  $('modal').classList.remove('show');
-
-  currentModalType=null;
-  currentModalId=null;
-
+  document.getElementById("modal").classList.remove("open");
 }
 
-
-$('modal').addEventListener(
-  'click',
-  e => {
-
-    if(e.target === $('modal')){
-      closeModal();
-    }
-
+function jsonPretty(value){
+  try{
+    return JSON.stringify(value,null,2);
+  }catch{
+    return String(value);
   }
-);
+}
 
 
 /* =========================================================
-   ADMIN AUTH CHECK
-========================================================= */
+   AUTH
+   ========================================================= */
 
-async function adminOK(){
+async function checkSession(){
 
-  try{
-
-    const sessionResult =
-      await sb.auth.getSession();
-
-    if(sessionResult.error){
-
-      throw sessionResult.error;
-
+  const {
+    data:{
+      session
     }
+  } = await supabaseClient.auth.getSession();
 
-    const session =
-      sessionResult.data.session;
-
-    if(!session){
-
-      return {
-        ok:false,
-        message:'No active session was found.'
-      };
-
-    }
-
-    const user =
-      session.user;
-
-    const adminResult =
-      await sb.rpc(
-        'is_admin_user'
-      );
-
-    if(adminResult.error){
-
-      console.error(
-        'Admin verification error:',
-        adminResult.error
-      );
-
-      return {
-        ok:false,
-        message:
-          'Admin verification failed: ' +
-          adminResult.error.message
-      };
-
-    }
-
-    if(adminResult.data !== true){
-
-      await sb.auth.signOut();
-
-      return {
-        ok:false,
-        message:
-          'This account is not authorized to access the admin dashboard.'
-      };
-
-    }
-
-    return {
-      ok:true,
-      user:user
-    };
-
-  }catch(err){
-
-    console.error(
-      'Admin check error:',
-      err
-    );
-
-    return {
-      ok:false,
-      message:
-        err?.message ||
-        'Unable to verify administrator access.'
-    };
-
+  if(!session){
+    showLogin();
+    return;
   }
 
+  const {
+    data:{
+      user
+    }
+  } = await supabaseClient.auth.getUser();
+
+  if(!user){
+    showLogin();
+    return;
+  }
+
+  const {
+    data:admin,
+    error
+  } = await supabaseClient
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id",user.id)
+    .maybeSingle();
+
+  if(error || !admin){
+    await supabaseClient.auth.signOut();
+
+    showLogin();
+
+    document.getElementById("loginError").textContent =
+      "This account is not authorized as an administrator.";
+
+    document.getElementById("loginError")
+      .classList.remove("hidden");
+
+    return;
+  }
+
+  currentUser = user;
+
+  showApp();
+
+  await loadEverything();
 }
-
-
-function showApp(){
-
-  $('login')
-    .classList
-    .add('hidden');
-
-  $('app')
-    .classList
-    .remove('hidden');
-
-  loadBookings();
-
-}
-
 
 function showLogin(){
-
-  $('app')
-    .classList
-    .add('hidden');
-
-  $('login')
-    .classList
-    .remove('hidden');
-
+  document.getElementById("loginPage").style.display = "flex";
+  document.getElementById("app").style.display = "none";
 }
 
+function showApp(){
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("app").style.display = "block";
+}
 
-/* =========================================================
-   LOGIN
-========================================================= */
-
-$('loginForm').onsubmit =
-async e => {
+document.getElementById("loginForm")
+.addEventListener("submit",async e=>{
 
   e.preventDefault();
 
-  const loginError =
-    $('loginError');
+  const email =
+    document.getElementById("loginEmail").value.trim();
 
-  const loginBtn =
-    $('loginBtn');
+  const password =
+    document.getElementById("loginPassword").value;
 
-  loginError
-    .classList
-    .add('hidden');
+  const errorBox =
+    document.getElementById("loginError");
 
-  loginError.textContent='';
+  errorBox.classList.add("hidden");
 
-  loginBtn.disabled=true;
-  loginBtn.textContent='Signing in...';
+  const {
+    error
+  } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
 
-  try{
+  if(error){
 
-    const email =
-      $('email')
-        .value
-        .trim();
+    errorBox.textContent =
+      error.message;
 
-    const password =
-      $('password')
-        .value;
+    errorBox.classList.remove("hidden");
 
-    if(!email || !password){
-
-      throw new Error(
-        'Please enter your email and password.'
-      );
-
-    }
-
-    const result =
-      await sb.auth.signInWithPassword({
-        email:email,
-        password:password
-      });
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-    const check =
-      await adminOK();
-
-    if(!check.ok){
-
-      throw new Error(
-        check.message
-      );
-
-    }
-
-    showApp();
-
-  }catch(err){
-
-    console.error(
-      'Login error:',
-      err
-    );
-
-    loginError.textContent =
-      err?.message ||
-      'Unable to sign in. Please try again.';
-
-    loginError
-      .classList
-      .remove('hidden');
-
-  }finally{
-
-    loginBtn.disabled=false;
-    loginBtn.textContent='Sign in';
-
+    return;
   }
 
-};
+  await checkSession();
+});
 
 
-/* =========================================================
-   LOGOUT
-========================================================= */
+document.getElementById("logoutBtn")
+.addEventListener("click",async()=>{
 
-$('logout').onclick =
-async () => {
+  await supabaseClient.auth.signOut();
 
-  try{
-
-    await sb.auth.signOut();
-
-  }catch(err){
-
-    console.error(
-      'Logout error:',
-      err
-    );
-
-  }
+  currentUser = null;
 
   showLogin();
-
-};
-
-
-/* =========================================================
-   MOBILE MENU
-========================================================= */
-
-$('mobileMenu').onclick =
-() => {
-
-  $('sidebar')
-    .classList
-    .toggle('open');
-
-};
+});
 
 
 /* =========================================================
    NAVIGATION
-========================================================= */
+   ========================================================= */
 
-document
-  .querySelectorAll('.nav-btn')
-  .forEach(btn => {
+document.querySelectorAll(".nav-btn")
+.forEach(button=>{
 
-    btn.addEventListener(
-      'click',
-      async () => {
+  button.addEventListener("click",()=>{
 
-        document
-          .querySelectorAll('.nav-btn')
-          .forEach(
-            b => b.classList.remove('active')
-          );
+    document
+      .querySelectorAll(".nav-btn")
+      .forEach(b=>b.classList.remove("active"));
 
-        btn.classList.add('active');
+    button.classList.add("active");
 
-        document
-          .querySelectorAll('.page')
-          .forEach(
-            page => page.classList.remove('active')
-          );
+    const page =
+      button.dataset.page;
 
-        const page =
-          btn.dataset.page;
+    document
+      .querySelectorAll(".page")
+      .forEach(p=>p.classList.remove("active"));
 
-        $('page-' + page)
-          .classList
-          .add('active');
+    document
+      .getElementById("page-"+page)
+      .classList.add("active");
 
-        $('sidebar')
-          .classList
-          .remove('open');
+    document.getElementById("topTitle")
+      .textContent =
+      button.textContent.trim();
 
-        if(page === 'reservations'){
-          await loadBookings();
-        }
-
-        if(page === 'rooms'){
-          await loadRooms();
-        }
-
-        if(page === 'requests'){
-          await loadRequests();
-        }
-
-        if(page === 'reviews'){
-          await loadReviews();
-        }
-
-        if(page === 'settings'){
-          await loadSettings();
-        }
-
-      }
-    );
+    document.getElementById("sidebar")
+      .classList.remove("open");
 
   });
+
+});
+
+
+document.getElementById("menuBtn")
+.addEventListener("click",()=>{
+  document.getElementById("sidebar")
+    .classList.toggle("open");
+});
+
+
+/* =========================================================
+   LOAD EVERYTHING
+   ========================================================= */
+
+async function loadEverything(){
+
+  await Promise.all([
+    loadReservations(),
+    loadRoomTypes(),
+    loadRooms(),
+    loadRequests(),
+    loadReviews(),
+    loadSettings()
+  ]);
+
+  updateDashboard();
+}
 
 
 /* =========================================================
    RESERVATIONS
-========================================================= */
+   ========================================================= */
 
-async function loadBookings(){
+async function loadReservations(){
 
-  $('bookingLoading')
-    .classList
-    .remove('hidden');
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("bookings")
+    .select(`
+      id,
+      booking_reference,
+      room_type_id,
+      room_id,
+      guest_first_name,
+      guest_last_name,
+      guest_email,
+      guest_phone,
+      adults,
+      children,
+      check_in,
+      check_out,
+      nights,
+      room_price,
+      extras_total,
+      discount_total,
+      total_amount,
+      special_requests,
+      status,
+      payment_status,
+      payment_reference,
+      created_at,
+      updated_at,
+      room_types(name),
+      rooms(room_number)
+    `)
+    .order("created_at",{ascending:false});
 
-  $('bookingEmpty')
-    .classList
-    .add('hidden');
+  if(error){
 
-  $('bookingTableWrap')
-    .classList
-    .add('hidden');
+    console.error(error);
 
-  try{
-
-    const result =
-      await sb
-        .from('bookings')
-        .select('*')
-        .order(
-          'created_at',
-          {
-            ascending:false
-          }
-        );
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-    bookings =
-      result.data || [];
-
-    updateBookingStats();
-
-    renderBookings();
-
-  }catch(err){
-
-    console.error(
-      'Bookings error:',
-      err
-    );
-
-    $('bookingLoading')
-      .textContent =
-      'Unable to load reservations: ' +
-      (err?.message || 'Unknown error');
-
-    showToast(
-      'Unable to load reservations.',
-      true
-    );
+    document.getElementById("reservationsTable").innerHTML =
+      `<div class="empty">Unable to load reservations.<br>${esc(error.message)}</div>`;
 
     return;
-
   }
 
+  reservations = data || [];
+
+  renderReservations();
+
+  renderDashboardReservations();
+
+  updateDashboard();
 }
 
 
-function updateBookingStats(){
-
-  const total =
-    bookings.length;
-
-  const pending =
-    bookings.filter(
-      b =>
-        String(b.status).toLowerCase()
-        === 'pending'
-    ).length;
-
-  const confirmed =
-    bookings.filter(
-      b =>
-        String(b.status).toLowerCase()
-        === 'confirmed'
-    ).length;
-
-  const cancelled =
-    bookings.filter(
-      b => {
-
-        const s =
-          String(b.status)
-            .toLowerCase();
-
-        return (
-          s === 'cancelled' ||
-          s === 'canceled'
-        );
-
-      }
-    ).length;
-
-  const unpaid =
-    bookings.filter(
-      b =>
-        String(b.payment_status)
-          .toLowerCase()
-        === 'unpaid'
-    ).length;
-
-  $('statTotal').textContent =
-    total;
-
-  $('statPending').textContent =
-    pending;
-
-  $('statConfirmed').textContent =
-    confirmed;
-
-  $('statCancelled').textContent =
-    cancelled;
-
-  $('statUnpaid').textContent =
-    unpaid;
-
-}
-
-
-function getFilteredBookings(){
+function filteredReservations(){
 
   const search =
-    $('bookingSearch')
-      .value
+    document.getElementById("reservationSearch")
+      ?.value
       .trim()
-      .toLowerCase();
+      .toLowerCase() || "";
 
   const status =
-    $('bookingStatusFilter')
-      .value
-      .toLowerCase();
+    document.getElementById("reservationStatus")
+      ?.value || "";
 
   const payment =
-    $('bookingPaymentFilter')
-      .value
-      .toLowerCase();
+    document.getElementById("reservationPayment")
+      ?.value || "";
 
-  return bookings.filter(
-    b => {
+  return reservations.filter(r=>{
 
-      const guest =
-        (
-          String(b.guest_first_name || '') +
-          ' ' +
-          String(b.guest_last_name || '')
-        ).toLowerCase();
+    const text = [
+      r.booking_reference,
+      r.guest_first_name,
+      r.guest_last_name,
+      r.guest_email
+    ]
+    .join(" ")
+    .toLowerCase();
 
-      const email =
-        String(
-          b.guest_email || ''
-        ).toLowerCase();
-
-      const reference =
-        String(
-          b.booking_reference || ''
-        ).toLowerCase();
-
-      const matchesSearch =
-        !search ||
-        guest.includes(search) ||
-        email.includes(search) ||
-        reference.includes(search);
-
-      const matchesStatus =
-        !status ||
-        String(b.status || '')
-          .toLowerCase() === status;
-
-      const matchesPayment =
-        !payment ||
-        String(b.payment_status || '')
-          .toLowerCase() === payment;
-
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesPayment
-      );
-
-    }
-  );
-
-}
-
-
-function renderBookings(){
-
-  $('bookingLoading')
-    .classList
-    .add('hidden');
-
-  const data =
-    getFilteredBookings();
-
-  if(!data.length){
-
-    $('bookingTableWrap')
-      .classList
-      .add('hidden');
-
-    $('bookingEmpty')
-      .classList
-      .remove('hidden');
-
-    $('bookingEmpty')
-      .textContent =
-      bookings.length
-        ? 'No reservations match your filters.'
-        : 'No reservations found.';
-
-    return;
-
-  }
-
-  $('bookingEmpty')
-    .classList
-    .add('hidden');
-
-  $('bookingTableWrap')
-    .classList
-    .remove('hidden');
-
-  $('bookingTable').innerHTML =
-    data.map(
-      b => {
-
-        const guest =
-          (
-            String(b.guest_first_name || '') +
-            ' ' +
-            String(b.guest_last_name || '')
-          ).trim();
-
-        const room =
-          b.room_number ||
-          b.room_id ||
-          'Assigned by system';
-
-        return `
-          <tr>
-
-            <td>
-              <strong>
-                ${escapeHTML(
-                  b.booking_reference || '—'
-                )}
-              </strong>
-            </td>
-
-            <td>
-              <strong>
-                ${escapeHTML(
-                  guest || '—'
-                )}
-              </strong>
-              <div style="color:#707773;margin-top:4px">
-                ${escapeHTML(
-                  b.guest_email || '—'
-                )}
-              </div>
-            </td>
-
-            <td>
-              ${escapeHTML(
-                room
-              )}
-            </td>
-
-            <td>
-              ${formatDate(b.check_in)}
-              →
-              ${formatDate(b.check_out)}
-              <div style="color:#707773;margin-top:4px">
-                ${escapeHTML(
-                  String(b.nights || 0)
-                )} night(s)
-              </div>
-            </td>
-
-            <td>
-              ${formatMoney(
-                b.total_amount
-              )}
-            </td>
-
-            <td>
-              ${statusBadge(
-                b.status
-              )}
-            </td>
-
-            <td>
-              ${statusBadge(
-                b.payment_status
-              )}
-            </td>
-
-            <td>
-
-              <div class="actions">
-
-                <button
-                  class="btn dark"
-                  type="button"
-                  onclick="viewBooking('${escapeHTML(
-                    b.id
-                  )}')"
-                >
-                  View
-                </button>
-
-                ${
-                  String(b.status).toLowerCase()
-                  !== 'confirmed'
-                  ?
-                  `
-                  <button
-                    class="btn green"
-                    type="button"
-                    onclick="updateBookingStatus(
-                      '${escapeHTML(b.id)}',
-                      'confirmed'
-                    )"
-                  >
-                    Confirm
-                  </button>
-                  `
-                  :
-                  ''
-                }
-
-                ${
-                  (
-                    String(b.status).toLowerCase()
-                    !== 'cancelled' &&
-                    String(b.status).toLowerCase()
-                    !== 'canceled'
-                  )
-                  ?
-                  `
-                  <button
-                    class="btn red"
-                    type="button"
-                    onclick="updateBookingStatus(
-                      '${escapeHTML(b.id)}',
-                      'cancelled'
-                    )"
-                  >
-                    Cancel
-                  </button>
-                  `
-                  :
-                  ''
-                }
-
-                ${
-                  String(b.payment_status).toLowerCase()
-                  !== 'paid'
-                  ?
-                  `
-                  <button
-                    class="btn green"
-                    type="button"
-                    onclick="markBookingPaid(
-                      '${escapeHTML(b.id)}'
-                    )"
-                  >
-                    Mark paid
-                  </button>
-                  `
-                  :
-                  ''
-                }
-
-              </div>
-
-            </td>
-
-          </tr>
-        `;
-
-      }
-    ).join('');
-
-}
-
-
-$('bookingSearch').addEventListener(
-  'input',
-  renderBookings
-);
-
-$('bookingStatusFilter').addEventListener(
-  'change',
-  renderBookings
-);
-
-$('bookingPaymentFilter').addEventListener(
-  'change',
-  renderBookings
-);
-
-
-function findBooking(id){
-
-  return bookings.find(
-    b => String(b.id) === String(id)
-  );
-
-}
-
-
-function viewBooking(id){
-
-  const b =
-    findBooking(id);
-
-  if(!b){
-
-    showToast(
-      'Reservation not found.',
-      true
+    return (
+      (!search || text.includes(search)) &&
+      (!status || r.status === status) &&
+      (!payment || r.payment_status === payment)
     );
 
-    return;
+  });
+}
 
+
+function renderReservations(){
+
+  const list = filteredReservations();
+
+  if(!list.length){
+
+    document.getElementById("reservationsTable").innerHTML =
+      `<div class="empty">No reservations found.</div>`;
+
+    return;
   }
 
-  currentModalType='booking';
-  currentModalId=id;
+  let html = `
+    <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Guest</th>
+          <th>Room</th>
+          <th>Stay</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Payment</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
 
-  const guest =
-    (
-      String(b.guest_first_name || '') +
-      ' ' +
-      String(b.guest_last_name || '')
-    ).trim();
+  list.forEach(r=>{
 
-  const html = `
+    const guest =
+      `${r.guest_first_name || ""} ${r.guest_last_name || ""}`.trim();
 
-    <div class="detail-grid">
+    const roomType =
+      r.room_types?.name || "—";
 
-      <div class="detail">
-        <div class="detail-label">
-          Booking reference
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            b.booking_reference || '—'
-          )}
-        </div>
-      </div>
+    const roomNumber =
+      r.rooms?.room_number
+      ? `Room ${r.rooms.room_number}`
+      : "Not assigned";
 
-      <div class="detail">
-        <div class="detail-label">
-          Created
-        </div>
-        <div class="detail-value">
-          ${formatDateTime(
-            b.created_at
-          )}
-        </div>
-      </div>
+    html += `
+      <tr>
 
-      <div class="detail">
-        <div class="detail-label">
-          Guest
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            guest || '—'
-          )}
-        </div>
-      </div>
+        <td>
+          <strong>${esc(r.booking_reference)}</strong><br>
+          <small>${dateFormat(r.created_at)}</small>
+        </td>
 
-      <div class="detail">
-        <div class="detail-label">
-          Email
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            b.guest_email || '—'
-          )}
-        </div>
-      </div>
+        <td>
+          <strong>${esc(guest)}</strong><br>
+          <small>${esc(r.guest_email)}</small>
+        </td>
 
-      <div class="detail">
-        <div class="detail-label">
-          Phone
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            b.guest_phone || '—'
-          )}
-        </div>
-      </div>
+        <td>
+          ${esc(roomType)}<br>
+          <small>${esc(roomNumber)}</small>
+        </td>
 
-      <div class="detail">
-        <div class="detail-label">
-          Guests
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            String(b.adults ?? 0)
-          )} adult(s),
-          ${escapeHTML(
-            String(b.children ?? 0)
-          )} child(ren)
-        </div>
-      </div>
+        <td>
+          ${dateFormat(r.check_in)}
+          →
+          ${dateFormat(r.check_out)}
+          <br>
+          <small>${esc(r.nights)} night(s)</small>
+        </td>
 
-      <div class="detail">
-        <div class="detail-label">
-          Room type ID
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            b.room_type_id || '—'
-          )}
-        </div>
-      </div>
+        <td>
+          ${money(r.total_amount)}
+        </td>
 
-      <div class="detail">
-        <div class="detail-label">
-          Room
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            b.room_number ||
-            b.room_id ||
-            'Assigned by system'
-          )}
-        </div>
-      </div>
+        <td>
+          ${badge(r.status)}
+        </td>
 
-      <div class="detail">
-        <div class="detail-label">
-          Check-in
-        </div>
-        <div class="detail-value">
-          ${formatDate(
-            b.check_in
-          )}
-        </div>
-      </div>
+        <td>
+          ${badge(r.payment_status)}
+        </td>
 
-      <div class="detail">
-        <div class="detail-label">
-          Check-out
-        </div>
-        <div class="detail-value">
-          ${formatDate(
-            b.check_out
-          )}
-        </div>
-      </div>
+        <td>
+          <div class="actions">
 
-      <div class="detail">
-        <div class="detail-label">
-          Nights
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            String(b.nights ?? 0)
-          )}
-        </div>
-      </div>
+            <button
+              class="btn btn-light"
+              onclick="viewReservation('${r.id}')">
+              View
+            </button>
 
-      <div class="detail">
-        <div class="detail-label">
-          Room price
-        </div>
-        <div class="detail-value">
-          ${formatMoney(
-            b.room_price
-          )}
-        </div>
-      </div>
+            ${
+              r.status !== "confirmed"
+              ? `<button
+                   class="btn btn-success"
+                   onclick="updateBooking('${r.id}',{status:'confirmed'})">
+                   Confirm
+                 </button>`
+              : ""
+            }
 
-      <div class="detail">
-        <div class="detail-label">
-          Extras
-        </div>
-        <div class="detail-value">
-          ${formatMoney(
-            b.extras_total
-          )}
-        </div>
-      </div>
+            ${
+              r.status !== "cancelled"
+              ? `<button
+                   class="btn btn-danger"
+                   onclick="updateBooking('${r.id}',{status:'cancelled'})">
+                   Cancel
+                 </button>`
+              : ""
+            }
 
-      <div class="detail">
-        <div class="detail-label">
-          Discount
-        </div>
-        <div class="detail-value">
-          ${formatMoney(
-            b.discount_total
-          )}
-        </div>
-      </div>
+            ${
+              r.payment_status !== "paid"
+              ? `<button
+                   class="btn btn-accent"
+                   onclick="markPaid('${r.id}')">
+                   Paid
+                 </button>`
+              : ""
+            }
 
-      <div class="detail">
-        <div class="detail-label">
-          Total amount
-        </div>
-        <div class="detail-value">
-          ${formatMoney(
-            b.total_amount
-          )}
-        </div>
-      </div>
+          </div>
+        </td>
 
-      <div class="detail">
-        <div class="detail-label">
-          Reservation status
-        </div>
-        <div class="detail-value">
-          ${statusBadge(
-            b.status
-          )}
-        </div>
-      </div>
+      </tr>
+    `;
+  });
 
-      <div class="detail">
-        <div class="detail-label">
-          Payment status
-        </div>
-        <div class="detail-value">
-          ${statusBadge(
-            b.payment_status
-          )}
-        </div>
-      </div>
-
-      <div class="detail">
-        <div class="detail-label">
-          Payment reference
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            b.payment_reference || '—'
-          )}
-        </div>
-      </div>
-
-      <div class="detail full">
-        <div class="detail-label">
-          Special requests
-        </div>
-        <div class="detail-value">
-          ${escapeHTML(
-            b.special_requests || 'None'
-          )}
-        </div>
-      </div>
-
-    </div>
-
-    <div class="modal-actions">
-
-      <button
-        class="btn green"
-        type="button"
-        onclick="updateBookingStatus(
-          '${escapeHTML(b.id)}',
-          'confirmed'
-        )"
-      >
-        Confirm reservation
-      </button>
-
-      <button
-        class="btn red"
-        type="button"
-        onclick="updateBookingStatus(
-          '${escapeHTML(b.id)}',
-          'cancelled'
-        )"
-      >
-        Cancel reservation
-      </button>
-
-      <button
-        class="btn"
-        type="button"
-        onclick="markBookingPaid(
-          '${escapeHTML(b.id)}'
-        )"
-      >
-        Mark paid
-      </button>
-
+  html += `
+      </tbody>
+    </table>
     </div>
   `;
 
-  openModal(
-    'Reservation ' +
-    (b.booking_reference || ''),
-    html
-  );
-
+  document.getElementById("reservationsTable")
+    .innerHTML = html;
 }
 
 
-async function updateBookingStatus(
-  id,
-  status
-){
+function renderDashboardReservations(){
 
-  if(
-    status === 'cancelled' &&
-    !confirm(
-      'Cancel this reservation?'
-    )
-  ){
+  const list =
+    reservations.slice(0,6);
+
+  if(!list.length){
+
+    document.getElementById("dashboardReservations")
+      .innerHTML =
+      `<div class="empty">No reservations yet.</div>`;
 
     return;
-
   }
 
-  try{
+  let html = `
+    <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Guest</th>
+          <th>Dates</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
 
-    const result =
-      await sb
-        .from('bookings')
-        .update({
-          status:status,
-          updated_at:new Date().toISOString()
-        })
-        .eq(
-          'id',
-          id
-        );
+  list.forEach(r=>{
 
-    if(result.error){
+    html += `
+      <tr>
 
-      throw result.error;
+        <td>
+          <strong>${esc(r.booking_reference)}</strong>
+        </td>
 
-    }
+        <td>
+          ${esc(
+            `${r.guest_first_name || ""} ${r.guest_last_name || ""}`
+          )}
+        </td>
 
-    showToast(
-      'Reservation updated successfully.'
-    );
+        <td>
+          ${dateFormat(r.check_in)}
+          →
+          ${dateFormat(r.check_out)}
+        </td>
 
-    closeModal();
+        <td>${badge(r.status)}</td>
 
-    await loadBookings();
+        <td>
+          <button
+            class="btn btn-light"
+            onclick="viewReservation('${r.id}')">
+            View
+          </button>
+        </td>
 
-  }catch(err){
+      </tr>
+    `;
+  });
 
-    console.error(
-      'Booking update error:',
-      err
-    );
+  html += `
+      </tbody>
+    </table>
+    </div>
+  `;
 
-    showToast(
-      err?.message ||
-      'Unable to update reservation.',
-      true
-    );
-
-  }
-
+  document.getElementById("dashboardReservations")
+    .innerHTML = html;
 }
 
 
-async function markBookingPaid(id){
+function viewReservation(id){
+
+  const r =
+    reservations.find(x=>x.id===id);
+
+  if(!r) return;
+
+  const guest =
+    `${r.guest_first_name || ""} ${r.guest_last_name || ""}`.trim();
+
+  const room =
+    r.rooms?.room_number
+    ? `Room ${r.rooms.room_number}`
+    : "Not assigned";
+
+  openModal(
+    "Reservation " + r.booking_reference,
+    `
+      <div class="detail-grid">
+
+        <div class="detail">
+          <small>Booking reference</small>
+          <strong>${esc(r.booking_reference)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Reservation status</small>
+          <strong>${badge(r.status)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Guest</small>
+          <strong>${esc(guest)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Email</small>
+          <strong>${esc(r.guest_email)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Phone</small>
+          <strong>${esc(r.guest_phone || "—")}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Guests</small>
+          <strong>
+            ${esc(r.adults)} adults,
+            ${esc(r.children)} children
+          </strong>
+        </div>
+
+        <div class="detail">
+          <small>Room type</small>
+          <strong>${esc(r.room_types?.name || "—")}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Assigned room</small>
+          <strong>${esc(room)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Check-in</small>
+          <strong>${dateFormat(r.check_in)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Check-out</small>
+          <strong>${dateFormat(r.check_out)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Nights</small>
+          <strong>${esc(r.nights)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Room price</small>
+          <strong>${money(r.room_price)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Extras</small>
+          <strong>${money(r.extras_total)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Discount</small>
+          <strong>${money(r.discount_total)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Total</small>
+          <strong>${money(r.total_amount)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Payment</small>
+          <strong>${badge(r.payment_status)}</strong>
+        </div>
+
+        <div class="detail">
+          <small>Payment reference</small>
+          <strong>${esc(r.payment_reference || "—")}</strong>
+        </div>
+
+      </div>
+
+      <div style="margin-top:16px">
+
+        <div class="detail">
+          <small>Special requests</small>
+          <strong>${esc(r.special_requests || "None")}</strong>
+        </div>
+
+      </div>
+
+      <div class="actions" style="margin-top:18px">
+
+        ${
+          r.status !== "confirmed"
+          ? `<button
+              class="btn btn-success"
+              onclick="updateBooking('${r.id}',{status:'confirmed'});closeModal()">
+              Confirm reservation
+             </button>`
+          : ""
+        }
+
+        ${
+          r.status !== "cancelled"
+          ? `<button
+              class="btn btn-danger"
+              onclick="updateBooking('${r.id}',{status:'cancelled'});closeModal()">
+              Cancel reservation
+             </button>`
+          : ""
+        }
+
+        ${
+          r.payment_status !== "paid"
+          ? `<button
+              class="btn btn-accent"
+              onclick="markPaid('${r.id}');closeModal()">
+              Mark paid
+             </button>`
+          : ""
+        }
+
+      </div>
+    `
+  );
+}
+
+
+async function updateBooking(id,changes){
+
+  const {
+    error
+  } = await supabaseClient
+    .from("bookings")
+    .update(changes)
+    .eq("id",id);
+
+  if(error){
+
+    toast("Update failed: " + error.message);
+
+    return;
+  }
+
+  toast("Reservation updated.");
+
+  await loadReservations();
+}
+
+
+async function markPaid(id){
+
+  await updateBooking(
+    id,
+    {
+      payment_status:"paid"
+    }
+  );
+}
+
+
+/* =========================================================
+   ROOM TYPES
+   ========================================================= */
+
+async function loadRoomTypes(){
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("room_types")
+    .select("*")
+    .order("created_at",{ascending:true});
+
+  if(error){
+
+    document.getElementById("roomTypesList")
+      .innerHTML =
+      `<div class="empty">${esc(error.message)}</div>`;
+
+    return;
+  }
+
+  roomTypes = data || [];
+
+  renderRoomTypes();
+
+  updateDashboard();
+}
+
+
+function renderRoomTypes(){
+
+  if(!roomTypes.length){
+
+    document.getElementById("roomTypesList")
+      .innerHTML =
+      `<div class="empty">No room types found.</div>`;
+
+    return;
+  }
+
+  let html =
+    `<div class="grid-3">`;
+
+  roomTypes.forEach(r=>{
+
+    let image =
+      r.image_url ||
+      "images/room.jpg";
+
+    html += `
+      <div class="room-card">
+
+        <img
+          class="room-image"
+          src="${esc(image)}"
+          onerror="this.src='images/room.jpg'"
+        >
+
+        <div class="room-info">
+
+          <h3>${esc(r.name)}</h3>
+
+          <p>${esc(
+            r.short_description ||
+            r.description ||
+            "No description"
+          )}</p>
+
+          <p>
+            <strong>${money(r.price_per_night)}</strong>
+          </p>
+
+          <p>
+            Up to ${esc(r.max_guests)} guest(s)
+          </p>
+
+          <p>
+            ${badge(r.is_active ? "active" : "inactive")}
+          </p>
+
+          <div class="actions" style="margin-top:12px">
+
+            <button
+              class="btn btn-light"
+              onclick="openRoomTypeModal('${r.id}')">
+              Edit
+            </button>
+
+            <button
+              class="btn ${r.is_active ? "btn-danger" : "btn-success"}"
+              onclick="toggleRoomType('${r.id}',${!r.is_active})">
+              ${r.is_active ? "Deactivate" : "Activate"}
+            </button>
+
+            <button
+              class="btn btn-danger"
+              onclick="deleteRoomType('${r.id}')">
+              Delete
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  document.getElementById("roomTypesList")
+    .innerHTML = html;
+}
+
+
+function openRoomTypeModal(id=null){
+
+  const r =
+    id
+    ? roomTypes.find(x=>x.id===id)
+    : null;
+
+  openModal(
+    id ? "Edit Room Type" : "Add Room Type",
+    `
+
+      <form id="roomTypeForm">
+
+        <input
+          type="hidden"
+          id="rtId"
+          value="${esc(r?.id || "")}"
+        >
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Name</label>
+            <input
+              id="rtName"
+              required
+              value="${esc(r?.name || "")}"
+            >
+          </div>
+
+          <div class="field">
+            <label>Slug</label>
+            <input
+              id="rtSlug"
+              required
+              value="${esc(r?.slug || "")}"
+            >
+          </div>
+
+          <div class="field">
+            <label>Price per night</label>
+            <input
+              id="rtPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              value="${esc(r?.price_per_night ?? 0)}"
+            >
+          </div>
+
+          <div class="field">
+            <label>Maximum guests</label>
+            <input
+              id="rtGuests"
+              type="number"
+              min="1"
+              value="${esc(r?.max_guests ?? 2)}"
+            >
+          </div>
+
+          <div class="field">
+            <label>Bed type</label>
+            <input
+              id="rtBed"
+              value="${esc(r?.bed_type || "")}"
+            >
+          </div>
+
+          <div class="field">
+            <label>Room size</label>
+            <input
+              id="rtSize"
+              value="${esc(r?.room_size || "")}"
+            >
+          </div>
+
+          <div class="field">
+            <label>View type</label>
+            <input
+              id="rtView"
+              value="${esc(r?.view_type || "")}"
+            >
+          </div>
+
+          <div class="field">
+            <label>Image URL</label>
+            <input
+              id="rtImage"
+              value="${esc(r?.image_url || "")}"
+              placeholder="images/room.jpg"
+            >
+          </div>
+
+          <div class="field full-field">
+            <label>Short description</label>
+            <textarea id="rtShort">${esc(r?.short_description || "")}</textarea>
+          </div>
+
+          <div class="field full-field">
+            <label>Description</label>
+            <textarea id="rtDescription">${esc(r?.description || "")}</textarea>
+          </div>
+
+          <div class="field full-field">
+            <label>Amenities JSON</label>
+            <textarea id="rtAmenities">${esc(
+              jsonPretty(r?.amenities || [])
+            )}</textarea>
+          </div>
+
+          <div class="field full-field">
+            <label>Gallery JSON</label>
+            <textarea id="rtGallery">${esc(
+              jsonPretty(r?.gallery || [])
+            )}</textarea>
+          </div>
+
+        </div>
+
+        <button class="btn btn-accent" type="submit">
+          Save Room Type
+        </button>
+
+      </form>
+
+    `
+  );
+
+  document.getElementById("roomTypeForm")
+    .addEventListener("submit",saveRoomType);
+}
+
+
+async function saveRoomType(e){
+
+  e.preventDefault();
+
+  let amenities;
+  let gallery;
 
   try{
 
-    const result =
-      await sb
-        .from('bookings')
-        .update({
-          payment_status:'paid',
-          updated_at:new Date().toISOString()
-        })
-        .eq(
-          'id',
-          id
-        );
+    amenities =
+      JSON.parse(
+        document.getElementById("rtAmenities").value || "[]"
+      );
 
-    if(result.error){
+    gallery =
+      JSON.parse(
+        document.getElementById("rtGallery").value || "[]"
+      );
 
-      throw result.error;
+  }catch{
 
-    }
+    toast("Amenities and gallery must contain valid JSON.");
 
-    showToast(
-      'Payment marked as paid.'
-    );
+    return;
+  }
 
-    closeModal();
+  const id =
+    document.getElementById("rtId").value;
 
-    await loadBookings();
+  const payload = {
 
-  }catch(err){
+    name:
+      document.getElementById("rtName").value.trim(),
 
-    console.error(
-      'Payment update error:',
-      err
-    );
+    slug:
+      document.getElementById("rtSlug").value.trim(),
 
-    showToast(
-      err?.message ||
-      'Unable to update payment.',
-      true
-    );
+    price_per_night:
+      Number(document.getElementById("rtPrice").value || 0),
+
+    max_guests:
+      Number(document.getElementById("rtGuests").value || 2),
+
+    bed_type:
+      document.getElementById("rtBed").value.trim() || null,
+
+    room_size:
+      document.getElementById("rtSize").value.trim() || null,
+
+    view_type:
+      document.getElementById("rtView").value.trim() || null,
+
+    image_url:
+      document.getElementById("rtImage").value.trim() || null,
+
+    short_description:
+      document.getElementById("rtShort").value.trim() || null,
+
+    description:
+      document.getElementById("rtDescription").value.trim() || null,
+
+    amenities,
+
+    gallery,
+
+    updated_at:
+      new Date().toISOString()
+
+  };
+
+  let error;
+
+  if(id){
+
+    ({
+      error
+    } =
+      await supabaseClient
+        .from("room_types")
+        .update(payload)
+        .eq("id",id));
+
+  }else{
+
+    ({
+      error
+    } =
+      await supabaseClient
+        .from("room_types")
+        .insert(payload));
 
   }
 
+  if(error){
+
+    toast("Could not save room type: " + error.message);
+
+    return;
+  }
+
+  closeModal();
+
+  toast("Room type saved.");
+
+  await loadRoomTypes();
+}
+
+
+async function toggleRoomType(id,value){
+
+  const {
+    error
+  } = await supabaseClient
+    .from("room_types")
+    .update({
+      is_active:value,
+      updated_at:new Date().toISOString()
+    })
+    .eq("id",id);
+
+  if(error){
+
+    toast(error.message);
+
+    return;
+  }
+
+  await loadRoomTypes();
+
+  toast("Room type updated.");
+}
+
+
+async function deleteRoomType(id){
+
+  const r =
+    roomTypes.find(x=>x.id===id);
+
+  if(!r) return;
+
+  if(!confirm(
+    `Delete "${r.name}"?\n\nThis can fail if rooms are still assigned to this room type.`
+  )){
+    return;
+  }
+
+  const {
+    error
+  } = await supabaseClient
+    .from("room_types")
+    .delete()
+    .eq("id",id);
+
+  if(error){
+
+    toast("Delete failed: " + error.message);
+
+    return;
+  }
+
+  toast("Room type deleted.");
+
+  await loadRoomTypes();
 }
 
 
 /* =========================================================
    ROOMS
-========================================================= */
+   ========================================================= */
 
 async function loadRooms(){
 
-  $('roomsLoading')
-    .classList
-    .remove('hidden');
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("rooms")
+    .select(`
+      *,
+      room_types(name)
+    `)
+    .order("room_number",{ascending:true});
 
-  $('roomsEmpty')
-    .classList
-    .add('hidden');
+  if(error){
 
-  $('roomsTableWrap')
-    .classList
-    .add('hidden');
-
-  $('inventoryGrid').innerHTML =
-    '<div class="loading">Loading room inventory...</div>';
-
-  try{
-
-    const [
-      typesResult,
-      roomsResult
-    ] =
-      await Promise.all([
-
-        sb
-          .from('room_types')
-          .select('*'),
-
-        sb
-          .from('rooms')
-          .select('*')
-
-      ]);
-
-    if(typesResult.error){
-
-      throw typesResult.error;
-
-    }
-
-    if(roomsResult.error){
-
-      throw roomsResult.error;
-
-    }
-
-    roomTypes =
-      typesResult.data || [];
-
-    rooms =
-      roomsResult.data || [];
-
-    renderInventory();
-    renderRooms();
-
-  }catch(err){
-
-    console.error(
-      'Rooms error:',
-      err
-    );
-
-    $('roomsLoading')
-      .textContent =
-      'Unable to load rooms: ' +
-      (err?.message || 'Unknown error');
-
-    $('inventoryGrid').innerHTML =
-      `
-      <div class="empty">
-        Unable to load room inventory.
-      </div>
-      `;
-
-    showToast(
-      'Unable to load rooms.',
-      true
-    );
-
-  }
-
-}
-
-
-function detectRoomTypeId(roomType){
-
-  return (
-    roomType?.id ||
-    roomType?.room_type_id ||
-    null
-  );
-
-}
-
-
-function detectRoomTypeName(roomType){
-
-  return (
-    roomType?.name ||
-    roomType?.title ||
-    roomType?.room_type_name ||
-    roomType?.slug ||
-    'Room type'
-  );
-
-}
-
-
-function roomTypeForRoom(room){
-
-  const roomTypeId =
-    room.room_type_id ||
-    room.roomtype_id ||
-    room.type_id;
-
-  if(roomTypeId){
-
-    return roomTypes.find(
-      t =>
-        String(
-          detectRoomTypeId(t)
-        ) === String(roomTypeId)
-    );
-
-  }
-
-  return null;
-
-}
-
-
-function detectRoomNumber(room){
-
-  return (
-    room.room_number ||
-    room.number ||
-    room.name ||
-    room.room_no ||
-    room.code ||
-    '—'
-  );
-
-}
-
-
-function detectRoomStatus(room){
-
-  return (
-    room.status ||
-    (
-      room.is_available === true
-        ? 'available'
-        : room.is_available === false
-          ? 'unavailable'
-          : 'unknown'
-    )
-  );
-
-}
-
-
-function renderInventory(){
-
-  const grid =
-    $('inventoryGrid');
-
-  if(!roomTypes.length){
-
-    grid.innerHTML =
-      `
-      <div class="empty">
-        No room types found.
-      </div>
-      `;
+    document.getElementById("roomsList")
+      .innerHTML =
+      `<div class="empty">${esc(error.message)}</div>`;
 
     return;
-
   }
 
-  grid.innerHTML =
-    roomTypes.map(
-      type => {
+  rooms = data || [];
 
-        const id =
-          detectRoomTypeId(type);
+  renderRooms();
 
-        const name =
-          detectRoomTypeName(type);
-
-        const list =
-          rooms.filter(
-            r => {
-
-              const typeId =
-                r.room_type_id ||
-                r.roomtype_id ||
-                r.type_id;
-
-              return (
-                id &&
-                typeId &&
-                String(typeId)
-                === String(id)
-              );
-
-            }
-          );
-
-        const available =
-          list.filter(
-            r =>
-              String(
-                detectRoomStatus(r)
-              ).toLowerCase()
-              === 'available'
-          ).length;
-
-        return `
-          <div class="inventory-card">
-
-            <h3>
-              ${escapeHTML(name)}
-            </h3>
-
-            <div class="inventory-number">
-              ${list.length}
-            </div>
-
-            <div class="inventory-small">
-              ${available} available
-            </div>
-
-          </div>
-        `;
-
-      }
-    ).join('');
-
+  updateDashboard();
 }
 
 
 function renderRooms(){
 
-  $('roomsLoading')
-    .classList
-    .add('hidden');
+  const filter =
+    document.getElementById("roomStatusFilter")
+      ?.value || "";
 
-  if(!rooms.length){
+  const list =
+    rooms.filter(r=>
+      !filter ||
+      r.status === filter
+    );
 
-    $('roomsTableWrap')
-      .classList
-      .add('hidden');
+  if(!list.length){
 
-    $('roomsEmpty')
-      .classList
-      .remove('hidden');
+    document.getElementById("roomsList")
+      .innerHTML =
+      `<div class="empty">No rooms found.</div>`;
 
     return;
+  }
+
+  let html = `
+    <div class="table-wrap">
+    <table>
+
+      <thead>
+        <tr>
+          <th>Room</th>
+          <th>Room Type</th>
+          <th>Floor</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+  `;
+
+  list.forEach(r=>{
+
+    html += `
+      <tr>
+
+        <td>
+          <strong>Room ${esc(r.room_number)}</strong>
+        </td>
+
+        <td>
+          ${esc(r.room_types?.name || "—")}
+        </td>
+
+        <td>
+          ${esc(r.floor || "—")}
+        </td>
+
+        <td>
+          ${badge(r.status)}
+        </td>
+
+        <td>
+
+          <div class="actions">
+
+            <button
+              class="btn btn-light"
+              onclick="openRoomModal('${r.id}')">
+              Edit
+            </button>
+
+            <button
+              class="btn btn-danger"
+              onclick="deleteRoom('${r.id}')">
+              Delete
+            </button>
+
+          </div>
+
+        </td>
+
+      </tr>
+    `;
+  });
+
+  html += `
+      </tbody>
+    </table>
+    </div>
+  `;
+
+  document.getElementById("roomsList")
+    .innerHTML = html;
+}
+
+
+function openRoomModal(id=null){
+
+  const r =
+    id
+    ? rooms.find(x=>x.id===id)
+    : null;
+
+  const options =
+    roomTypes
+      .map(rt=>`
+        <option
+          value="${esc(rt.id)}"
+          ${r?.room_type_id===rt.id ? "selected":""}
+        >
+          ${esc(rt.name)}
+        </option>
+      `)
+      .join("");
+
+  openModal(
+    id ? "Edit Room" : "Add Room",
+    `
+
+      <form id="roomForm">
+
+        <input
+          type="hidden"
+          id="roomId"
+          value="${esc(r?.id || "")}"
+        >
+
+        <div class="field">
+          <label>Room type</label>
+          <select id="roomTypeId" required>
+            <option value="">Select room type</option>
+            ${options}
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Room number</label>
+          <input
+            id="roomNumber"
+            required
+            value="${esc(r?.room_number || "")}"
+          >
+        </div>
+
+        <div class="field">
+          <label>Floor</label>
+          <input
+            id="roomFloor"
+            value="${esc(r?.floor || "")}"
+          >
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <select id="roomStatus">
+            ${["available","occupied","maintenance","out_of_service"]
+              .map(s=>`
+                <option
+                  value="${s}"
+                  ${r?.status===s ? "selected":""}
+                >
+                  ${s.replaceAll("_"," ")}
+                </option>
+              `).join("")
+            }
+          </select>
+        </div>
+
+        <button class="btn btn-accent" type="submit">
+          Save Room
+        </button>
+
+      </form>
+
+    `
+  );
+
+  document.getElementById("roomForm")
+    .addEventListener("submit",saveRoom);
+}
+
+
+async function saveRoom(e){
+
+  e.preventDefault();
+
+  const id =
+    document.getElementById("roomId").value;
+
+  const payload = {
+
+    room_type_id:
+      document.getElementById("roomTypeId").value,
+
+    room_number:
+      document.getElementById("roomNumber").value.trim(),
+
+    floor:
+      document.getElementById("roomFloor").value.trim() || null,
+
+    status:
+      document.getElementById("roomStatus").value,
+
+    updated_at:
+      new Date().toISOString()
+
+  };
+
+  let error;
+
+  if(id){
+
+    ({
+      error
+    } =
+      await supabaseClient
+        .from("rooms")
+        .update(payload)
+        .eq("id",id));
+
+  }else{
+
+    ({
+      error
+    } =
+      await supabaseClient
+        .from("rooms")
+        .insert(payload));
 
   }
 
-  $('roomsEmpty')
-    .classList
-    .add('hidden');
+  if(error){
 
-  $('roomsTableWrap')
-    .classList
-    .remove('hidden');
+    toast("Could not save room: " + error.message);
 
-  $('roomsTable').innerHTML =
-    rooms.map(
-      room => {
+    return;
+  }
 
-        const type =
-          roomTypeForRoom(room);
+  closeModal();
 
-        const typeName =
-          type
-            ? detectRoomTypeName(type)
-            : (
-              room.room_type_name ||
-              room.room_type ||
-              '—'
-            );
+  toast("Room saved.");
 
-        const status =
-          detectRoomStatus(room);
+  await loadRooms();
+}
 
-        return `
-          <tr>
 
-            <td>
-              <strong>
-                ${escapeHTML(
-                  detectRoomNumber(room)
-                )}
-              </strong>
-            </td>
+async function deleteRoom(id){
 
-            <td>
-              ${escapeHTML(
-                typeName
-              )}
-            </td>
+  if(!confirm("Delete this room?")){
+    return;
+  }
 
-            <td>
-              ${statusBadge(
-                status
-              )}
-            </td>
+  const {
+    error
+  } = await supabaseClient
+    .from("rooms")
+    .delete()
+    .eq("id",id);
 
-            <td>
+  if(error){
 
-              <button
-                class="btn dark"
-                type="button"
-                onclick="viewGenericRecord(
-                  'Room details',
-                  rooms,
-                  '${escapeHTML(room.id || '')}'
-                )"
-              >
-                View
-              </button>
+    toast("Delete failed: " + error.message);
 
-            </td>
+    return;
+  }
 
-          </tr>
-        `;
+  toast("Room deleted.");
 
-      }
-    ).join('');
-
+  await loadRooms();
 }
 
 
 /* =========================================================
    HOTEL REQUESTS
-========================================================= */
+   ========================================================= */
 
 async function loadRequests(){
 
-  $('requestsLoading')
-    .classList
-    .remove('hidden');
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("hotel_requests")
+    .select("*")
+    .order("created_at",{ascending:false});
 
-  $('requestsEmpty')
-    .classList
-    .add('hidden');
+  if(error){
 
-  $('requestsTableWrap')
-    .classList
-    .add('hidden');
+    document.getElementById("requestsList")
+      .innerHTML =
+      `<div class="empty">${esc(error.message)}</div>`;
 
-  try{
-
-    const result =
-      await sb
-        .from('hotel_requests')
-        .select('*')
-        .order(
-          'created_at',
-          {
-            ascending:false
-          }
-        );
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-    requests =
-      result.data || [];
-
-    renderRequests();
-
-  }catch(err){
-
-    console.error(
-      'Requests error:',
-      err
-    );
-
-    $('requestsLoading')
-      .textContent =
-      'Unable to load hotel requests: ' +
-      (err?.message || 'Unknown error');
-
-    showToast(
-      'Unable to load hotel requests.',
-      true
-    );
-
+    return;
   }
 
-}
+  requests = data || [];
 
+  renderRequests();
 
-function detectRequestStatus(request){
-
-  return (
-    request.status ||
-    request.request_status ||
-    request.state ||
-    'pending'
-  );
-
-}
-
-
-function detectRequestGuest(request){
-
-  return (
-    request.guest_name ||
-    request.name ||
-    (
-      request.first_name ||
-      request.last_name
-        ?
-        (
-          String(request.first_name || '') +
-          ' ' +
-          String(request.last_name || '')
-        ).trim()
-        :
-        null
-    ) ||
-    request.email ||
-    'Guest'
-  );
-
-}
-
-
-function detectRequestType(request){
-
-  return (
-    request.request_type ||
-    request.type ||
-    request.category ||
-    request.subject ||
-    'Hotel request'
-  );
-
-}
-
-
-function getFilteredRequests(){
-
-  const search =
-    $('requestSearch')
-      .value
-      .trim()
-      .toLowerCase();
-
-  const status =
-    $('requestStatusFilter')
-      .value
-      .toLowerCase();
-
-  return requests.filter(
-    r => {
-
-      const text =
-        JSON.stringify(r)
-          .toLowerCase();
-
-      const requestStatus =
-        String(
-          detectRequestStatus(r)
-        ).toLowerCase();
-
-      return (
-        (!search || text.includes(search)) &&
-        (!status || requestStatus === status)
-      );
-
-    }
-  );
-
+  updateDashboard();
 }
 
 
 function renderRequests(){
 
-  $('requestsLoading')
-    .classList
-    .add('hidden');
+  const search =
+    document.getElementById("requestSearch")
+      ?.value
+      .trim()
+      .toLowerCase() || "";
 
-  const data =
-    getFilteredRequests();
+  const status =
+    document.getElementById("requestStatus")
+      ?.value || "";
 
-  if(!data.length){
+  const list =
+    requests.filter(r=>{
 
-    $('requestsTableWrap')
-      .classList
-      .add('hidden');
+      const text = [
+        r.request_type,
+        r.first_name,
+        r.last_name,
+        r.email,
+        r.phone,
+        r.subject,
+        r.message
+      ]
+      .join(" ")
+      .toLowerCase();
 
-    $('requestsEmpty')
-      .classList
-      .remove('hidden');
+      return (
+        (!search || text.includes(search)) &&
+        (!status || r.status===status)
+      );
+    });
+
+  if(!list.length){
+
+    document.getElementById("requestsList")
+      .innerHTML =
+      `<div class="empty">No hotel requests found.</div>`;
 
     return;
-
   }
 
-  $('requestsEmpty')
-    .classList
-    .add('hidden');
+  let html = `
+    <div class="table-wrap">
+    <table>
 
-  $('requestsTableWrap')
-    .classList
-    .remove('hidden');
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Guest</th>
+          <th>Request</th>
+          <th>Requested Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
 
-  $('requestsTable').innerHTML =
-    data.map(
-      r => {
+      <tbody>
+  `;
 
-        const id =
-          r.id || '';
+  list.forEach(r=>{
 
-        return `
-          <tr>
+    html += `
+      <tr>
 
-            <td>
-              ${formatDateTime(
-                r.created_at ||
-                r.created ||
-                r.date
-              )}
-            </td>
+        <td>
+          ${dateFormat(r.created_at)}
+        </td>
 
-            <td>
-              ${escapeHTML(
-                detectRequestGuest(r)
-              )}
-            </td>
+        <td>
+          <strong>
+            ${esc(
+              `${r.first_name || ""} ${r.last_name || ""}`
+            )}
+          </strong>
+          <br>
+          <small>${esc(r.email || r.phone || "—")}</small>
+        </td>
 
-            <td>
-              ${escapeHTML(
-                detectRequestType(r)
-              )}
-            </td>
+        <td>
+          <strong>${esc(r.request_type)}</strong>
+          <br>
+          <small>${esc(r.subject || "")}</small>
+        </td>
 
-            <td>
-              ${statusBadge(
-                detectRequestStatus(r)
-              )}
-            </td>
+        <td>
+          ${dateFormat(r.requested_date)}
+          ${r.requested_time
+            ? `<br><small>${esc(r.requested_time)}</small>`
+            : ""}
+        </td>
 
-            <td>
+        <td>
+          ${badge(r.status)}
+        </td>
 
-              <button
-                class="btn dark"
-                type="button"
-                onclick="viewRequest(
-                  '${escapeHTML(id)}'
-                )"
-              >
-                View
-              </button>
+        <td>
 
-            </td>
+          <div class="actions">
 
-          </tr>
-        `;
+            <button
+              class="btn btn-light"
+              onclick="viewRequest('${r.id}')">
+              View
+            </button>
 
-      }
-    ).join('');
+            <button
+              class="btn btn-accent"
+              onclick="editRequest('${r.id}')">
+              Update
+            </button>
 
+            <button
+              class="btn btn-danger"
+              onclick="deleteRequest('${r.id}')">
+              Delete
+            </button>
+
+          </div>
+
+        </td>
+
+      </tr>
+    `;
+  });
+
+  html += `
+      </tbody>
+    </table>
+    </div>
+  `;
+
+  document.getElementById("requestsList")
+    .innerHTML = html;
 }
-
-
-$('requestSearch').addEventListener(
-  'input',
-  renderRequests
-);
-
-$('requestStatusFilter').addEventListener(
-  'change',
-  renderRequests
-);
 
 
 function viewRequest(id){
 
-  const request =
-    requests.find(
-      r =>
-        String(r.id || '') === String(id)
-    );
+  const r =
+    requests.find(x=>x.id===id);
 
-  if(!request){
+  if(!r) return;
 
-    showToast(
-      'Request not found.',
-      true
-    );
+  openModal(
+    "Hotel Request",
+    `
 
-    return;
+      <div class="detail-grid">
 
-  }
+        <div class="detail">
+          <small>Request type</small>
+          <strong>${esc(r.request_type)}</strong>
+        </div>
 
-  const body =
-    createRecordDetails(
-      request
-    );
+        <div class="detail">
+          <small>Status</small>
+          <strong>${badge(r.status)}</strong>
+        </div>
 
-  const status =
-    detectRequestStatus(request);
+        <div class="detail">
+          <small>Guest</small>
+          <strong>
+            ${esc(
+              `${r.first_name || ""} ${r.last_name || ""}`
+            )}
+          </strong>
+        </div>
 
-  let actions = '';
+        <div class="detail">
+          <small>Email</small>
+          <strong>${esc(r.email || "—")}</strong>
+        </div>
 
-  const statusColumn =
-    findColumn(
-      request,
-      [
-        'status',
-        'request_status',
-        'state'
-      ]
-    );
+        <div class="detail">
+          <small>Phone</small>
+          <strong>${esc(r.phone || "—")}</strong>
+        </div>
 
-  if(statusColumn){
+        <div class="detail">
+          <small>Guests</small>
+          <strong>${esc(r.guests || "—")}</strong>
+        </div>
 
-    actions = `
+        <div class="detail">
+          <small>Requested date</small>
+          <strong>${dateFormat(r.requested_date)}</strong>
+        </div>
 
-      <div class="modal-actions">
-
-        <button
-          class="btn green"
-          type="button"
-          onclick="updateRequestStatus(
-            '${escapeHTML(request.id)}',
-            '${escapeHTML(statusColumn)}',
-            'completed'
-          )"
-        >
-          Mark completed
-        </button>
-
-        <button
-          class="btn red"
-          type="button"
-          onclick="updateRequestStatus(
-            '${escapeHTML(request.id)}',
-            '${escapeHTML(statusColumn)}',
-            'cancelled'
-          )"
-        >
-          Cancel
-        </button>
+        <div class="detail">
+          <small>Requested time</small>
+          <strong>${esc(r.requested_time || "—")}</strong>
+        </div>
 
       </div>
 
-    `;
+      <div style="margin-top:15px" class="detail">
+        <small>Subject</small>
+        <strong>${esc(r.subject || "—")}</strong>
+      </div>
 
-  }
+      <div style="margin-top:12px" class="detail">
+        <small>Message</small>
+        <strong>${esc(r.message || "—")}</strong>
+      </div>
 
-  openModal(
-    'Hotel request',
-    body + actions
+      <div style="margin-top:12px" class="detail">
+        <small>Admin notes</small>
+        <strong>${esc(r.admin_notes || "—")}</strong>
+      </div>
+
+    `
   );
-
 }
 
 
-async function updateRequestStatus(
-  id,
-  column,
-  status
-){
+function editRequest(id){
 
-  try{
+  const r =
+    requests.find(x=>x.id===id);
 
-    const update = {};
+  if(!r) return;
 
-    update[column] =
-      status;
+  openModal(
+    "Update Hotel Request",
+    `
 
-    const result =
-      await sb
-        .from('hotel_requests')
-        .update(update)
-        .eq('id',id);
+      <form id="requestForm">
 
-    if(result.error){
+        <div class="field">
+          <label>Status</label>
 
-      throw result.error;
+          <select id="reqStatus">
 
-    }
+            ${[
+              "new",
+              "in_progress",
+              "resolved",
+              "cancelled"
+            ].map(s=>`
+              <option
+                value="${s}"
+                ${r.status===s ? "selected":""}
+              >
+                ${s.replaceAll("_"," ")}
+              </option>
+            `).join("")}
 
-    showToast(
-      'Request updated successfully.'
-    );
+          </select>
+        </div>
 
-    closeModal();
+        <div class="field">
+          <label>Admin notes</label>
 
-    await loadRequests();
+          <textarea id="reqNotes">${esc(
+            r.admin_notes || ""
+          )}</textarea>
+        </div>
 
-  }catch(err){
+        <button class="btn btn-accent">
+          Save
+        </button>
 
-    console.error(
-      'Request update error:',
-      err
-    );
+      </form>
 
-    showToast(
-      err?.message ||
-      'Unable to update request.',
-      true
-    );
+    `
+  );
 
+  document.getElementById("requestForm")
+    .addEventListener("submit",async e=>{
+
+      e.preventDefault();
+
+      const {
+        error
+      } = await supabaseClient
+        .from("hotel_requests")
+        .update({
+          status:
+            document.getElementById("reqStatus").value,
+
+          admin_notes:
+            document.getElementById("reqNotes").value.trim() || null,
+
+          updated_at:
+            new Date().toISOString()
+        })
+        .eq("id",id);
+
+      if(error){
+
+        toast(error.message);
+
+        return;
+      }
+
+      closeModal();
+
+      toast("Request updated.");
+
+      await loadRequests();
+
+    });
+}
+
+
+async function deleteRequest(id){
+
+  if(!confirm("Delete this hotel request?")){
+    return;
   }
 
+  const {
+    error
+  } = await supabaseClient
+    .from("hotel_requests")
+    .delete()
+    .eq("id",id);
+
+  if(error){
+
+    toast(error.message);
+
+    return;
+  }
+
+  toast("Request deleted.");
+
+  await loadRequests();
 }
 
 
 /* =========================================================
    REVIEWS
-========================================================= */
+   ========================================================= */
 
 async function loadReviews(){
 
-  $('reviewsLoading')
-    .classList
-    .remove('hidden');
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("reviews")
+    .select("*")
+    .order("created_at",{ascending:false});
 
-  $('reviewsEmpty')
-    .classList
-    .add('hidden');
+  if(error){
 
-  $('reviewsTableWrap')
-    .classList
-    .add('hidden');
+    document.getElementById("reviewsList")
+      .innerHTML =
+      `<div class="empty">${esc(error.message)}</div>`;
 
-  try{
-
-    const result =
-      await sb
-        .from('reviews')
-        .select('*')
-        .order(
-          'created_at',
-          {
-            ascending:false
-          }
-        );
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-    reviews =
-      result.data || [];
-
-    renderReviews();
-
-  }catch(err){
-
-    console.error(
-      'Reviews error:',
-      err
-    );
-
-    $('reviewsLoading')
-      .textContent =
-      'Unable to load reviews: ' +
-      (err?.message || 'Unknown error');
-
-    showToast(
-      'Unable to load reviews.',
-      true
-    );
-
+    return;
   }
 
-}
+  reviews = data || [];
 
+  renderReviews();
 
-function detectReviewGuest(review){
-
-  return (
-    review.guest_name ||
-    review.name ||
-    review.author_name ||
-    review.author ||
-    review.email ||
-    'Guest'
-  );
-
-}
-
-
-function detectReviewRating(review){
-
-  return (
-    review.rating ??
-    review.score ??
-    review.stars ??
-    '—'
-  );
-
-}
-
-
-function detectReviewText(review){
-
-  return (
-    review.review_text ||
-    review.review ||
-    review.comment ||
-    review.message ||
-    review.content ||
-    '—'
-  );
-
-}
-
-
-function detectReviewStatus(review){
-
-  if(
-    review.published !== undefined
-  ){
-
-    return review.published
-      ? 'published'
-      : 'unpublished';
-
-  }
-
-  if(
-    review.is_published !== undefined
-  ){
-
-    return review.is_published
-      ? 'published'
-      : 'unpublished';
-
-  }
-
-  if(
-    review.approved !== undefined
-  ){
-
-    return review.approved
-      ? 'approved'
-      : 'pending';
-
-  }
-
-  if(
-    review.is_approved !== undefined
-  ){
-
-    return review.is_approved
-      ? 'approved'
-      : 'pending';
-
-  }
-
-  return (
-    review.status ||
-    'unknown'
-  );
-
-}
-
-
-function getFilteredReviews(){
-
-  const search =
-    $('reviewSearch')
-      .value
-      .trim()
-      .toLowerCase();
-
-  return reviews.filter(
-    review =>
-      !search ||
-      JSON.stringify(review)
-        .toLowerCase()
-        .includes(search)
-  );
-
+  updateDashboard();
 }
 
 
 function renderReviews(){
 
-  $('reviewsLoading')
-    .classList
-    .add('hidden');
+  const published =
+    document.getElementById("reviewPublished")
+      ?.value || "";
 
-  const data =
-    getFilteredReviews();
+  const featured =
+    document.getElementById("reviewFeatured")
+      ?.value || "";
 
-  if(!data.length){
+  const list =
+    reviews.filter(r=>{
 
-    $('reviewsTableWrap')
-      .classList
-      .add('hidden');
+      return (
+        (!published ||
+          (published==="published"
+            ? r.is_published
+            : !r.is_published
+          )
+        ) &&
+        (!featured ||
+          (featured==="featured"
+            ? r.is_featured
+            : !r.is_featured
+          )
+        )
+      );
 
-    $('reviewsEmpty')
-      .classList
-      .remove('hidden');
+    });
 
-    return;
+  if(!list.length){
 
-  }
-
-  $('reviewsEmpty')
-    .classList
-    .add('hidden');
-
-  $('reviewsTableWrap')
-    .classList
-    .remove('hidden');
-
-  $('reviewsTable').innerHTML =
-    data.map(
-      review => {
-
-        const text =
-          detectReviewText(review);
-
-        const short =
-          String(text).length > 100
-            ?
-              String(text).slice(0,100) + '…'
-            :
-              text;
-
-        return `
-          <tr>
-
-            <td>
-              ${escapeHTML(
-                detectReviewGuest(review)
-              )}
-            </td>
-
-            <td>
-              ${escapeHTML(
-                String(
-                  detectReviewRating(review)
-                )
-              )}
-            </td>
-
-            <td>
-              ${escapeHTML(
-                short
-              )}
-            </td>
-
-            <td>
-              ${statusBadge(
-                detectReviewStatus(review)
-              )}
-            </td>
-
-            <td>
-
-              <button
-                class="btn dark"
-                type="button"
-                onclick="viewReview(
-                  '${escapeHTML(
-                    review.id || ''
-                  )}'
-                )"
-              >
-                View
-              </button>
-
-            </td>
-
-          </tr>
-        `;
-
-      }
-    ).join('');
-
-}
-
-
-$('reviewSearch').addEventListener(
-  'input',
-  renderReviews
-);
-
-
-function viewReview(id){
-
-  const review =
-    reviews.find(
-      r =>
-        String(r.id || '') === String(id)
-    );
-
-  if(!review){
-
-    showToast(
-      'Review not found.',
-      true
-    );
+    document.getElementById("reviewsList")
+      .innerHTML =
+      `<div class="empty">No reviews found.</div>`;
 
     return;
-
   }
-
-  const body =
-    createRecordDetails(
-      review
-    );
-
-  const moderation =
-    buildReviewModeration(
-      review
-    );
-
-  openModal(
-    'Guest review',
-    body + moderation
-  );
-
-}
-
-
-function buildReviewModeration(review){
 
   let html =
-    '<div class="modal-actions">';
+    `<div style="display:grid;gap:14px">`;
 
-  const publishedColumn =
-    findColumn(
-      review,
-      [
-        'published',
-        'is_published'
-      ]
-    );
-
-  const approvedColumn =
-    findColumn(
-      review,
-      [
-        'approved',
-        'is_approved'
-      ]
-    );
-
-  const statusColumn =
-    findColumn(
-      review,
-      [
-        'status'
-      ]
-    );
-
-  if(publishedColumn){
+  list.forEach(r=>{
 
     html += `
+      <div class="review-box">
 
-      <button
-        class="btn green"
-        type="button"
-        onclick="setReviewBoolean(
-          '${escapeHTML(review.id)}',
-          '${escapeHTML(publishedColumn)}',
-          true
-        )"
-      >
-        Publish
-      </button>
+        <div style="display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap">
 
-      <button
-        class="btn red"
-        type="button"
-        onclick="setReviewBoolean(
-          '${escapeHTML(review.id)}',
-          '${escapeHTML(publishedColumn)}',
-          false
-        )"
-      >
-        Unpublish
-      </button>
+          <div>
 
+            <strong>${esc(r.guest_name)}</strong>
+
+            ${
+              r.guest_location
+              ? `<small style="color:#718096">
+                   — ${esc(r.guest_location)}
+                 </small>`
+              : ""
+            }
+
+            <div class="stars">
+              ${"★".repeat(Math.max(0,Math.min(5,r.rating)))}
+              ${"☆".repeat(Math.max(0,5-r.rating))}
+            </div>
+
+          </div>
+
+          <div class="actions">
+
+            ${badge(r.is_published ? "published":"unpublished")}
+
+            ${r.is_featured ? badge("featured") : ""}
+
+          </div>
+
+        </div>
+
+        <p style="line-height:1.7">
+          ${esc(r.review_text)}
+        </p>
+
+        <small style="color:#718096">
+          Stay:
+          ${dateFormat(r.stay_date)}
+          · Added:
+          ${dateFormat(r.created_at)}
+        </small>
+
+        <div class="actions" style="margin-top:14px">
+
+          <button
+            class="btn ${r.is_published ? "btn-danger":"btn-success"}"
+            onclick="toggleReviewPublished('${r.id}',${!r.is_published})">
+            ${r.is_published ? "Unpublish":"Publish"}
+          </button>
+
+          <button
+            class="btn ${r.is_featured ? "btn-danger":"btn-accent"}"
+            onclick="toggleReviewFeatured('${r.id}',${!r.is_featured})">
+            ${r.is_featured ? "Unfeature":"Feature"}
+          </button>
+
+          <button
+            class="btn btn-danger"
+            onclick="deleteReview('${r.id}')">
+            Delete
+          </button>
+
+        </div>
+
+      </div>
     `;
+  });
 
-  }
+  html += `</div>`;
 
-  if(approvedColumn){
-
-    html += `
-
-      <button
-        class="btn green"
-        type="button"
-        onclick="setReviewBoolean(
-          '${escapeHTML(review.id)}',
-          '${escapeHTML(approvedColumn)}',
-          true
-        )"
-      >
-        Approve
-      </button>
-
-      <button
-        class="btn red"
-        type="button"
-        onclick="setReviewBoolean(
-          '${escapeHTML(review.id)}',
-          '${escapeHTML(approvedColumn)}',
-          false
-        )"
-      >
-        Reject
-      </button>
-
-    `;
-
-  }
-
-  if(statusColumn){
-
-    html += `
-
-      <button
-        class="btn green"
-        type="button"
-        onclick="setReviewStatus(
-          '${escapeHTML(review.id)}',
-          '${escapeHTML(statusColumn)}',
-          'published'
-        )"
-      >
-        Set published
-      </button>
-
-      <button
-        class="btn red"
-        type="button"
-        onclick="setReviewStatus(
-          '${escapeHTML(review.id)}',
-          '${escapeHTML(statusColumn)}',
-          'rejected'
-        )"
-      >
-        Reject
-      </button>
-
-    `;
-
-  }
-
-  html +=
-    '</div>';
-
-  return html;
-
+  document.getElementById("reviewsList")
+    .innerHTML = html;
 }
 
 
-async function setReviewBoolean(
-  id,
-  column,
-  value
-){
+async function toggleReviewPublished(id,value){
 
-  try{
+  const {
+    error
+  } = await supabaseClient
+    .from("reviews")
+    .update({
+      is_published:value
+    })
+    .eq("id",id);
 
-    const update = {};
+  if(error){
 
-    update[column] =
-      value;
+    toast(error.message);
 
-    const result =
-      await sb
-        .from('reviews')
-        .update(update)
-        .eq('id',id);
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-    showToast(
-      'Review updated successfully.'
-    );
-
-    closeModal();
-
-    await loadReviews();
-
-  }catch(err){
-
-    console.error(
-      'Review update error:',
-      err
-    );
-
-    showToast(
-      err?.message ||
-      'Unable to update review.',
-      true
-    );
-
+    return;
   }
 
+  toast(
+    value
+    ? "Review published."
+    : "Review unpublished."
+  );
+
+  await loadReviews();
 }
 
 
-async function setReviewStatus(
-  id,
-  column,
-  status
-){
+async function toggleReviewFeatured(id,value){
 
-  try{
+  const {
+    error
+  } = await supabaseClient
+    .from("reviews")
+    .update({
+      is_featured:value
+    })
+    .eq("id",id);
 
-    const update = {};
+  if(error){
 
-    update[column] =
-      status;
+    toast(error.message);
 
-    const result =
-      await sb
-        .from('reviews')
-        .update(update)
-        .eq('id',id);
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-    showToast(
-      'Review status updated.'
-    );
-
-    closeModal();
-
-    await loadReviews();
-
-  }catch(err){
-
-    console.error(
-      'Review status error:',
-      err
-    );
-
-    showToast(
-      err?.message ||
-      'Unable to update review.',
-      true
-    );
-
+    return;
   }
 
+  toast("Review updated.");
+
+  await loadReviews();
+}
+
+
+async function deleteReview(id){
+
+  if(!confirm("Delete this review?")){
+    return;
+  }
+
+  const {
+    error
+  } = await supabaseClient
+    .from("reviews")
+    .delete()
+    .eq("id",id);
+
+  if(error){
+
+    toast(error.message);
+
+    return;
+  }
+
+  toast("Review deleted.");
+
+  await loadReviews();
 }
 
 
 /* =========================================================
    SITE SETTINGS
-========================================================= */
+   ========================================================= */
 
 async function loadSettings(){
 
-  $('settingsLoading')
-    .classList
-    .remove('hidden');
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("site_settings")
+    .select("*")
+    .order("setting_key",{ascending:true});
 
-  $('settingsEmpty')
-    .classList
-    .add('hidden');
+  if(error){
 
-  $('settingsList').innerHTML='';
+    document.getElementById("settingsList")
+      .innerHTML =
+      `<div class="empty">${esc(error.message)}</div>`;
 
-  try{
-
-    const result =
-      await sb
-        .from('site_settings')
-        .select('*');
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-    settings =
-      result.data || [];
-
-    renderSettings();
-
-  }catch(err){
-
-    console.error(
-      'Settings error:',
-      err
-    );
-
-    $('settingsLoading')
-      .textContent =
-      'Unable to load site settings: ' +
-      (err?.message || 'Unknown error');
-
-    showToast(
-      'Unable to load site settings.',
-      true
-    );
-
+    return;
   }
 
+  settings = data || [];
+
+  renderSettings();
 }
 
 
-function detectSettingKey(setting){
+function settingDisplay(value){
 
-  return (
-    setting.key ||
-    setting.name ||
-    setting.setting_key ||
-    setting.slug ||
-    setting.title ||
-    'Setting'
-  );
+  if(typeof value === "boolean"){
+    return value ? "Enabled" : "Disabled";
+  }
 
-}
+  if(value === null || value === undefined){
+    return "—";
+  }
 
+  if(typeof value === "object"){
+    return jsonPretty(value);
+  }
 
-function detectSettingValue(setting){
-
-  return (
-    setting.value ??
-    setting.setting_value ??
-    setting.content ??
-    setting.description ??
-    ''
-  );
-
-}
-
-
-function detectSettingValueColumn(setting){
-
-  return findColumn(
-    setting,
-    [
-      'value',
-      'setting_value',
-      'content',
-      'description'
-    ]
-  );
-
+  return String(value);
 }
 
 
 function renderSettings(){
 
-  $('settingsLoading')
-    .classList
-    .add('hidden');
-
   if(!settings.length){
 
-    $('settingsEmpty')
-      .classList
-      .remove('hidden');
+    document.getElementById("settingsList")
+      .innerHTML =
+      `<div class="empty">No site settings found.</div>`;
 
     return;
-
   }
 
-  $('settingsEmpty')
-    .classList
-    .add('hidden');
+  let html = "";
 
-  $('settingsList').innerHTML =
-    settings.map(
-      setting => {
+  settings.forEach(s=>{
 
-        const key =
-          detectSettingKey(setting);
+    html += `
+      <div class="setting-row">
 
-        const value =
-          detectSettingValue(setting);
+        <div class="setting-key">
+          ${esc(s.setting_key)}
+        </div>
 
-        return `
-          <div class="setting-row">
+        <div class="setting-value">
+          ${esc(settingDisplay(s.setting_value))}
+        </div>
 
-            <div style="min-width:0">
+        <div>
+          <button
+            class="btn btn-light"
+            onclick="editSetting('${s.id}')">
+            Edit
+          </button>
+        </div>
 
-              <div class="setting-key">
-                ${escapeHTML(key)}
-              </div>
+      </div>
+    `;
+  });
 
-              <div class="setting-value">
-                ${escapeHTML(
-                  String(value)
-                )}
-              </div>
-
-            </div>
-
-            <button
-              class="btn dark setting-edit"
-              type="button"
-              onclick="editSetting(
-                '${escapeHTML(
-                  setting.id || ''
-                )}'
-              )"
-            >
-              Edit
-            </button>
-
-          </div>
-        `;
-
-      }
-    ).join('');
-
+  document.getElementById("settingsList")
+    .innerHTML = html;
 }
 
 
 function editSetting(id){
 
-  const setting =
-    settings.find(
-      s =>
-        String(s.id || '') === String(id)
-    );
+  const s =
+    settings.find(x=>x.id===id);
 
-  if(!setting){
+  if(!s) return;
 
-    showToast(
-      'Setting not found.',
-      true
-    );
+  let raw =
+    s.setting_value;
 
-    return;
+  let type =
+    typeof raw;
 
+  if(raw === null){
+    type = "string";
+    raw = "";
   }
 
-  const valueColumn =
-    detectSettingValueColumn(
-      setting
-    );
+  let input = "";
 
-  if(!valueColumn){
+  if(type === "boolean"){
 
-    showToast(
-      'No editable value column was detected for this setting.',
-      true
-    );
+    input = `
+      <select id="settingInput">
 
-    return;
+        <option
+          value="true"
+          ${raw ? "selected":""}>
+          Enabled
+        </option>
 
-  }
+        <option
+          value="false"
+          ${!raw ? "selected":""}>
+          Disabled
+        </option>
 
-  const key =
-    detectSettingKey(setting);
+      </select>
+    `;
 
-  const current =
-    detectSettingValue(setting);
+  }else if(type === "object"){
 
-  openModal(
-    'Edit setting',
-    `
+    input = `
+      <textarea
+        id="settingInput"
+        style="min-height:220px"
+      >${esc(jsonPretty(raw))}</textarea>
+    `;
 
-      <div class="field">
+  }else{
 
-        <label>
-          ${escapeHTML(key)}
-        </label>
-
-        <textarea
-          id="settingEditValue"
-          rows="7"
-          style="resize:vertical"
-        >${escapeHTML(
-          String(current)
-        )}</textarea>
-
-      </div>
-
-      <div class="modal-actions">
-
-        <button
-          class="primary"
-          type="button"
-          onclick="saveSetting(
-            '${escapeHTML(setting.id)}',
-            '${escapeHTML(valueColumn)}'
-          )"
-        >
-          Save setting
-        </button>
-
-      </div>
-
-    `
-  );
-
-}
-
-
-async function saveSetting(
-  id,
-  column
-){
-
-  const input =
-    $('settingEditValue');
-
-  if(!input){
-
-    return;
-
-  }
-
-  try{
-
-    const update = {};
-
-    update[column] =
-      input.value;
-
-    const result =
-      await sb
-        .from('site_settings')
-        .update(update)
-        .eq('id',id);
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-    showToast(
-      'Site setting saved successfully.'
-    );
-
-    closeModal();
-
-    await loadSettings();
-
-  }catch(err){
-
-    console.error(
-      'Setting update error:',
-      err
-    );
-
-    showToast(
-      err?.message ||
-      'Unable to save setting.',
-      true
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   GENERIC RECORD HELPERS
-========================================================= */
-
-function findColumn(
-  object,
-  candidates
-){
-
-  if(!object){
-    return null;
-  }
-
-  for(
-    const candidate of candidates
-  ){
-
-    if(
-      Object.prototype.hasOwnProperty.call(
-        object,
-        candidate
-      )
-    ){
-
-      return candidate;
-
-    }
-
-  }
-
-  return null;
-
-}
-
-
-function createRecordDetails(record){
-
-  if(!record){
-
-    return `
-      <div class="empty">
-        No record data available.
-      </div>
+    input = `
+      <input
+        id="settingInput"
+        value="${esc(raw)}"
+      >
     `;
 
   }
 
-  const entries =
-    Object.entries(record);
-
-  return `
-
-    <div class="detail-grid">
-
-      ${
-        entries.map(
-          ([key,value]) => {
-
-            let display = value;
-
-            if(
-              value === null ||
-              value === undefined ||
-              value === ''
-            ){
-
-              display='—';
-
-            }else if(
-              typeof value === 'object'
-            ){
-
-              try{
-
-                display =
-                  JSON.stringify(
-                    value
-                  );
-
-              }catch{
-
-                display =
-                  String(value);
-
-              }
-
-            }
-
-            return `
-
-              <div
-                class="detail ${
-                  String(display).length > 160
-                    ? 'full'
-                    : ''
-                }"
-              >
-
-                <div class="detail-label">
-                  ${escapeHTML(
-                    titleCase(key)
-                  )}
-                </div>
-
-                <div class="detail-value">
-                  ${escapeHTML(
-                    String(display)
-                  )}
-                </div>
-
-              </div>
-
-            `;
-
-          }
-        ).join('')
-      }
-
-    </div>
-
-  `;
-
-}
-
-
-function viewGenericRecord(
-  title,
-  array,
-  id
-){
-
-  const record =
-    array.find(
-      r =>
-        String(r.id || '') === String(id)
-    );
-
-  if(!record){
-
-    showToast(
-      'Record not found.',
-      true
-    );
-
-    return;
-
-  }
-
   openModal(
-    title,
-    createRecordDetails(record)
+    "Edit " + s.setting_key,
+    `
+
+      <form id="settingForm">
+
+        <div class="field">
+
+          <label>
+            ${esc(s.setting_key)}
+          </label>
+
+          ${input}
+
+        </div>
+
+        <button class="btn btn-accent">
+          Save Setting
+        </button>
+
+      </form>
+
+    `
   );
 
+  document.getElementById("settingForm")
+    .addEventListener("submit",async e=>{
+
+      e.preventDefault();
+
+      const valueEl =
+        document.getElementById("settingInput");
+
+      let value;
+
+      try{
+
+        if(type === "boolean"){
+
+          value =
+            valueEl.value === "true";
+
+        }else if(type === "object"){
+
+          value =
+            JSON.parse(valueEl.value);
+
+        }else{
+
+          value =
+            valueEl.value;
+        }
+
+      }catch{
+
+        toast("Invalid JSON.");
+
+        return;
+      }
+
+      const {
+        error
+      } = await supabaseClient
+        .from("site_settings")
+        .update({
+          setting_value:value,
+          updated_at:new Date().toISOString()
+        })
+        .eq("id",id);
+
+      if(error){
+
+        toast(
+          "Could not save setting: " +
+          error.message
+        );
+
+        return;
+      }
+
+      closeModal();
+
+      toast("Setting saved.");
+
+      await loadSettings();
+
+    });
 }
 
 
 /* =========================================================
-   INITIAL SESSION CHECK
-========================================================= */
+   DASHBOARD
+   ========================================================= */
 
-(async()=>{
+function updateDashboard(){
 
-  try{
+  const total =
+    reservations.length;
 
-    const sessionResult =
-      await sb.auth.getSession();
+  const pending =
+    reservations.filter(
+      r=>r.status==="pending"
+    ).length;
 
-    if(
-      !sessionResult.error &&
-      sessionResult.data.session
-    ){
+  const confirmed =
+    reservations.filter(
+      r=>r.status==="confirmed"
+    ).length;
 
-      const check =
-        await adminOK();
+  const unpaid =
+    reservations.filter(
+      r=>r.payment_status==="unpaid"
+    ).length;
 
-      if(check.ok){
+  const availableRooms =
+    rooms.filter(
+      r=>r.status==="available"
+    ).length;
 
-        showApp();
+  const newRequests =
+    requests.filter(
+      r=>r.status==="new"
+    ).length;
 
-        return;
+  const publishedReviews =
+    reviews.filter(
+      r=>r.is_published
+    ).length;
 
-      }
+  document.getElementById("statTotal")
+    .textContent = total;
 
-      await sb.auth.signOut();
+  document.getElementById("statPending")
+    .textContent = pending;
 
+  document.getElementById("statConfirmed")
+    .textContent = confirmed;
+
+  document.getElementById("statUnpaid")
+    .textContent = unpaid;
+
+  document.getElementById("statRooms")
+    .textContent = availableRooms;
+
+  document.getElementById("statRequests")
+    .textContent = newRequests;
+
+  document.getElementById("statReviews")
+    .textContent = publishedReviews;
+
+  document.getElementById("statRoomTypes")
+    .textContent = roomTypes.length;
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+supabaseClient.auth
+  .onAuthStateChange((event,session)=>{
+
+    if(event === "SIGNED_OUT"){
+      showLogin();
     }
 
-  }catch(err){
+  });
 
-    console.error(
-      'Initial session check error:',
-      err
-    );
+checkSession();
 
-  }
-
-  showLogin();
-
-})();
 </script>
 
 </body>
