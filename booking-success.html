@@ -1,1 +1,1621 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Reservation received — The Nordic Abuja"><meta name="theme-color" content="#171715"><title>Reservation received · The Nordic Abuja</title><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/pages.css"><link rel="manifest" href="site.webmanifest"></head><body><header class="site-header scrolled"><a class="brand" href="index.html"><span class="brand-word">THE NORDIC</span><span class="brand-sub">ABUJA</span></a><nav class="desktop-nav"><a href="rooms.html">Stay</a><a href="dining.html">Dine</a><a href="experience.html">Experience</a><a href="events.html">Meet</a><a href="abuja.html">Abuja</a></nav><div class="header-actions"><a class="button button-small button-light" href="booking.html">Book a stay</a></div></header><main><section class="page-hero"><div class="container"><div><p class="eyebrow">Reservation received</p><h1>You’re on your way to <em>The Nordic.</em></h1></div><p class="page-hero-copy">Your request has been saved on this device for now. Once the backend is connected, this page can show a real confirmation number, payment status and hotel contact details.</p></div></section><section class="section"><div class="container content-grid"><div class="form-card"><h3>Next step</h3><p>Connect Supabase to store the reservation securely, check room inventory and send it to the hotel admin dashboard.</p><ul class="checklist"><li>Live room availability</li><li>Automatic price calculation</li><li>Payment confirmation</li><li>Guest email / WhatsApp confirmation</li><li>Admin reservation management</li></ul><a class="button button-dark" href="index.html">Return to The Nordic</a></div><div><p class="eyebrow">Need help?</p><h2>Talk to the hotel.</h2><p class="muted">Call +234 916 248 1000 or email info@thenordicabuja.com.</p></div></div></section></main><footer class="site-footer"><div class="container footer-top"><div class="footer-brand"><span>THE NORDIC</span><small>ABUJA</small><p>A different kind of stay.</p></div><div class="footer-links"><div><h4>Explore</h4><a href="rooms.html">Rooms</a><a href="dining.html">Dining</a><a href="experience.html">Experience</a><a href="events.html">Meetings &amp; events</a></div><div><h4>Useful</h4><a href="abuja.html">Abuja guide</a><a href="gallery.html">Gallery</a><a href="offers.html">Offers</a><a href="contact.html">Contact</a><a href="faq.html">FAQ</a></div></div><div class="footer-contact"><h4>Stay in touch</h4><p>Zone B04, Plot 795, Off Shehu Yar'adua Way, Jabi, Abuja.</p><a href="mailto:info@thenordicabuja.com">info@thenordicabuja.com</a><a href="tel:+2349162481000">+234 916 248 1000</a></div></div><div class="container footer-bottom"><span>© <span id="year"></span> The Nordic Abuja</span><span><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span></div></footer><div class="toast" id="toast"></div><script src="js/main.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Your reservation confirmation — The Nordic Abuja"
+  >
+
+  <meta
+    name="theme-color"
+    content="#171715"
+  >
+
+  <title>
+    Reservation confirmed · The Nordic Abuja
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/pages.css"
+  >
+
+  <link
+    rel="manifest"
+    href="site.webmanifest"
+  >
+
+  <style>
+
+    /* =====================================================
+       BOOKING SUCCESS PAGE
+       ===================================================== */
+
+    .confirmation-section {
+      padding-top: 80px;
+      padding-bottom: 100px;
+    }
+
+    .confirmation-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .confirmation-card {
+      background: #fff;
+      padding: 38px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.07);
+    }
+
+    .confirmation-card h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .confirmation-intro {
+      color: #68665f;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    /* Reference */
+
+    .confirmation-reference {
+      background: #171715;
+      color: #fff;
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+
+    .confirmation-reference-label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      opacity: .65;
+      margin-bottom: 8px;
+    }
+
+    .confirmation-reference-value {
+      display: block;
+      font-family: var(--serif);
+      font-size: 30px;
+      letter-spacing: .05em;
+      word-break: break-word;
+    }
+
+    /* Details */
+
+    .confirmation-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--line);
+      margin-top: 20px;
+    }
+
+    .confirmation-detail {
+      padding: 17px 12px 17px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .confirmation-detail:nth-child(even) {
+      padding-left: 18px;
+      border-left: 1px solid var(--line);
+    }
+
+    .confirmation-detail-label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .11em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .confirmation-detail-value {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    /* Status */
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      background: #ece8df;
+      color: #393731;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+
+    .status-pill.success {
+      background: #e7efe7;
+      color: #315536;
+    }
+
+    .status-pill.pending {
+      background: #eee9df;
+      color: #665638;
+    }
+
+    /* Guest */
+
+    .guest-block {
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px solid var(--line);
+    }
+
+    .guest-block h3 {
+      margin-bottom: 15px;
+    }
+
+    .guest-contact {
+      display: grid;
+      gap: 7px;
+      color: #5e5b55;
+      font-size: 13px;
+    }
+
+    /* Requests */
+
+    .requests-block {
+      margin-top: 25px;
+      padding: 20px;
+      background: #eeeae2;
+    }
+
+    .requests-block strong {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 8px;
+    }
+
+    .requests-block p {
+      margin: 0;
+      color: #5e5b55;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    /* Side card */
+
+    .confirmation-side {
+      background: #171715;
+      color: #fff;
+      padding: 32px;
+      position: sticky;
+      top: 100px;
+    }
+
+    .confirmation-side h3 {
+      color: #fff;
+      margin-top: 0;
+    }
+
+    .confirmation-side p {
+      color: #c7c4bc;
+      line-height: 1.7;
+    }
+
+    .confirmation-side .eyebrow {
+      color: #bdb9b0;
+    }
+
+    .side-contact {
+      margin-top: 25px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,.14);
+    }
+
+    .side-contact a {
+      display: block;
+      color: #fff;
+      margin-top: 8px;
+      text-decoration: none;
+    }
+
+    .side-contact a:hover {
+      text-decoration: underline;
+    }
+
+    /* Buttons */
+
+    .confirmation-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .confirmation-actions .button {
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .button-outline-light {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 14px 20px;
+      border: 1px solid rgba(255,255,255,.35);
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition:
+        background .2s ease,
+        border-color .2s ease;
+    }
+
+    .button-outline-light:hover {
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.7);
+    }
+
+    /* Empty/error state */
+
+    .confirmation-error {
+      padding: 25px;
+      background: #f3e8e5;
+      color: #6b332b;
+      line-height: 1.7;
+      margin-top: 20px;
+    }
+
+    .confirmation-error strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    /* Print */
+
+    .print-only {
+      display: none;
+    }
+
+    @media print {
+
+      .site-header,
+      .site-footer,
+      .confirmation-side,
+      .confirmation-actions,
+      .page-hero {
+        display: none !important;
+      }
+
+      body {
+        background: #fff !important;
+      }
+
+      .confirmation-section {
+        padding: 0 !important;
+      }
+
+      .confirmation-grid {
+        display: block !important;
+      }
+
+      .confirmation-card {
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+
+      .print-only {
+        display: block;
+      }
+    }
+
+    /* Tablet */
+
+    @media (max-width: 850px) {
+
+      .confirmation-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .confirmation-side {
+        position: static;
+      }
+    }
+
+    /* Mobile */
+
+    @media (max-width: 520px) {
+
+      .confirmation-section {
+        padding-top: 45px;
+        padding-bottom: 65px;
+      }
+
+      .confirmation-card {
+        padding: 23px 18px;
+      }
+
+      .confirmation-side {
+        padding: 24px 20px;
+      }
+
+      .confirmation-reference {
+        padding: 20px;
+      }
+
+      .confirmation-reference-value {
+        font-size: 24px;
+      }
+
+      .confirmation-details {
+        grid-template-columns: 1fr;
+      }
+
+      .confirmation-detail {
+        padding: 15px 0 !important;
+        border-left: 0 !important;
+      }
+
+      .confirmation-detail:last-child {
+        border-bottom: 0;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header class="site-header scrolled">
+
+    <a
+      class="brand"
+      href="index.html"
+    >
+
+      <span class="brand-word">
+        THE NORDIC
+      </span>
+
+      <span class="brand-sub">
+        ABUJA
+      </span>
+
+    </a>
+
+    <nav class="desktop-nav">
+
+      <a href="rooms.html">
+        Stay
+      </a>
+
+      <a href="dining.html">
+        Dine
+      </a>
+
+      <a href="experience.html">
+        Experience
+      </a>
+
+      <a href="events.html">
+        Meet
+      </a>
+
+      <a href="abuja.html">
+        Abuja
+      </a>
+
+    </nav>
+
+    <div class="header-actions">
+
+      <a
+        class="button button-small button-light"
+        href="booking.html"
+      >
+        Book a stay
+      </a>
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN
+       ===================================================== -->
+
+  <main>
+
+    <!-- HERO -->
+
+    <section class="page-hero">
+
+      <div class="container">
+
+        <div>
+
+          <p class="eyebrow">
+            Reservation confirmed
+          </p>
+
+          <h1>
+            You’re on your way to
+            <em>The Nordic.</em>
+          </h1>
+
+        </div>
+
+        <p class="page-hero-copy">
+          Your reservation has been created successfully.
+          Keep your confirmation number safe — you can use
+          it when contacting the hotel about your stay.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- CONFIRMATION -->
+
+    <section class="section confirmation-section">
+
+      <div class="container confirmation-grid">
+
+
+        <!-- =================================================
+             MAIN CONFIRMATION CARD
+             ================================================= -->
+
+        <div class="confirmation-card">
+
+          <p class="eyebrow">
+            Your reservation
+          </p>
+
+          <h2>
+            Reservation confirmed.
+          </h2>
+
+          <p class="confirmation-intro">
+            Thank you for choosing The Nordic Abuja.
+            The reservation below was returned directly
+            from our booking system.
+          </p>
+
+
+          <!-- REFERENCE -->
+
+          <div class="confirmation-reference">
+
+            <span class="confirmation-reference-label">
+              Confirmation number
+            </span>
+
+            <span
+              class="confirmation-reference-value"
+              id="bookingReference"
+            >
+              Loading…
+            </span>
+
+          </div>
+
+
+          <!-- DETAILS -->
+
+          <div class="confirmation-details">
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Guest
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="guestName"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Room
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="roomType"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Room number
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="roomNumber"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Guests
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="guestCount"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Check-in
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="checkIn"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Check-out
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="checkOut"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Nights
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="nights"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Total
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="totalAmount"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Reservation status
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="reservationStatus"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="confirmation-detail">
+
+              <span class="confirmation-detail-label">
+                Payment status
+              </span>
+
+              <span
+                class="confirmation-detail-value"
+                id="paymentStatus"
+              >
+                —
+              </span>
+
+            </div>
+
+
+          </div>
+
+
+          <!-- GUEST CONTACT -->
+
+          <div class="guest-block">
+
+            <h3>
+              Guest details
+            </h3>
+
+            <div class="guest-contact">
+
+              <span id="guestEmail">
+                —
+              </span>
+
+              <span id="guestPhone">
+                —
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- SPECIAL REQUESTS -->
+
+          <div
+            class="requests-block"
+            id="requestsBlock"
+            style="display:none;"
+          >
+
+            <strong>
+              Special requests
+            </strong>
+
+            <p id="specialRequests">
+              —
+            </p>
+
+          </div>
+
+
+          <!-- ERROR -->
+
+          <div
+            class="confirmation-error"
+            id="confirmationError"
+            style="display:none;"
+          >
+
+            <strong>
+              Confirmation details unavailable
+            </strong>
+
+            <span id="confirmationErrorText">
+              We could not find the reservation details
+              on this device.
+            </span>
+
+          </div>
+
+
+          <!-- PRINT -->
+
+          <div class="print-only">
+
+            <p>
+              The Nordic Abuja ·
+              Zone B04, Plot 795, Off Shehu Yar'adua Way,
+              Jabi, Abuja.
+            </p>
+
+            <p>
+              +234 916 248 1000 ·
+              info@thenordicabuja.com
+            </p>
+
+          </div>
+
+
+          <!-- ACTIONS -->
+
+          <div class="confirmation-actions">
+
+            <button
+              type="button"
+              class="button button-dark"
+              id="printConfirmation"
+            >
+              Print / save confirmation
+            </button>
+
+            <a
+              class="button button-light"
+              id="whatsappButton"
+              href="#"
+              target="_blank"
+              rel="noopener"
+            >
+              Message hotel on WhatsApp
+            </a>
+
+            <a
+              class="button button-light"
+              href="tel:+2349162481000"
+            >
+              Call the hotel
+            </a>
+
+            <a
+              class="button button-dark"
+              href="index.html"
+            >
+              Return to The Nordic
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             SIDE PANEL
+             ================================================= -->
+
+        <aside class="confirmation-side">
+
+          <p class="eyebrow">
+            Need help?
+          </p>
+
+          <h3>
+            Talk to the hotel.
+          </h3>
+
+          <p>
+            If you need to change your dates, update
+            guest details or ask about your reservation,
+            contact The Nordic Abuja directly.
+          </p>
+
+
+          <div class="side-contact">
+
+            <span>
+              Phone
+            </span>
+
+            <a href="tel:+2349162481000">
+              +234 916 248 1000
+            </a>
+
+            <span style="display:block;margin-top:18px;">
+              Email
+            </span>
+
+            <a href="mailto:info@thenordicabuja.com">
+              info@thenordicabuja.com
+            </a>
+
+            <span style="display:block;margin-top:18px;">
+              Location
+            </span>
+
+            <p>
+              Zone B04, Plot 795,
+              Off Shehu Yar'adua Way,
+              Jabi, Abuja.
+            </p>
+
+          </div>
+
+
+          <div
+            class="confirmation-actions"
+            style="margin-top:25px;"
+          >
+
+            <a
+              class="button-outline-light"
+              href="booking.html"
+            >
+              Make another reservation
+            </a>
+
+          </div>
+
+        </aside>
+
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
+  <footer class="site-footer">
+
+    <div class="container footer-top">
+
+
+      <div class="footer-brand">
+
+        <span>
+          THE NORDIC
+        </span>
+
+        <small>
+          ABUJA
+        </small>
+
+        <p>
+          A different kind of stay.
+        </p>
+
+      </div>
+
+
+      <div class="footer-links">
+
+        <div>
+
+          <h4>
+            Explore
+          </h4>
+
+          <a href="rooms.html">
+            Rooms
+          </a>
+
+          <a href="dining.html">
+            Dining
+          </a>
+
+          <a href="experience.html">
+            Experience
+          </a>
+
+          <a href="events.html">
+            Meetings &amp; events
+          </a>
+
+        </div>
+
+
+        <div>
+
+          <h4>
+            Useful
+          </h4>
+
+          <a href="abuja.html">
+            Abuja guide
+          </a>
+
+          <a href="gallery.html">
+            Gallery
+          </a>
+
+          <a href="offers.html">
+            Offers
+          </a>
+
+          <a href="contact.html">
+            Contact
+          </a>
+
+          <a href="faq.html">
+            FAQ
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div class="footer-contact">
+
+        <h4>
+          Stay in touch
+        </h4>
+
+        <p>
+          Zone B04, Plot 795,
+          Off Shehu Yar'adua Way,
+          Jabi, Abuja.
+        </p>
+
+        <a href="mailto:info@thenordicabuja.com">
+          info@thenordicabuja.com
+        </a>
+
+        <a href="tel:+2349162481000">
+          +234 916 248 1000
+        </a>
+
+      </div>
+
+
+    </div>
+
+
+    <div class="container footer-bottom">
+
+      <span>
+        ©
+        <span id="year"></span>
+        The Nordic Abuja
+      </span>
+
+      <span>
+
+        <a href="privacy.html">
+          Privacy
+        </a>
+
+        ·
+
+        <a href="terms.html">
+          Terms
+        </a>
+
+      </span>
+
+    </div>
+
+  </footer>
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+  <script src="js/main.js"></script>
+
+
+  <!-- =====================================================
+       RESERVATION CONFIRMATION SCRIPT
+       ===================================================== -->
+
+  <script>
+
+    (function () {
+
+      "use strict";
+
+
+      /* ===================================================
+         ELEMENTS
+         =================================================== */
+
+      const referenceElement =
+        document.getElementById(
+          "bookingReference"
+        );
+
+      const guestNameElement =
+        document.getElementById(
+          "guestName"
+        );
+
+      const roomTypeElement =
+        document.getElementById(
+          "roomType"
+        );
+
+      const roomNumberElement =
+        document.getElementById(
+          "roomNumber"
+        );
+
+      const guestCountElement =
+        document.getElementById(
+          "guestCount"
+        );
+
+      const checkInElement =
+        document.getElementById(
+          "checkIn"
+        );
+
+      const checkOutElement =
+        document.getElementById(
+          "checkOut"
+        );
+
+      const nightsElement =
+        document.getElementById(
+          "nights"
+        );
+
+      const totalAmountElement =
+        document.getElementById(
+          "totalAmount"
+        );
+
+      const reservationStatusElement =
+        document.getElementById(
+          "reservationStatus"
+        );
+
+      const paymentStatusElement =
+        document.getElementById(
+          "paymentStatus"
+        );
+
+      const guestEmailElement =
+        document.getElementById(
+          "guestEmail"
+        );
+
+      const guestPhoneElement =
+        document.getElementById(
+          "guestPhone"
+        );
+
+      const requestsBlock =
+        document.getElementById(
+          "requestsBlock"
+        );
+
+      const specialRequestsElement =
+        document.getElementById(
+          "specialRequests"
+        );
+
+      const confirmationError =
+        document.getElementById(
+          "confirmationError"
+        );
+
+      const confirmationErrorText =
+        document.getElementById(
+          "confirmationErrorText"
+        );
+
+      const whatsappButton =
+        document.getElementById(
+          "whatsappButton"
+        );
+
+      const printButton =
+        document.getElementById(
+          "printConfirmation"
+        );
+
+
+      /* ===================================================
+         HELPERS
+         =================================================== */
+
+      function escapeText(value) {
+
+        if (
+          value === null ||
+          value === undefined
+        ) {
+          return "—";
+        }
+
+        return String(value);
+
+      }
+
+
+      function formatDate(value) {
+
+        if (!value) {
+          return "—";
+        }
+
+        const date =
+          new Date(
+            value + "T00:00:00"
+          );
+
+        if (
+          Number.isNaN(
+            date.getTime()
+          )
+        ) {
+          return value;
+        }
+
+        return date.toLocaleDateString(
+          "en-NG",
+          {
+            weekday: "short",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          }
+        );
+
+      }
+
+
+      function formatAmount(value) {
+
+        const amount =
+          Number(value || 0);
+
+        if (
+          amount <= 0
+        ) {
+          return "Rate on request";
+        }
+
+        return (
+          "₦" +
+          amount.toLocaleString(
+            "en-NG",
+            {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }
+          )
+        );
+
+      }
+
+
+      function formatStatus(
+        value,
+        type
+      ) {
+
+        const raw =
+          escapeText(value);
+
+        if (
+          raw === "—"
+        ) {
+          return raw;
+        }
+
+        const normalized =
+          String(raw)
+            .toLowerCase();
+
+        let className =
+          "status-pill";
+
+        if (
+          normalized === "pending" ||
+          normalized === "unpaid"
+        ) {
+
+          className +=
+            " pending";
+
+        }
+
+        if (
+          normalized === "confirmed" ||
+          normalized === "paid" ||
+          normalized === "completed"
+        ) {
+
+          className +=
+            " success";
+
+        }
+
+        return (
+          '<span class="' +
+          className +
+          '">' +
+          raw +
+          "</span>"
+        );
+
+      }
+
+
+      /* ===================================================
+         LOAD RESERVATION
+         =================================================== */
+
+      function loadReservation() {
+
+        let booking = null;
+
+
+        try {
+
+          const stored =
+            sessionStorage.getItem(
+              "nordic_booking_confirmation"
+            );
+
+          if (
+            stored
+          ) {
+
+            booking =
+              JSON.parse(
+                stored
+              );
+
+          }
+
+        } catch (error) {
+
+          console.error(
+            "Could not read reservation:",
+            error
+          );
+
+        }
+
+
+        /*
+         * The booking page also puts the reference
+         * in the URL. We use it as a second check.
+         */
+
+        const urlParams =
+          new URLSearchParams(
+            window.location.search
+          );
+
+        const urlReference =
+          urlParams.get(
+            "reference"
+          );
+
+
+        if (
+          !booking
+        ) {
+
+          showMissingReservation(
+            "Your reservation details are no longer available on this device. Please contact the hotel and provide your booking reference if you have it."
+          );
+
+          return;
+
+        }
+
+
+        /*
+         * Prevent displaying a mismatched booking
+         * if someone manually changes the URL reference.
+         */
+
+        if (
+          urlReference &&
+          booking.booking_reference &&
+          urlReference !==
+          booking.booking_reference
+        ) {
+
+          showMissingReservation(
+            "The confirmation link does not match the reservation stored on this device."
+          );
+
+          return;
+
+        }
+
+
+        renderReservation(
+          booking
+        );
+
+      }
+
+
+      /* ===================================================
+         RENDER RESERVATION
+         =================================================== */
+
+      function renderReservation(
+        booking
+      ) {
+
+        const fullName =
+          [
+            booking.guest_first_name,
+            booking.guest_last_name
+          ]
+          .filter(Boolean)
+          .join(" ");
+
+
+        referenceElement.textContent =
+          escapeText(
+            booking.booking_reference
+          );
+
+
+        guestNameElement.textContent =
+          fullName ||
+          "Guest";
+
+
+        roomTypeElement.textContent =
+          escapeText(
+            booking.room_type_name
+          );
+
+
+        roomNumberElement.textContent =
+          booking.room_number
+            ? "Room " +
+              booking.room_number
+            : "Assigned by hotel";
+
+
+        guestCountElement.textContent =
+          (
+            booking.adults ||
+            0
+          ) +
+          " adult" +
+          (
+            Number(
+              booking.adults
+            ) === 1
+              ? ""
+              : "s"
+          );
+
+
+        if (
+          Number(
+            booking.children || 0
+          ) > 0
+        ) {
+
+          guestCountElement.textContent +=
+            " · " +
+            booking.children +
+            " child" +
+            (
+              Number(
+                booking.children
+              ) === 1
+                ? ""
+                : "ren"
+            );
+
+        }
+
+
+        checkInElement.textContent =
+          formatDate(
+            booking.check_in
+          );
+
+
+        checkOutElement.textContent =
+          formatDate(
+            booking.check_out
+          );
+
+
+        nightsElement.textContent =
+          booking.nights
+            ? booking.nights +
+              " night" +
+              (
+                Number(
+                  booking.nights
+                ) === 1
+                  ? ""
+                  : "s"
+              )
+            : "—";
+
+
+        totalAmountElement.textContent =
+          formatAmount(
+            booking.total_amount
+          );
+
+
+        reservationStatusElement.innerHTML =
+          formatStatus(
+            booking.status,
+            "reservation"
+          );
+
+
+        paymentStatusElement.innerHTML =
+          formatStatus(
+            booking.payment_status,
+            "payment"
+          );
+
+
+        guestEmailElement.textContent =
+          booking.guest_email ||
+          "Email not provided";
+
+
+        guestPhoneElement.textContent =
+          booking.guest_phone ||
+          "Phone not provided";
+
+
+        if (
+          booking.special_requests
+        ) {
+
+          requestsBlock.style.display =
+            "block";
+
+          specialRequestsElement.textContent =
+            booking.special_requests;
+
+        }
+
+
+        /*
+         * WhatsApp message.
+         */
+
+        const reference =
+          booking.booking_reference ||
+          "my reservation";
+
+        const message =
+          "Hello The Nordic Abuja, I have a reservation with confirmation number " +
+          reference +
+          ". I would like to discuss my booking.";
+
+        whatsappButton.href =
+          "https://wa.me/2349162481000?text=" +
+          encodeURIComponent(
+            message
+          );
+
+
+        /*
+         * Update browser title.
+         */
+
+        document.title =
+          "Reservation " +
+          reference +
+          " · The Nordic Abuja";
+
+      }
+
+
+      /* ===================================================
+         MISSING RESERVATION
+         =================================================== */
+
+      function showMissingReservation(
+        message
+      ) {
+
+        referenceElement.textContent =
+          "Unavailable";
+
+        confirmationError.style.display =
+          "block";
+
+        confirmationErrorText.textContent =
+          message;
+
+      }
+
+
+      /* ===================================================
+         PRINT
+         =================================================== */
+
+      printButton.addEventListener(
+        "click",
+        function () {
+
+          window.print();
+
+        }
+      );
+
+
+      /* ===================================================
+         YEAR
+         =================================================== */
+
+      const yearElement =
+        document.getElementById(
+          "year"
+        );
+
+      if (
+        yearElement
+      ) {
+
+        yearElement.textContent =
+          new Date()
+            .getFullYear();
+
+      }
+
+
+      /* ===================================================
+         START
+         =================================================== */
+
+      loadReservation();
+
+
+    })();
+
+  </script>
+
+</body>
+</html>
