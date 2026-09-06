@@ -1,37 +1,12 @@
-THE NORDIC ABUJA — FULL WEBSITE UPGRADE
+THE NORDIC ABUJA — ADMIN UPGRADE
 
-UPLOAD THIS PACKAGE TO YOUR EXISTING GITHUB REPOSITORY:
-ezehgodwin816-create/the-nordic-abuja
+1. Replace the repository root admin.html with admin.html from this package.
+2. In Supabase SQL Editor, run admin-setup.sql.
+3. Do not change or upload anything inside images/.
+4. Open the live admin page.
+5. Sign out and sign back in with the existing admin account.
+6. Test each sidebar module one at a time.
 
-IMPORTANT:
-1. KEEP your existing images/ folder and all 11 JPG files already uploaded there.
-2. Upload/replace the HTML files in the root.
-3. Upload/replace the css/ folder.
-4. Upload/replace the js/ folder.
-5. Upload robots.txt, sitemap.xml and site.webmanifest.
-6. Do NOT delete the existing images/*.jpg files.
-
-NEW FRONTEND FEATURES:
-- Faster loader behavior
-- Responsive/mobile improvements
-- Booking-flow page
-- Booking success page
-- Date and guest selection
-- Room selection
-- Guest details form
-- Local booking draft until backend is connected
-- Concierge panel
-- Gallery lightbox
-- FAQ page
-- Privacy page
-- Terms page
-- SEO sitemap
-- robots.txt
-- Web app manifest
-- Existing hotel pages retained
-
-BACKEND NOTE:
-The booking page is NOT pretending to have live availability or payment yet.
-After this upload is working, we can connect Supabase for rooms, inventory,
-bookings, guests, offers, restaurant reservations, event enquiries, transfers,
-admin login and a real admin dashboard. Then we can connect Paystack/Flutterwave.
+The admin uses only the publishable Supabase key. The secret key is not included.
+The modules read actual database rows. Unknown columns are displayed dynamically rather than invented.
+No fake hotel data is inserted by these files.
