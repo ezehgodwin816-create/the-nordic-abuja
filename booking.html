@@ -1,1 +1,1366 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Book your stay — The Nordic Abuja"><meta name="theme-color" content="#171715"><title>Book your stay · The Nordic Abuja</title><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/pages.css"><link rel="manifest" href="site.webmanifest"></head><body><header class="site-header scrolled"><a class="brand" href="index.html"><span class="brand-word">THE NORDIC</span><span class="brand-sub">ABUJA</span></a><nav class="desktop-nav"><a href="rooms.html">Stay</a><a href="dining.html">Dine</a><a href="experience.html">Experience</a><a href="events.html">Meet</a><a href="abuja.html">Abuja</a></nav><div class="header-actions"><a class="button button-small button-light" href="booking.html">Book a stay</a></div></header><main><section class="page-hero"><div class="container"><div><p class="eyebrow">Direct booking</p><h1>Make your stay <em>yours.</em></h1></div><p class="page-hero-copy">Choose your dates, room and guests. This front-end booking flow is ready to connect to live availability, Supabase and payments after upload.</p></div></section><section class="section"><div class="container booking-layout"><form class="form-card" id="bookingForm"><div class="steps"><span class="step active"></span><span class="step"></span><span class="step"></span></div><p class="eyebrow">01 — Stay details</p><div class="form-grid"><div class="form-field"><label>Check in</label><input id="bookingCheckin" name="checkin" type="date" required></div><div class="form-field"><label>Check out</label><input id="bookingCheckout" name="checkout" type="date" required></div><div class="form-field"><label>Guests</label><select id="bookingGuests" name="guests"><option>1 guest</option><option selected>2 guests</option><option>3 guests</option><option>4 guests</option><option>5 guests</option><option>6+ guests</option></select></div><div class="form-field"><label>Room</label><select name="room"><option>Economy</option><option>Standard</option><option>Superior</option><option selected>Deluxe</option><option>Junior Suite</option></select></div><div class="form-field"><label>First name</label><input name="firstName" required></div><div class="form-field"><label>Last name</label><input name="lastName" required></div><div class="form-field"><label>Email</label><input name="email" type="email" required></div><div class="form-field"><label>Phone / WhatsApp</label><input name="phone" required></div><div class="form-field full"><label>Special requests</label><textarea name="requests" placeholder="Airport transfer, late arrival, celebration, accessibility needs..."></textarea></div></div><div class="notice" style="margin:20px 0">No payment is taken yet. After Supabase is connected, this form can check real inventory, calculate the live total and hand the booking to Paystack/Flutterwave.</div><button class="button button-dark" type="submit">Continue reservation →</button></form><aside class="summary"><p class="eyebrow light">Reservation</p><h3>Your stay, simply.</h3><div class="summary-row"><span>Availability</span><span>Live after backend setup</span></div><div class="summary-row"><span>Confirmation</span><span>Email + WhatsApp ready</span></div><div class="summary-row"><span>Payment</span><span>Secure gateway ready to connect</span></div><div class="summary-row summary-total"><span>Total</span><span>Calculated live</span></div></aside></div></section></main><footer class="site-footer"><div class="container footer-top"><div class="footer-brand"><span>THE NORDIC</span><small>ABUJA</small><p>A different kind of stay.</p></div><div class="footer-links"><div><h4>Explore</h4><a href="rooms.html">Rooms</a><a href="dining.html">Dining</a><a href="experience.html">Experience</a><a href="events.html">Meetings &amp; events</a></div><div><h4>Useful</h4><a href="abuja.html">Abuja guide</a><a href="gallery.html">Gallery</a><a href="offers.html">Offers</a><a href="contact.html">Contact</a><a href="faq.html">FAQ</a></div></div><div class="footer-contact"><h4>Stay in touch</h4><p>Zone B04, Plot 795, Off Shehu Yar'adua Way, Jabi, Abuja.</p><a href="mailto:info@thenordicabuja.com">info@thenordicabuja.com</a><a href="tel:+2349162481000">+234 916 248 1000</a></div></div><div class="container footer-bottom"><span>© <span id="year"></span> The Nordic Abuja</span><span><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span></div></footer><div class="toast" id="toast"></div><script src="js/main.js"></script></body></html>
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Book your stay — The Nordic Abuja">
+<meta name="theme-color" content="#171715">
+<title>Book your stay · The Nordic Abuja</title><link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="manifest" href="site.webmanifest"><style>
+.booking-status {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 4px;
+  display: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.booking-status.show {
+  display: block;
+}
+
+.booking-status.loading {
+  background: #f1f1ee;
+  color: #333;
+}
+
+.booking-status.success {
+  background: #edf6ee;
+  color: #245a2a;
+}
+
+.booking-status.error {
+  background: #f9eded;
+  color: #7a2424;
+}
+
+.booking-room-info {
+  margin-top: 12px;
+  font-size: 13px;
+  opacity: .8;
+}
+
+.summary-row span:last-child {
+  text-align: right;
+}
+
+.summary-total span:last-child {
+  font-weight: 700;
+}
+
+.booking-submit-loading {
+  opacity: .65;
+  pointer-events: none;
+}
+
+.booking-reference {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.price-note {
+  font-size: 12px;
+  opacity: .65;
+  margin-top: 5px;
+}
+
+select:disabled {
+  opacity: .65;
+}
+</style></head><body><header class="site-header scrolled">
+  <a class="brand" href="index.html">
+    <span class="brand-word">THE NORDIC</span>
+    <span class="brand-sub">ABUJA</span>
+  </a>  <nav class="desktop-nav">
+    <a href="rooms.html">Stay</a>
+    <a href="dining.html">Dine</a>
+    <a href="experience.html">Experience</a>
+    <a href="events.html">Meet</a>
+    <a href="abuja.html">Abuja</a>
+  </nav>  <div class="header-actions">
+    <a class="button button-small button-light" href="booking.html">Book a stay</a>
+  </div>
+</header><main><section class="page-hero">
+  <div class="container">
+    <div>
+      <p class="eyebrow">Direct booking</p>
+      <h1>Make your stay <em>yours.</em></h1>
+    </div><p class="page-hero-copy">
+  Choose your dates, room and guests. Check availability and make your reservation directly with The Nordic Abuja.
+</p>
+
+  </div>
+</section><section class="section"><div class="container booking-layout"><form class="form-card" id="bookingForm">  <div class="steps">
+    <span class="step active"></span>
+    <span class="step"></span>
+    <span class="step"></span>
+  </div>  <p class="eyebrow">01 — Stay details</p>  <div class="form-grid"><div class="form-field">
+  <label for="bookingCheckin">Check in</label>
+  <input
+    id="bookingCheckin"
+    name="checkin"
+    type="date"
+    required
+  >
+</div>
+
+<div class="form-field">
+  <label for="bookingCheckout">Check out</label>
+  <input
+    id="bookingCheckout"
+    name="checkout"
+    type="date"
+    required
+  >
+</div>
+
+<div class="form-field">
+  <label for="bookingGuests">Guests</label>
+  <select id="bookingGuests" name="guests" required>
+    <option value="1">1 guest</option>
+    <option value="2" selected>2 guests</option>
+    <option value="3">3 guests</option>
+    <option value="4">4 guests</option>
+    <option value="5">5 guests</option>
+    <option value="6">6 guests</option>
+  </select>
+</div>
+
+<div class="form-field">
+  <label for="bookingRoom">Room</label>
+
+  <select id="bookingRoom" name="room" required>
+    <option value="">Loading rooms...</option>
+  </select>
+
+  <div class="booking-room-info" id="roomInfo">
+    Select your dates and room.
+  </div>
+</div>
+
+<div class="form-field">
+  <label for="firstName">First name</label>
+  <input
+    id="firstName"
+    name="firstName"
+    type="text"
+    autocomplete="given-name"
+    required
+  >
+</div>
+
+<div class="form-field">
+  <label for="lastName">Last name</label>
+  <input
+    id="lastName"
+    name="lastName"
+    type="text"
+    autocomplete="family-name"
+    required
+  >
+</div>
+
+<div class="form-field">
+  <label for="email">Email</label>
+  <input
+    id="email"
+    name="email"
+    type="email"
+    autocomplete="email"
+    required
+  >
+</div>
+
+<div class="form-field">
+  <label for="phone">Phone / WhatsApp</label>
+  <input
+    id="phone"
+    name="phone"
+    type="tel"
+    autocomplete="tel"
+    required
+  >
+</div>
+
+<div class="form-field full">
+  <label for="requests">Special requests</label>
+  <textarea
+    id="requests"
+    name="requests"
+    placeholder="Airport transfer, late arrival, celebration, accessibility needs..."
+  ></textarea>
+</div>
+
+  </div>  <div class="notice" style="margin:20px 0">
+    No payment is taken at this stage. Your reservation is created as pending and unpaid. Payment can be connected after the booking flow has been fully tested.
+  </div>  <div
+    id="bookingStatus"
+    class="booking-status"
+    role="status"
+    aria-live="polite"
+  ></div><button
+class="button button-dark"
+id="bookingSubmit"
+type="submit"
+
+«»
+
+Continue reservation →
+
+  </button></form><aside class="summary">  <p class="eyebrow light">Reservation</p>  <h3>Your stay, simply.</h3>  <div class="summary-row">
+    <span>Room</span>
+    <span id="summaryRoom">Select a room</span>
+  </div>  <div class="summary-row">
+    <span>Guests</span>
+    <span id="summaryGuests">2 guests</span>
+  </div>  <div class="summary-row">
+    <span>Nights</span>
+    <span id="summaryNights">—</span>
+  </div>  <div class="summary-row">
+    <span>Availability</span>
+    <span id="summaryAvailability">Check dates</span>
+  </div>  <div class="summary-row summary-total">
+    <span>Total</span>
+    <span id="summaryTotal">Calculated live</span>
+  </div>  <div class="price-note" id="summaryPriceNote">
+    Room rates will appear when pricing is configured.
+  </div></aside></div>
+</section></main><footer class="site-footer"><div class="container footer-top">  <div class="footer-brand">
+    <span>THE NORDIC</span>
+    <small>ABUJA</small>
+    <p>A different kind of stay.</p>
+  </div>  <div class="footer-links"><div>
+  <h4>Explore</h4>
+  <a href="rooms.html">Rooms</a>
+  <a href="dining.html">Dining</a>
+  <a href="experience.html">Experience</a>
+  <a href="events.html">Meetings &amp; events</a>
+</div>
+
+<div>
+  <h4>Useful</h4>
+  <a href="abuja.html">Abuja guide</a>
+  <a href="gallery.html">Gallery</a>
+  <a href="offers.html">Offers</a>
+  <a href="contact.html">Contact</a>
+  <a href="faq.html">FAQ</a>
+</div>
+
+  </div>  <div class="footer-contact">
+    <h4>Stay in touch</h4><p>
+  Zone B04, Plot 795, Off Shehu Yar'adua Way, Jabi, Abuja.
+</p>
+
+<a href="mailto:info@thenordicabuja.com">
+  info@thenordicabuja.com
+</a>
+
+<a href="tel:+2349162481000">
+  +234 916 248 1000
+</a>
+
+  </div></div><div class="container footer-bottom">  <span>
+    © <span id="year"></span> The Nordic Abuja
+  </span>  <span>
+    <a href="privacy.html">Privacy</a> ·
+    <a href="terms.html">Terms</a>
+  </span></div></footer><div class="toast" id="toast"></div><!-- Existing site JavaScript --><script src="js/main.js"></script><!-- Supabase --><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+(function () {
+
+  "use strict";
+
+  /* =========================================================
+     THE NORDIC ABUJA — SUPABASE CONFIGURATION
+     ========================================================= */
+
+  const SUPABASE_URL =
+    "https://rzjvhfnizwckzbdawrbn.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+  /* =========================================================
+     ELEMENTS
+     ========================================================= */
+
+  const form =
+    document.getElementById("bookingForm");
+
+  const checkinInput =
+    document.getElementById("bookingCheckin");
+
+  const checkoutInput =
+    document.getElementById("bookingCheckout");
+
+  const guestsInput =
+    document.getElementById("bookingGuests");
+
+  const roomInput =
+    document.getElementById("bookingRoom");
+
+  const roomInfo =
+    document.getElementById("roomInfo");
+
+  const bookingStatus =
+    document.getElementById("bookingStatus");
+
+  const submitButton =
+    document.getElementById("bookingSubmit");
+
+  const summaryRoom =
+    document.getElementById("summaryRoom");
+
+  const summaryGuests =
+    document.getElementById("summaryGuests");
+
+  const summaryNights =
+    document.getElementById("summaryNights");
+
+  const summaryAvailability =
+    document.getElementById("summaryAvailability");
+
+  const summaryTotal =
+    document.getElementById("summaryTotal");
+
+  const summaryPriceNote =
+    document.getElementById("summaryPriceNote");
+
+
+  /* =========================================================
+     STATE
+     ========================================================= */
+
+  let roomTypes = [];
+
+  let selectedRoomType = null;
+
+  let availabilityTimer = null;
+
+
+  /* =========================================================
+     DATE HELPERS
+     ========================================================= */
+
+  function getTodayString() {
+
+    const now = new Date();
+
+    const year =
+      now.getFullYear();
+
+    const month =
+      String(now.getMonth() + 1).padStart(2, "0");
+
+    const day =
+      String(now.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+
+  function calculateNights(checkin, checkout) {
+
+    if (!checkin || !checkout) {
+      return 0;
+    }
+
+    const start =
+      new Date(checkin + "T00:00:00");
+
+    const end =
+      new Date(checkout + "T00:00:00");
+
+    const difference =
+      end.getTime() - start.getTime();
+
+    return Math.round(
+      difference / (1000 * 60 * 60 * 24)
+    );
+  }
+
+
+  /* =========================================================
+     STATUS
+     ========================================================= */
+
+  function showStatus(message, type) {
+
+    bookingStatus.textContent =
+      message;
+
+    bookingStatus.className =
+      "booking-status show " + type;
+  }
+
+
+  function hideStatus() {
+
+    bookingStatus.textContent = "";
+
+    bookingStatus.className =
+      "booking-status";
+  }
+
+
+  /* =========================================================
+     ROOM DISPLAY
+     ========================================================= */
+
+  function formatPrice(price) {
+
+    const amount =
+      Number(price || 0);
+
+    if (amount <= 0) {
+      return "Rate on request";
+    }
+
+    return "₦" +
+      amount.toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }
+      );
+  }
+
+
+  function updateRoomSummary() {
+
+    selectedRoomType =
+      roomTypes.find(
+        room =>
+          room.id === roomInput.value
+      ) || null;
+
+    if (!selectedRoomType) {
+
+      summaryRoom.textContent =
+        "Select a room";
+
+      roomInfo.textContent =
+        "Select your dates and room.";
+
+      summaryTotal.textContent =
+        "Calculated live";
+
+      summaryPriceNote.textContent =
+        "Room rates will appear when pricing is configured.";
+
+      return;
+    }
+
+    summaryRoom.textContent =
+      selectedRoomType.name;
+
+    roomInfo.textContent =
+      selectedRoomType.max_guests +
+      " guest" +
+      (
+        selectedRoomType.max_guests === 1
+          ? ""
+          : "s"
+      ) +
+      " maximum · " +
+      formatPrice(
+        selectedRoomType.price_per_night
+      ) +
+      " per night";
+
+    const nights =
+      calculateNights(
+        checkinInput.value,
+        checkoutInput.value
+      );
+
+    if (nights > 0) {
+
+      const total =
+        Number(
+          selectedRoomType.price_per_night || 0
+        ) * nights;
+
+      if (
+        Number(
+          selectedRoomType.price_per_night || 0
+        ) > 0
+      ) {
+
+        summaryTotal.textContent =
+          "₦" +
+          total.toLocaleString(
+            "en-NG",
+            {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }
+          );
+
+        summaryPriceNote.textContent =
+          formatPrice(
+            selectedRoomType.price_per_night
+          ) +
+          " × " +
+          nights +
+          " night" +
+          (nights === 1 ? "" : "s");
+
+      } else {
+
+        summaryTotal.textContent =
+          "Rate on request";
+
+        summaryPriceNote.textContent =
+          "Pricing has not been configured yet.";
+      }
+
+    } else {
+
+      summaryTotal.textContent =
+        "Calculated live";
+
+      summaryPriceNote.textContent =
+        "Room rates will appear when pricing is configured.";
+    }
+  }
+
+
+  /* =========================================================
+     LOAD ROOM TYPES FROM SUPABASE
+     ========================================================= */
+
+  async function loadRoomTypes() {
+
+    roomInput.disabled = true;
+
+    roomInput.innerHTML =
+      '<option value="">Loading rooms...</option>';
+
+    try {
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("room_types")
+          .select(
+            "id,name,slug,description,price_per_night,max_guests"
+          )
+          .eq("is_active", true)
+          .order("name", {
+            ascending: true
+          });
+
+      if (error) {
+        throw error;
+      }
+
+      roomTypes =
+        data || [];
+
+      roomInput.innerHTML =
+        '<option value="">Select a room</option>';
+
+      roomTypes.forEach(function (room) {
+
+        const option =
+          document.createElement("option");
+
+        option.value =
+          room.id;
+
+        option.textContent =
+          room.name;
+
+        roomInput.appendChild(option);
+
+      });
+
+      roomInput.disabled =
+        false;
+
+      updateRoomSummary();
+
+    } catch (error) {
+
+      console.error(
+        "Room loading error:",
+        error
+      );
+
+      roomInput.innerHTML =
+        '<option value="">Unable to load rooms</option>';
+
+      roomInfo.textContent =
+        "We could not load the available room types. Please refresh the page.";
+
+      showStatus(
+        "Unable to connect to the booking system. Please refresh the page and try again.",
+        "error"
+      );
+    }
+  }
+
+
+  /* =========================================================
+     CHECK AVAILABILITY
+     ========================================================= */
+
+  async function checkAvailability() {
+
+    const roomTypeId =
+      roomInput.value;
+
+    const checkin =
+      checkinInput.value;
+
+    const checkout =
+      checkoutInput.value;
+
+    if (
+      !roomTypeId ||
+      !checkin ||
+      !checkout
+    ) {
+
+      summaryAvailability.textContent =
+        "Check dates";
+
+      return;
+    }
+
+    const nights =
+      calculateNights(
+        checkin,
+        checkout
+      );
+
+    if (nights <= 0) {
+
+      summaryAvailability.textContent =
+        "Invalid dates";
+
+      return;
+    }
+
+    summaryAvailability.textContent =
+      "Checking...";
+
+    try {
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.rpc(
+          "get_available_room_count",
+          {
+            p_room_type_id:
+              roomTypeId,
+
+            p_check_in:
+              checkin,
+
+            p_check_out:
+              checkout
+          }
+        );
+
+      if (error) {
+        throw error;
+      }
+
+      const count =
+        Number(data || 0);
+
+      if (count > 0) {
+
+        summaryAvailability.textContent =
+          count +
+          " room" +
+          (count === 1 ? "" : "s") +
+          " available";
+
+        roomInfo.textContent =
+          selectedRoomType
+            ? (
+                selectedRoomType.max_guests +
+                " guest" +
+                (
+                  selectedRoomType.max_guests === 1
+                    ? ""
+                    : "s"
+                ) +
+                " maximum · " +
+                formatPrice(
+                  selectedRoomType.price_per_night
+                ) +
+                " per night · " +
+                count +
+                " available"
+              )
+            : "Room available";
+
+      } else {
+
+        summaryAvailability.textContent =
+          "Unavailable";
+
+        roomInfo.textContent =
+          "This room type is not available for the selected dates.";
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Availability error:",
+        error
+      );
+
+      summaryAvailability.textContent =
+        "Unable to check";
+
+      roomInfo.textContent =
+        "Availability could not be checked. Please try again.";
+    }
+  }
+
+
+  function scheduleAvailabilityCheck() {
+
+    clearTimeout(
+      availabilityTimer
+    );
+
+    updateRoomSummary();
+
+    availabilityTimer =
+      setTimeout(
+        checkAvailability,
+        350
+      );
+  }
+
+
+  /* =========================================================
+     VALIDATION
+     ========================================================= */
+
+  function validateDates() {
+
+    const today =
+      getTodayString();
+
+    const checkin =
+      checkinInput.value;
+
+    const checkout =
+      checkoutInput.value;
+
+    if (!checkin) {
+
+      showStatus(
+        "Please select your check-in date.",
+        "error"
+      );
+
+      checkinInput.focus();
+
+      return false;
+    }
+
+    if (!checkout) {
+
+      showStatus(
+        "Please select your check-out date.",
+        "error"
+      );
+
+      checkoutInput.focus();
+
+      return false;
+    }
+
+    if (checkin < today) {
+
+      showStatus(
+        "Check-in cannot be before today.",
+        "error"
+      );
+
+      checkinInput.focus();
+
+      return false;
+    }
+
+    if (checkout <= checkin) {
+
+      showStatus(
+        "Check-out must be after check-in.",
+        "error"
+      );
+
+      checkoutInput.focus();
+
+      return false;
+    }
+
+    return true;
+  }
+
+
+  function validateGuests() {
+
+    const guests =
+      Number(
+        guestsInput.value
+      );
+
+    if (
+      !Number.isInteger(guests) ||
+      guests < 1
+    ) {
+
+      showStatus(
+        "Please select the number of guests.",
+        "error"
+      );
+
+      return false;
+    }
+
+    if (
+      selectedRoomType &&
+      guests >
+      Number(
+        selectedRoomType.max_guests
+      )
+    ) {
+
+      showStatus(
+        selectedRoomType.name +
+        " accommodates a maximum of " +
+        selectedRoomType.max_guests +
+        " guests.",
+        "error"
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
+
+  /* =========================================================
+     UPDATE SUMMARY
+     ========================================================= */
+
+  function updateGuestSummary() {
+
+    const guests =
+      Number(
+        guestsInput.value
+      );
+
+    summaryGuests.textContent =
+      guests +
+      " guest" +
+      (guests === 1 ? "" : "s");
+  }
+
+
+  function updateNightsSummary() {
+
+    const nights =
+      calculateNights(
+        checkinInput.value,
+        checkoutInput.value
+      );
+
+    summaryNights.textContent =
+      nights > 0
+        ? nights +
+          " night" +
+          (nights === 1 ? "" : "s")
+        : "—";
+  }
+
+
+  /* =========================================================
+     FORM SUBMISSION
+     ========================================================= */
+
+  async function submitBooking(event) {
+
+    event.preventDefault();
+
+    hideStatus();
+
+    if (!validateDates()) {
+      return;
+    }
+
+    if (!roomInput.value) {
+
+      showStatus(
+        "Please select a room.",
+        "error"
+      );
+
+      roomInput.focus();
+
+      return;
+    }
+
+    selectedRoomType =
+      roomTypes.find(
+        room =>
+          room.id === roomInput.value
+      ) || null;
+
+    if (!selectedRoomType) {
+
+      showStatus(
+        "The selected room could not be found. Please refresh and try again.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (!validateGuests()) {
+      return;
+    }
+
+    const firstName =
+      document
+        .getElementById("firstName")
+        .value
+        .trim();
+
+    const lastName =
+      document
+        .getElementById("lastName")
+        .value
+        .trim();
+
+    const email =
+      document
+        .getElementById("email")
+        .value
+        .trim();
+
+    const phone =
+      document
+        .getElementById("phone")
+        .value
+        .trim();
+
+    const requests =
+      document
+        .getElementById("requests")
+        .value
+        .trim();
+
+    if (!firstName || !lastName) {
+
+      showStatus(
+        "Please enter your first and last name.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (!email) {
+
+      showStatus(
+        "Please enter your email address.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (!phone) {
+
+      showStatus(
+        "Please enter your phone or WhatsApp number.",
+        "error"
+      );
+
+      return;
+    }
+
+    const guests =
+      Number(
+        guestsInput.value
+      );
+
+    const nights =
+      calculateNights(
+        checkinInput.value,
+        checkoutInput.value
+      );
+
+    submitButton.disabled =
+      true;
+
+    submitButton.classList.add(
+      "booking-submit-loading"
+    );
+
+    submitButton.textContent =
+      "Checking availability...";
+
+    showStatus(
+      "Checking the selected room and dates...",
+      "loading"
+    );
+
+    try {
+
+      /*
+       * The secure Supabase RPC performs the final
+       * availability check and locks an available room
+       * before creating the booking.
+       */
+
+      submitButton.textContent =
+        "Creating reservation...";
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.rpc(
+          "create_hotel_booking",
+          {
+            p_room_type_id:
+              selectedRoomType.id,
+
+            p_check_in:
+              checkinInput.value,
+
+            p_check_out:
+              checkoutInput.value,
+
+            p_guest_first_name:
+              firstName,
+
+            p_guest_last_name:
+              lastName,
+
+            p_guest_email:
+              email,
+
+            p_guest_phone:
+              phone,
+
+            p_adults:
+              guests,
+
+            p_children:
+              0,
+
+            p_special_requests:
+              requests || null
+          }
+        );
+
+      if (error) {
+        throw error;
+      }
+
+      const booking =
+        Array.isArray(data)
+          ? data[0]
+          : data;
+
+      if (!booking) {
+
+        throw new Error(
+          "The booking system did not return a reservation."
+        );
+      }
+
+      /*
+       * Save a small amount of confirmation information
+       * locally so the confirmation page can display it.
+       */
+
+      const confirmationData = {
+
+        booking_id:
+          booking.booking_id,
+
+        booking_reference:
+          booking.booking_reference,
+
+        room_type_name:
+          booking.room_type_name,
+
+        room_number:
+          booking.room_number,
+
+        check_in:
+          booking.check_in,
+
+        check_out:
+          booking.check_out,
+
+        nights:
+          booking.nights || nights,
+
+        price_per_night:
+          booking.price_per_night,
+
+        total_amount:
+          booking.total_amount,
+
+        status:
+          booking.status,
+
+        payment_status:
+          booking.payment_status,
+
+        guest_first_name:
+          firstName,
+
+        guest_last_name:
+          lastName,
+
+        guest_email:
+          email,
+
+        guest_phone:
+          phone
+      };
+
+      sessionStorage.setItem(
+        "nordic_booking_confirmation",
+        JSON.stringify(
+          confirmationData
+        )
+      );
+
+      showStatus(
+        "Reservation created successfully. Your booking reference is " +
+        booking.booking_reference +
+        ".",
+        "success"
+      );
+
+      submitButton.textContent =
+        "Reservation confirmed ✓";
+
+      /*
+       * Send the guest to the confirmation page.
+       * The reference is also included in the URL so the
+       * page can still identify the booking after navigation.
+       */
+
+      const params =
+        new URLSearchParams({
+
+          reference:
+            booking.booking_reference
+
+        });
+
+      setTimeout(
+        function () {
+
+          window.location.href =
+            "booking-success.html?" +
+            params.toString();
+
+        },
+        900
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Booking creation error:",
+        error
+      );
+
+      let message =
+        "We could not complete your reservation. Please check your dates and try again.";
+
+      if (
+        error &&
+        error.message
+      ) {
+
+        if (
+          error.message
+            .toLowerCase()
+            .includes("no rooms are available")
+        ) {
+
+          message =
+            "Sorry, there are no rooms available for the selected dates. Please choose different dates or another room type.";
+
+        } else if (
+          error.message
+            .toLowerCase()
+            .includes("capacity")
+        ) {
+
+          message =
+            "The selected room cannot accommodate the number of guests you selected.";
+
+        } else if (
+          error.message
+            .toLowerCase()
+            .includes("check-in")
+        ) {
+
+          message =
+            error.message;
+
+        } else if (
+          error.message
+            .toLowerCase()
+            .includes("check-out")
+        ) {
+
+          message =
+            error.message;
+
+        } else if (
+          error.message
+            .toLowerCase()
+            .includes("guest")
+        ) {
+
+          message =
+            error.message;
+        }
+      }
+
+      showStatus(
+        message,
+        "error"
+      );
+
+      submitButton.disabled =
+        false;
+
+      submitButton.classList.remove(
+        "booking-submit-loading"
+      );
+
+      submitButton.textContent =
+        "Continue reservation →";
+    }
+  }
+
+
+  /* =========================================================
+     EVENTS
+     ========================================================= */
+
+  checkinInput.addEventListener(
+    "change",
+    function () {
+
+      if (
+        checkoutInput.value &&
+        checkoutInput.value <=
+        checkinInput.value
+      ) {
+
+        checkoutInput.value =
+          "";
+      }
+
+      if (
+        checkinInput.value
+      ) {
+
+        checkoutInput.min =
+          checkinInput.value;
+      }
+
+      updateNightsSummary();
+
+      scheduleAvailabilityCheck();
+    }
+  );
+
+
+  checkoutInput.addEventListener(
+    "change",
+    function () {
+
+      updateNightsSummary();
+
+      scheduleAvailabilityCheck();
+    }
+  );
+
+
+  roomInput.addEventListener(
+    "change",
+    function () {
+
+      updateRoomSummary();
+
+      scheduleAvailabilityCheck();
+    }
+  );
+
+
+  guestsInput.addEventListener(
+    "change",
+    function () {
+
+      updateGuestSummary();
+
+      validateGuests();
+    }
+  );
+
+
+  form.addEventListener(
+    "submit",
+    submitBooking
+  );
+
+
+  /* =========================================================
+     INITIALISE
+     ========================================================= */
+
+  checkinInput.min =
+    getTodayString();
+
+  checkoutInput.min =
+    getTodayString();
+
+  updateGuestSummary();
+
+  updateNightsSummary();
+
+  loadRoomTypes();
+
+
+})();
+</script></body>
+</html>
