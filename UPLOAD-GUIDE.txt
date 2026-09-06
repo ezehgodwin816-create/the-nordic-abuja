@@ -1,0 +1,21 @@
+The Nordic Abuja — corrected inner pages
+
+Replace these 10 root HTML files in GitHub:
+about.html
+abuja.html
+contact.html
+dining.html
+events.html
+experience.html
+gallery.html
+offers.html
+rooms.html
+room-deluxe.html
+
+Paths corrected to match the existing repository folders:
+assets/css/style.css -> css/style.css
+assets/css/pages.css -> css/pages.css
+assets/images/... -> images/...
+assets/js/main.js -> js/main.js
+
+No assets folder is needed. The existing css/, js/ and images/ folders stay unchanged.
