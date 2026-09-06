@@ -1,0 +1,8 @@
+{
+  "name": "The Nordic Abuja",
+  "short_name": "The Nordic",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#171715",
+  "theme_color": "#171715"
+}

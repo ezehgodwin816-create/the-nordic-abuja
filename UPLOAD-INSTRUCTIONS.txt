@@ -1,0 +1,37 @@
+THE NORDIC ABUJA — FULL WEBSITE UPGRADE
+
+UPLOAD THIS PACKAGE TO YOUR EXISTING GITHUB REPOSITORY:
+ezehgodwin816-create/the-nordic-abuja
+
+IMPORTANT:
+1. KEEP your existing images/ folder and all 11 JPG files already uploaded there.
+2. Upload/replace the HTML files in the root.
+3. Upload/replace the css/ folder.
+4. Upload/replace the js/ folder.
+5. Upload robots.txt, sitemap.xml and site.webmanifest.
+6. Do NOT delete the existing images/*.jpg files.
+
+NEW FRONTEND FEATURES:
+- Faster loader behavior
+- Responsive/mobile improvements
+- Booking-flow page
+- Booking success page
+- Date and guest selection
+- Room selection
+- Guest details form
+- Local booking draft until backend is connected
+- Concierge panel
+- Gallery lightbox
+- FAQ page
+- Privacy page
+- Terms page
+- SEO sitemap
+- robots.txt
+- Web app manifest
+- Existing hotel pages retained
+
+BACKEND NOTE:
+The booking page is NOT pretending to have live availability or payment yet.
+After this upload is working, we can connect Supabase for rooms, inventory,
+bookings, guests, offers, restaurant reservations, event enquiries, transfers,
+admin login and a real admin dashboard. Then we can connect Paystack/Flutterwave.
