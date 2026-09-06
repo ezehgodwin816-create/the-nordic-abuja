@@ -1,0 +1,1 @@
+Add approved/licensed images here. Required filenames are listed in the root README.md.
