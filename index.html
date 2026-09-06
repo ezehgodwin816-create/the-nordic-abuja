@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#171715" />
+  <meta name="description" content="The Nordic Abuja — a contemporary Afro-Nordic boutique hotel experience in Abuja." />
+  <meta property="og:title" content="The Nordic Abuja — A Different Kind of Stay" />
+  <meta property="og:description" content="Discover rooms, dining, meetings, experiences and Abuja through The Nordic." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/images/hero.svg" />
+  <title>The Nordic Abuja — A Different Kind of Stay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="site-loader" aria-hidden="true">
+    <div class="loader-mark">N</div>
+  </div>
+
+  <header class="site-header" id="siteHeader">
+    <a class="brand" href="index.html" aria-label="The Nordic Abuja home">
+      <span class="brand-word">THE NORDIC</span>
+      <span class="brand-sub">ABUJA</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a href="#stay">Stay</a>
+      <a href="#dine">Dine</a>
+      <a href="#experience">Experience</a>
+      <a href="#meet">Meet</a>
+      <a href="#abuja">Abuja</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-button menu-toggle" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
+        <span></span><span></span>
+      </button>
+      <a class="button button-small button-light" href="#booking">Book a stay</a>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <button class="mobile-close menu-toggle" type="button" aria-label="Close menu">×</button>
+    <nav aria-label="Mobile navigation">
+      <a href="#stay">Stay</a>
+      <a href="#dine">Dine</a>
+      <a href="#experience">Experience</a>
+      <a href="#meet">Meet</a>
+      <a href="#abuja">Abuja</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#offers">Offers</a>
+      <a href="#booking">Book your stay</a>
+    </nav>
+  </div>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-media">
+        <img src="assets/images/hero.svg" alt="The Nordic Abuja exterior" fetchpriority="high" />
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="eyebrow light">Afro-Nordic hospitality · Abuja</p>
+        <h1>A different<br><em>kind of stay.</em></h1>
+        <p class="hero-copy">Nordic simplicity, Nigerian warmth, and a calm place to call your own in the heart of Abuja.</p>
+        <div class="hero-ctas">
+          <a class="button button-light" href="#booking">Check availability <span>↗</span></a>
+          <a class="text-link light" href="#stay">Discover The Nordic <span>↓</span></a>
+        </div>
+      </div>
+      <div class="hero-scroll">Scroll to explore <span></span></div>
+    </section>
+
+    <section class="booking-bar" id="booking">
+      <div class="booking-inner">
+        <div class="booking-field">
+          <label for="checkin">Check in</label>
+          <input id="checkin" type="date" />
+        </div>
+        <div class="booking-field">
+          <label for="checkout">Check out</label>
+          <input id="checkout" type="date" />
+        </div>
+        <div class="booking-field select-field">
+          <label for="guests">Guests</label>
+          <select id="guests">
+            <option>1 guest</option>
+            <option selected>2 guests</option>
+            <option>3 guests</option>
+            <option>4 guests</option>
+            <option>5+ guests</option>
+          </select>
+        </div>
+        <button class="button button-dark booking-submit" type="button" id="bookingButton">Check availability <span>→</span></button>
+      </div>
+      <p class="booking-note">Direct booking · Best available rate · Secure reservation</p>
+    </section>
+
+    <section class="intro section" id="stay">
+      <div class="container split-intro">
+        <div>
+          <p class="eyebrow">01 — The Nordic feeling</p>
+          <h2>Calm, <em>by design.</em></h2>
+        </div>
+        <div class="intro-copy">
+          <p class="lead">A contemporary boutique hotel where clean Nordic lines meet the warmth, rhythm and character of Nigeria.</p>
+          <p>From considered rooms and soulful dining to quiet corners, thoughtful service and spaces made for gathering, The Nordic is designed around the feeling of being somewhere you want to stay.</p>
+          <a class="arrow-link" href="about.html">Discover our story <span>↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="image-story">
+      <div class="story-image reveal">
+        <img src="assets/images/story.svg" alt="Interior detail at The Nordic Abuja" loading="lazy" />
+      </div>
+      <div class="story-caption">
+        <span>Designed for living</span>
+        <span>Natural materials · Thoughtful light · Quiet luxury</span>
+      </div>
+    </section>
+
+    <section class="rooms section" id="rooms">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">02 — Stay</p>
+            <h2>Rooms with <em>room to breathe.</em></h2>
+          </div>
+          <a class="arrow-link" href="rooms.html">Explore all rooms <span>↗</span></a>
+        </div>
+        <div class="room-feature">
+          <div class="room-feature-image reveal">
+            <img src="assets/images/deluxe.svg" alt="Deluxe room at The Nordic Abuja" loading="lazy" />
+            <span class="image-tag">65 m² · King bed</span>
+          </div>
+          <div class="room-feature-info">
+            <p class="eyebrow">Featured stay</p>
+            <h3>Deluxe</h3>
+            <p>Space to slow down. A generous room with a king bed, sitting area, workspace and a rainfall shower.</p>
+            <div class="amenities-mini">
+              <span>55" Smart TV</span><span>Wi-Fi</span><span>Rainforest shower</span><span>Safe</span>
+            </div>
+            <a class="button button-dark" href="room-deluxe.html">View the Deluxe <span>↗</span></a>
+          </div>
+        </div>
+        <div class="room-strip">
+          <a href="rooms.html" class="room-card">
+            <span class="room-number">01</span><span class="room-name">Economy</span><span class="room-size">24 m²</span><span>↗</span>
+          </a>
+          <a href="rooms.html" class="room-card">
+            <span class="room-number">02</span><span class="room-name">Standard</span><span class="room-size">35 m²</span><span>↗</span>
+          </a>
+          <a href="rooms.html" class="room-card">
+            <span class="room-number">03</span><span class="room-name">Superior</span><span class="room-size">37 m²</span><span>↗</span>
+          </a>
+          <a href="rooms.html" class="room-card">
+            <span class="room-number">04</span><span class="room-name">Junior Suite</span><span class="room-size">47 m²</span><span>↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="dark-feature" id="dine">
+      <div class="container dark-feature-grid">
+        <div class="dark-feature-copy">
+          <p class="eyebrow light">03 — Dine · TARO</p>
+          <h2>Good food.<br><em>Good company.</em></h2>
+          <p>At TARO Bistro & Bar, fresh local ingredients meet relaxed, soulful cooking. Come for breakfast, stay for lunch, return for dinner.</p>
+          <div class="button-row">
+            <a class="button button-light" href="dining.html">Discover TARO <span>↗</span></a>
+            <a class="text-link light" href="dining.html#menu">View menu <span>→</span></a>
+          </div>
+        </div>
+        <div class="dark-feature-image reveal">
+          <img src="assets/images/taro.svg" alt="TARO Bistro and Bar" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <section class="experience section" id="experience">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">04 — Experience</p>
+            <h2>More than a room.</h2>
+          </div>
+          <p class="section-intro">A stay shaped around how you want to spend your time.</p>
+        </div>
+        <div class="experience-grid">
+          <a class="experience-card large" href="experience.html#wellbeing">
+            <img src="assets/images/gym.svg" alt="Fitness room" loading="lazy" />
+            <div class="card-gradient"></div>
+            <div class="card-content"><span>01</span><h3>Move well.</h3><p>Wellbeing & fitness</p></div>
+          </a>
+          <a class="experience-card" href="experience.html#rooftop">
+            <img src="assets/images/rooftop.svg" alt="Rooftop experience" loading="lazy" />
+            <div class="card-gradient"></div>
+            <div class="card-content"><span>02</span><h3>Above Abuja.</h3><p>Rooftop & city views</p></div>
+          </a>
+          <a class="experience-card" href="experience.html#concierge">
+            <img src="assets/images/lounge.svg" alt="Hotel lounge" loading="lazy" />
+            <div class="card-gradient"></div>
+            <div class="card-content"><span>03</span><h3>Take your time.</h3><p>Spaces to pause</p></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="events section" id="meet">
+      <div class="container events-grid">
+        <div class="events-image reveal">
+          <img src="assets/images/events.svg" alt="Meeting and events space" loading="lazy" />
+        </div>
+        <div class="events-copy">
+          <p class="eyebrow">05 — Meetings & events</p>
+          <h2>Meet <em>differently.</em></h2>
+          <p class="lead">Thoughtful spaces for meetings, workshops, conferences and celebrations — with the service to make the details easy.</p>
+          <div class="venue-list">
+            <div><span>Lagos</span><span>Conference room</span></div>
+            <div><span>Kano</span><span>Meeting room</span></div>
+            <div><span>Ibadan</span><span>Meeting room</span></div>
+            <div><span>Abuja</span><span>Boardroom</span></div>
+            <div><span>Jos</span><span>Meeting room</span></div>
+          </div>
+          <a class="button button-dark" href="events.html">Plan an event <span>↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="city-section" id="abuja">
+      <div class="city-image">
+        <img src="assets/images/abuja.svg" alt="Abuja city" loading="lazy" />
+      </div>
+      <div class="city-overlay"></div>
+      <div class="city-content">
+        <p class="eyebrow light">06 — The city</p>
+        <h2>Your Abuja,<br><em>curated.</em></h2>
+        <p>From art and culture to food, shopping and places worth taking the long way to, let The Nordic be your starting point.</p>
+        <a class="button button-light" href="abuja.html">Explore Abuja <span>↗</span></a>
+      </div>
+    </section>
+
+    <section class="quote-section section">
+      <div class="container quote-container">
+        <p class="eyebrow">07 — Guest stories</p>
+        <blockquote>“A calm, beautifully designed place in Abuja where the details actually matter.”</blockquote>
+        <div class="quote-meta"><span>Guest experience</span><span>★★★★★</span></div>
+        <p class="small-note">Demo presentation copy — verified guest reviews and attribution should be added before launch.</p>
+      </div>
+    </section>
+
+    <section class="gallery section" id="gallery">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">08 — Gallery</p><h2>See the <em>feeling.</em></h2></div>
+          <a class="arrow-link" href="gallery.html">Open gallery <span>↗</span></a>
+        </div>
+        <div class="gallery-grid">
+          <button class="gallery-item wide" data-lightbox="assets/images/room.svg" data-caption="Rooms & suites" type="button"><img src="assets/images/room.svg" alt="Hotel room" loading="lazy" /><span>Rooms & suites</span></button>
+          <button class="gallery-item tall" data-lightbox="assets/images/taro.svg" data-caption="TARO Bistro & Bar" type="button"><img src="assets/images/taro.svg" alt="TARO dining" loading="lazy" /><span>TARO</span></button>
+          <button class="gallery-item" data-lightbox="assets/images/lounge.svg" data-caption="The Nordic lounge" type="button"><img src="assets/images/lounge.svg" alt="Hotel lounge" loading="lazy" /><span>The hotel</span></button>
+          <button class="gallery-item" data-lightbox="assets/images/gym.svg" data-caption="Wellbeing" type="button"><img src="assets/images/gym.svg" alt="Gym" loading="lazy" /><span>Wellbeing</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="offers section" id="offers">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">09 — Offers</p><h2>Stay a little <em>different.</em></h2></div>
+          <a class="arrow-link" href="offers.html">All offers <span>↗</span></a>
+        </div>
+        <div class="offers-grid">
+          <article class="offer-card"><span class="offer-label">Weekend</span><h3>The slow weekend</h3><p>A little more time to sleep in, dine well and explore Abuja.</p><a href="offers.html">Discover offer →</a></article>
+          <article class="offer-card featured"><span class="offer-label">Business</span><h3>The smart stay</h3><p>A considered base for focused work, meetings and easy evenings.</p><a href="offers.html">Discover offer →</a></article>
+          <article class="offer-card"><span class="offer-label">Long stay</span><h3>Stay longer</h3><p>More days, more room to settle in and experience the city.</p><a href="offers.html">Discover offer →</a></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="concierge">
+      <div class="container concierge-inner">
+        <div><p class="eyebrow light">10 — Concierge</p><h2>Need something?</h2><p>Let us help you plan the stay — from a room and restaurant table to airport transfers and a day in Abuja.</p></div>
+        <button class="button button-light" type="button" id="conciergeOpen">Open Nordic Concierge <span>↗</span></button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-top">
+      <div class="footer-brand"><span>THE NORDIC</span><small>ABUJA</small><p>A different kind of stay.</p></div>
+      <div class="footer-links"><div><h4>Explore</h4><a href="rooms.html">Rooms</a><a href="dining.html">Dining</a><a href="experience.html">Experience</a><a href="events.html">Meetings & events</a></div><div><h4>Useful</h4><a href="abuja.html">Abuja guide</a><a href="gallery.html">Gallery</a><a href="offers.html">Offers</a><a href="contact.html">Contact</a></div></div>
+      <div class="footer-contact"><h4>Stay in touch</h4><p>Zone B04, Plot 795, Off Shehu Yar'adua Way, Jabi, Abuja.</p><a href="mailto:info@thenordicabuja.com">info@thenordicabuja.com</a><a href="tel:+2349162481000">+234 916 248 1000</a></div>
+    </div>
+    <div class="container footer-bottom"><span>© <span id="year"></span> The Nordic Abuja · Concept redesign</span><span>Privacy · Terms</span></div>
+  </footer>
+
+  <div class="floating-actions">
+    <a href="https://wa.me/2349162481000" aria-label="Chat on WhatsApp" target="_blank" rel="noopener">WA</a>
+    <button type="button" id="backTop" aria-label="Back to top">↑</button>
+  </div>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox-close" type="button" aria-label="Close image">×</button>
+    <img id="lightboxImage" src="" alt="" />
+    <p id="lightboxCaption"></p>
+  </div>
+
+  <aside class="concierge-panel" id="conciergePanel" aria-hidden="true">
+    <div class="concierge-panel-head"><div><span class="eyebrow">Nordic Concierge</span><h3>How can we help?</h3></div><button id="conciergeClose" type="button">×</button></div>
+    <div class="concierge-options">
+      <a href="#booking">🛏️ Book a stay</a>
+      <a href="dining.html#reservation">🍽️ Reserve dining</a>
+      <a href="contact.html#transfer">✈️ Airport transfer</a>
+      <a href="events.html">💼 Plan an event</a>
+      <a href="contact.html#occasion">🎉 Celebrate something</a>
+      <a href="abuja.html">📍 Explore Abuja</a>
+      <a href="contact.html">☎️ Contact the hotel</a>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
