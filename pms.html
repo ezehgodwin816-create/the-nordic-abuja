@@ -4,22 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>The Nordic Abuja — PMS</title>
+
   <link rel="stylesheet" href="pms.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
-  <!-- LOGIN -->
+  <!-- =========================
+       LOGIN
+  ========================== -->
   <div id="login">
+
     <div class="login-card">
 
       <div class="logo">N</div>
 
       <h1>The Nordic Abuja</h1>
+
       <p>Property Management System</p>
 
       <form id="loginForm">
+
         <input
           id="email"
           type="email"
@@ -36,7 +43,9 @@
           required
         >
 
-        <button type="submit">Sign in</button>
+        <button type="submit">
+          Sign in
+        </button>
 
         <button
           type="button"
@@ -47,14 +56,19 @@
         </button>
 
         <div id="loginError"></div>
+
       </form>
 
     </div>
+
   </div>
 
 
-  <!-- PASSWORD RESET -->
+  <!-- =========================
+       PASSWORD RESET
+  ========================== -->
   <div id="reset" class="hidden">
+
     <div class="login-card">
 
       <div class="logo">N</div>
@@ -62,7 +76,7 @@
       <h1>Set New Password</h1>
 
       <p>
-        Create a new password for your Nordic Abuja PMS administrator account.
+        Create a new password for your administrator account.
       </p>
 
       <form id="resetForm">
@@ -85,7 +99,9 @@
           required
         >
 
-        <button type="submit">Update Password</button>
+        <button type="submit">
+          Update Password
+        </button>
 
         <button
           type="button"
@@ -100,50 +116,87 @@
       </form>
 
     </div>
+
   </div>
 
 
-  <!-- PMS APP -->
+  <!-- =========================
+       PMS APPLICATION
+  ========================== -->
   <div id="app" class="hidden">
 
     <header>
-      <button id="menu">☰</button>
 
-      <b>THE NORDIC ABUJA</b>
+      <button id="menu">
+        ☰
+      </button>
+
+      <b>
+        THE NORDIC ABUJA
+      </b>
 
       <span id="who"></span>
 
-      <button id="logout">Sign out</button>
+      <button id="logout">
+        Sign out
+      </button>
+
     </header>
 
 
     <aside id="side">
 
-      <button data-v="dashboard">Dashboard</button>
+      <button data-v="dashboard">
+        Dashboard
+      </button>
 
-      <button data-v="frontdesk">Front Desk</button>
+      <button data-v="frontdesk">
+        Front Desk
+      </button>
 
-      <button data-v="calendar">Calendar</button>
+      <button data-v="calendar">
+        Calendar
+      </button>
 
-      <button data-v="guests">Guests & CRM</button>
+      <button data-v="guests">
+        Guests & CRM
+      </button>
 
-      <button data-v="housekeeping">Housekeeping</button>
+      <button data-v="housekeeping">
+        Housekeeping
+      </button>
 
-      <button data-v="maintenance">Maintenance</button>
+      <button data-v="maintenance">
+        Maintenance
+      </button>
 
-      <button data-v="folios">Folios & Billing</button>
+      <button data-v="folios">
+        Folios & Billing
+      </button>
 
-      <button data-v="payments">Payments</button>
+      <button data-v="payments">
+        Payments
+      </button>
 
-      <button data-v="rates">Rates & Promotions</button>
+      <button data-v="rates">
+        Rates & Promotions
+      </button>
 
-      <button data-v="extras">Extras</button>
+      <button data-v="extras">
+        Extras
+      </button>
 
-      <button data-v="reports">Reports</button>
+      <button data-v="reports">
+        Reports
+      </button>
 
-      <button data-v="staff">Staff & Permissions</button>
+      <button data-v="staff">
+        Staff & Permissions
+      </button>
 
-      <button data-v="audit">Audit Log</button>
+      <button data-v="audit">
+        Audit Log
+      </button>
 
     </aside>
 
