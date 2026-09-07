@@ -1,3 +1,159 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The Nordic Abuja — PMS</title><link rel="stylesheet" href="pms.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
-<div id="login"><div class="login-card"><div class="logo">N</div><h1>The Nordic Abuja</h1><p>Property Management System</p><form id="loginForm"><input id="email" type="email" placeholder="Admin email" required><input id="password" type="password" placeholder="Password" required><button>Sign in</button><div id="loginError"></div></form></div></div>
-<div id="app" class="hidden"><header><button id="menu">☰</button><b>THE NORDIC ABUJA</b><span id="who"></span><button id="logout">Sign out</button></header><aside id="side"><button data-v="dashboard">Dashboard</button><button data-v="frontdesk">Front Desk</button><button data-v="calendar">Calendar</button><button data-v="guests">Guests & CRM</button><button data-v="housekeeping">Housekeeping</button><button data-v="maintenance">Maintenance</button><button data-v="folios">Folios & Billing</button><button data-v="payments">Payments</button><button data-v="rates">Rates & Promotions</button><button data-v="extras">Extras</button><button data-v="reports">Reports</button><button data-v="staff">Staff & Permissions</button><button data-v="audit">Audit Log</button></aside><main id="main"></main></div><script src="pms.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>The Nordic Abuja — PMS</title>
+  <link rel="stylesheet" href="pms.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <div id="login">
+    <div class="login-card">
+
+      <div class="logo">N</div>
+
+      <h1>The Nordic Abuja</h1>
+      <p>Property Management System</p>
+
+      <form id="loginForm">
+        <input
+          id="email"
+          type="email"
+          placeholder="Admin email"
+          autocomplete="email"
+          required
+        >
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button type="submit">Sign in</button>
+
+        <button
+          type="button"
+          id="forgotPassword"
+          class="secondary"
+        >
+          Forgot password?
+        </button>
+
+        <div id="loginError"></div>
+      </form>
+
+    </div>
+  </div>
+
+
+  <!-- PASSWORD RESET -->
+  <div id="reset" class="hidden">
+    <div class="login-card">
+
+      <div class="logo">N</div>
+
+      <h1>Set New Password</h1>
+
+      <p>
+        Create a new password for your Nordic Abuja PMS administrator account.
+      </p>
+
+      <form id="resetForm">
+
+        <input
+          id="newPassword"
+          type="password"
+          placeholder="New password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        >
+
+        <input
+          id="confirmPassword"
+          type="password"
+          placeholder="Confirm new password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        >
+
+        <button type="submit">Update Password</button>
+
+        <button
+          type="button"
+          id="backToLogin"
+          class="secondary"
+        >
+          Back to login
+        </button>
+
+        <div id="resetError"></div>
+
+      </form>
+
+    </div>
+  </div>
+
+
+  <!-- PMS APP -->
+  <div id="app" class="hidden">
+
+    <header>
+      <button id="menu">☰</button>
+
+      <b>THE NORDIC ABUJA</b>
+
+      <span id="who"></span>
+
+      <button id="logout">Sign out</button>
+    </header>
+
+
+    <aside id="side">
+
+      <button data-v="dashboard">Dashboard</button>
+
+      <button data-v="frontdesk">Front Desk</button>
+
+      <button data-v="calendar">Calendar</button>
+
+      <button data-v="guests">Guests & CRM</button>
+
+      <button data-v="housekeeping">Housekeeping</button>
+
+      <button data-v="maintenance">Maintenance</button>
+
+      <button data-v="folios">Folios & Billing</button>
+
+      <button data-v="payments">Payments</button>
+
+      <button data-v="rates">Rates & Promotions</button>
+
+      <button data-v="extras">Extras</button>
+
+      <button data-v="reports">Reports</button>
+
+      <button data-v="staff">Staff & Permissions</button>
+
+      <button data-v="audit">Audit Log</button>
+
+    </aside>
+
+
+    <main id="main"></main>
+
+  </div>
+
+
+  <script src="pms.js"></script>
+
+</body>
+</html>
