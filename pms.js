@@ -3710,3 +3710,1307 @@ document.addEventListener(
 
 
 addRoomToolbar();
+/* =========================================================
+   ROOM TYPES MANAGEMENT — ADD / EDIT / DELETE
+========================================================= */
+
+let editingRoomTypeId = null;
+
+
+/* =========================
+   ROOM TYPE MODAL
+========================= */
+
+function createRoomTypeModal() {
+
+  if ($('roomTypeModal')) return;
+
+  const modal = document.createElement('div');
+
+  modal.id = 'roomTypeModal';
+
+  modal.innerHTML = `
+    <div class="room-type-modal-backdrop">
+
+      <div class="room-type-modal-card">
+
+        <div class="room-type-modal-head">
+
+          <div>
+            <h2 id="roomTypeModalTitle">
+              Add Room Type
+            </h2>
+
+            <div class="muted">
+              Room type information
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="secondary"
+            id="closeRoomTypeModal"
+          >
+            ✕
+          </button>
+
+        </div>
+
+
+        <form id="roomTypeForm">
+
+          <div class="room-type-form-grid">
+
+            <div>
+              <label>Room type name</label>
+
+              <input
+                id="roomTypeName"
+                type="text"
+                required
+                placeholder="e.g. Deluxe Room"
+              >
+            </div>
+
+
+            <div>
+              <label>Slug</label>
+
+              <input
+                id="roomTypeSlug"
+                type="text"
+                required
+                placeholder="e.g. deluxe-room"
+              >
+            </div>
+
+
+            <div class="room-type-full">
+
+              <label>Description</label>
+
+              <textarea
+                id="roomTypeDescription"
+                rows="4"
+                placeholder="Full room type description"
+              ></textarea>
+
+            </div>
+
+
+            <div class="room-type-full">
+
+              <label>Short description</label>
+
+              <input
+                id="roomTypeShortDescription"
+                type="text"
+                placeholder="Short description"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label>
+                Price per night (₦)
+              </label>
+
+              <input
+                id="roomTypePrice"
+                type="number"
+                min="0"
+                step="0.01"
+                value="0"
+                required
+              >
+
+            </div>
+
+
+            <div>
+
+              <label>
+                Maximum guests
+              </label>
+
+              <input
+                id="roomTypeMaxGuests"
+                type="number"
+                min="1"
+                step="1"
+                value="2"
+                required
+              >
+
+            </div>
+
+
+            <div>
+
+              <label>
+                Bed type
+              </label>
+
+              <input
+                id="roomTypeBedType"
+                type="text"
+                placeholder="e.g. King Bed"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label>
+                Room size
+              </label>
+
+              <input
+                id="roomTypeRoomSize"
+                type="text"
+                placeholder="e.g. 45 m²"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label>
+                View type
+              </label>
+
+              <input
+                id="roomTypeViewType"
+                type="text"
+                placeholder="e.g. City View"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label>
+                Image URL
+              </label>
+
+              <input
+                id="roomTypeImageUrl"
+                type="url"
+                placeholder="https://..."
+              >
+
+            </div>
+
+
+            <div class="room-type-full">
+
+              <label>
+                Amenities
+              </label>
+
+              <input
+                id="roomTypeAmenities"
+                type="text"
+                placeholder="Wi-Fi, TV, Air Conditioning, Mini Bar"
+              >
+
+              <div class="muted room-type-help">
+                Separate amenities with commas.
+              </div>
+
+            </div>
+
+
+            <div class="room-type-full">
+
+              <label class="room-type-check">
+
+                <input
+                  id="roomTypeActive"
+                  type="checkbox"
+                  checked
+                >
+
+                <span>
+                  Active room type
+                </span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="roomTypeFormError"
+            class="room-type-form-error"
+          ></div>
+
+
+          <div class="room-type-modal-actions">
+
+            <button
+              type="button"
+              class="secondary"
+              id="cancelRoomType"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="primary"
+              id="saveRoomType"
+            >
+              Save Room Type
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+
+  $('closeRoomTypeModal')
+    .addEventListener(
+      'click',
+      closeRoomTypeModal
+    );
+
+
+  $('cancelRoomType')
+    .addEventListener(
+      'click',
+      closeRoomTypeModal
+    );
+
+
+  $('roomTypeForm')
+    .addEventListener(
+      'submit',
+      saveRoomType
+    );
+
+}
+
+
+/* =========================
+   CREATE SLUG
+========================= */
+
+function makeRoomTypeSlug(value) {
+
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9]+/g,
+      '-'
+    )
+    .replace(
+      /^-+|-+$/g,
+      ''
+    );
+
+}
+
+
+/* =========================
+   OPEN ROOM TYPE MODAL
+========================= */
+
+function openRoomTypeModal(
+  roomType = null
+) {
+
+  createRoomTypeModal();
+
+  editingRoomTypeId =
+    roomType?.id || null;
+
+
+  $('roomTypeModalTitle')
+    .textContent =
+      roomType
+        ? 'Edit Room Type'
+        : 'Add Room Type';
+
+
+  $('roomTypeName').value =
+    roomType?.name || '';
+
+
+  $('roomTypeSlug').value =
+    roomType?.slug || '';
+
+
+  $('roomTypeDescription').value =
+    roomType?.description || '';
+
+
+  $('roomTypeShortDescription').value =
+    roomType?.short_description || '';
+
+
+  $('roomTypePrice').value =
+    roomType?.price_per_night ?? 0;
+
+
+  $('roomTypeMaxGuests').value =
+    roomType?.max_guests ?? 2;
+
+
+  $('roomTypeBedType').value =
+    roomType?.bed_type || '';
+
+
+  $('roomTypeRoomSize').value =
+    roomType?.room_size || '';
+
+
+  $('roomTypeViewType').value =
+    roomType?.view_type || '';
+
+
+  $('roomTypeImageUrl').value =
+    roomType?.image_url || '';
+
+
+  let amenities = [];
+
+  if (
+    Array.isArray(
+      roomType?.amenities
+    )
+  ) {
+
+    amenities =
+      roomType.amenities;
+
+  }
+
+
+  $('roomTypeAmenities').value =
+    amenities.join(', ');
+
+
+  $('roomTypeActive').checked =
+    roomType?.is_active !== false;
+
+
+  $('roomTypeFormError').textContent =
+    '';
+
+
+  $('roomTypeModal')
+    .classList.add('show');
+
+}
+
+
+/* =========================
+   CLOSE ROOM TYPE MODAL
+========================= */
+
+function closeRoomTypeModal() {
+
+  const modal =
+    $('roomTypeModal');
+
+  if (modal) {
+
+    modal.classList.remove(
+      'show'
+    );
+
+  }
+
+  editingRoomTypeId = null;
+
+}
+
+
+/* =========================
+   SAVE ROOM TYPE
+========================= */
+
+async function saveRoomType(event) {
+
+  event.preventDefault();
+
+
+  const errorBox =
+    $('roomTypeFormError');
+
+  const saveButton =
+    $('saveRoomType');
+
+
+  errorBox.textContent =
+    '';
+
+
+  const name =
+    $('roomTypeName')
+      .value
+      .trim();
+
+
+  let slug =
+    $('roomTypeSlug')
+      .value
+      .trim();
+
+
+  if (!slug) {
+
+    slug =
+      makeRoomTypeSlug(
+        name
+      );
+
+  }
+
+
+  const price =
+    Number(
+      $('roomTypePrice').value
+    );
+
+
+  const maxGuests =
+    Number(
+      $('roomTypeMaxGuests').value
+    );
+
+
+  if (!name) {
+
+    errorBox.textContent =
+      'Room type name is required.';
+
+    return;
+
+  }
+
+
+  if (!slug) {
+
+    errorBox.textContent =
+      'A valid slug is required.';
+
+    return;
+
+  }
+
+
+  if (
+    !Number.isFinite(price) ||
+    price < 0
+  ) {
+
+    errorBox.textContent =
+      'Price must be zero or greater.';
+
+    return;
+
+  }
+
+
+  if (
+    !Number.isInteger(maxGuests) ||
+    maxGuests < 1
+  ) {
+
+    errorBox.textContent =
+      'Maximum guests must be at least 1.';
+
+    return;
+
+  }
+
+
+  const amenitiesText =
+    $('roomTypeAmenities')
+      .value
+      .trim();
+
+
+  const amenities =
+    amenitiesText
+      ? amenitiesText
+          .split(',')
+          .map(
+            item =>
+              item.trim()
+          )
+          .filter(Boolean)
+      : [];
+
+
+  const payload = {
+
+    name,
+
+    slug,
+
+    description:
+      $('roomTypeDescription')
+        .value
+        .trim() || null,
+
+    short_description:
+      $('roomTypeShortDescription')
+        .value
+        .trim() || null,
+
+    price_per_night:
+      price,
+
+    max_guests:
+      maxGuests,
+
+    bed_type:
+      $('roomTypeBedType')
+        .value
+        .trim() || null,
+
+    room_size:
+      $('roomTypeRoomSize')
+        .value
+        .trim() || null,
+
+    view_type:
+      $('roomTypeViewType')
+        .value
+        .trim() || null,
+
+    amenities,
+
+    image_url:
+      $('roomTypeImageUrl')
+        .value
+        .trim() || null,
+
+    is_active:
+      $('roomTypeActive').checked
+
+  };
+
+
+  const originalText =
+    saveButton.textContent;
+
+
+  saveButton.disabled =
+    true;
+
+
+  saveButton.textContent =
+    editingRoomTypeId
+      ? 'Saving...'
+      : 'Creating...';
+
+
+  try {
+
+    let result;
+
+
+    if (editingRoomTypeId) {
+
+      result =
+        await db
+          .from('room_types')
+          .update(payload)
+          .eq(
+            'id',
+            editingRoomTypeId
+          )
+          .select()
+          .single();
+
+    } else {
+
+      result =
+        await db
+          .from('room_types')
+          .insert(payload)
+          .select()
+          .single();
+
+    }
+
+
+    if (result.error) {
+      throw result.error;
+    }
+
+
+    try {
+
+      await db.rpc(
+        'pms_audit',
+        {
+
+          p_action:
+            editingRoomTypeId
+              ? 'update_room_type'
+              : 'create_room_type',
+
+          p_entity_type:
+            'room_type',
+
+          p_entity_id:
+            result.data?.id ||
+            editingRoomTypeId,
+
+          p_details:
+            {
+              name:
+                payload.name,
+
+              slug:
+                payload.slug,
+
+              price_per_night:
+                payload.price_per_night,
+
+              is_active:
+                payload.is_active
+            }
+
+        }
+      );
+
+    } catch (auditError) {
+
+      console.warn(
+        'Room type audit log failed:',
+        auditError
+      );
+
+    }
+
+
+    closeRoomTypeModal();
+
+
+    await loadRoomTypes();
+
+
+    /*
+     * Refresh the room-type dropdown
+     * if the Rooms modal already exists.
+     */
+
+    populateRoomTypeOptions();
+
+
+    alert(
+      editingRoomTypeId
+        ? 'Room type updated successfully.'
+        : 'Room type added successfully.'
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'Room type save error:',
+      error
+    );
+
+
+    errorBox.textContent =
+      error?.message ||
+      'Unable to save room type.';
+
+
+  } finally {
+
+    saveButton.disabled =
+      false;
+
+    saveButton.textContent =
+      originalText;
+
+  }
+
+}
+
+
+/* =========================
+   DELETE ROOM TYPE
+========================= */
+
+async function deleteRoomType(id) {
+
+  const roomType =
+    RT.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+
+  if (!roomType) return;
+
+
+  /*
+   * Prevent accidental deletion if
+   * rooms are currently using this type.
+   */
+
+  const roomsUsingType =
+    R.filter(
+      room =>
+        String(
+          room.room_type_id
+        ) ===
+        String(id)
+    );
+
+
+  if (roomsUsingType.length) {
+
+    alert(
+      `This room type cannot be deleted because ${roomsUsingType.length} room${roomsUsingType.length === 1 ? '' : 's'} currently use it.\n\nEdit those rooms first, then delete the room type.`
+    );
+
+    return;
+
+  }
+
+
+  const confirmed =
+    confirm(
+      `Delete room type "${roomType.name}"?\n\nThis action cannot be undone.`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const { error } =
+      await db
+        .from('room_types')
+        .delete()
+        .eq(
+          'id',
+          id
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    try {
+
+      await db.rpc(
+        'pms_audit',
+        {
+
+          p_action:
+            'delete_room_type',
+
+          p_entity_type:
+            'room_type',
+
+          p_entity_id:
+            id,
+
+          p_details:
+            {
+              name:
+                roomType.name,
+
+              slug:
+                roomType.slug
+            }
+
+        }
+      );
+
+    } catch (auditError) {
+
+      console.warn(
+        'Room type audit log failed:',
+        auditError
+      );
+
+    }
+
+
+    await loadRoomTypes();
+
+
+    populateRoomTypeOptions();
+
+
+    alert(
+      'Room type deleted successfully.'
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'Room type delete error:',
+      error
+    );
+
+
+    alert(
+      'Unable to delete room type: ' +
+      (
+        error?.message ||
+        'Unknown error.'
+      )
+    );
+
+  }
+
+}
+
+
+/* =========================
+   ROOM TYPE RENDERER
+========================= */
+
+function renderRoomTypes() {
+
+  const table =
+    $('roomTypesTable');
+
+  if (!table) return;
+
+
+  if (!RT.length) {
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="100%">
+          No room types found.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  table.innerHTML =
+    RT.map(
+      roomType => {
+
+        return `
+          <tr>
+
+            <td>
+              ${escapeHtml(
+                roomType.name ||
+                '-'
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                roomType.description ||
+                '-'
+              )}
+            </td>
+
+            <td>
+              ${money(
+                roomType.price_per_night
+              )}
+            </td>
+
+            <td>
+
+              <span class="badge">
+                ${
+                  roomType.is_active
+                    ? 'Active'
+                    : 'Inactive'
+                }
+              </span>
+
+            </td>
+
+            <td>
+
+              <button
+                type="button"
+                class="secondary room-type-edit-button"
+                data-room-type-id="${roomType.id}"
+              >
+                Edit
+              </button>
+
+              <button
+                type="button"
+                class="secondary room-type-delete-button"
+                data-room-type-id="${roomType.id}"
+              >
+                Delete
+              </button>
+
+            </td>
+
+          </tr>
+        `;
+
+      }
+    ).join('');
+
+
+  table
+    .querySelectorAll(
+      '.room-type-edit-button'
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            const roomType =
+              RT.find(
+                item =>
+                  String(item.id) ===
+                  String(
+                    button.dataset.roomTypeId
+                  )
+              );
+
+
+            if (roomType) {
+
+              openRoomTypeModal(
+                roomType
+              );
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+
+  table
+    .querySelectorAll(
+      '.room-type-delete-button'
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            deleteRoomType(
+              button.dataset.roomTypeId
+            );
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================
+   ADD ROOM TYPE BUTTON
+========================= */
+
+function addRoomType() {
+
+  openRoomTypeModal();
+
+}
+
+
+/* =========================
+   ROOM TYPE TOOLBAR
+========================= */
+
+function addRoomTypeToolbar() {
+
+  const section =
+    $('rates');
+
+  if (!section) return;
+
+
+  const head =
+    section.querySelector(
+      '.head'
+    );
+
+  if (!head) return;
+
+
+  if (
+    section.querySelector(
+      '#addRoomTypeButton'
+    )
+  ) {
+    return;
+  }
+
+
+  const button =
+    document.createElement(
+      'button'
+    );
+
+
+  button.id =
+    'addRoomTypeButton';
+
+
+  button.type =
+    'button';
+
+
+  button.className =
+    'primary';
+
+
+  button.textContent =
+    '+ Add Room Type';
+
+
+  button.style.marginTop =
+    '12px';
+
+
+  button.addEventListener(
+    'click',
+    addRoomType
+  );
+
+
+  head.appendChild(
+    button
+  );
+
+}
+
+
+/* =========================
+   ROOM TYPE CSS
+========================= */
+
+(function addRoomTypeStyles() {
+
+  if (
+    document.getElementById(
+      'roomTypeCrudStyles'
+    )
+  ) {
+    return;
+  }
+
+
+  const style =
+    document.createElement(
+      'style'
+    );
+
+
+  style.id =
+    'roomTypeCrudStyles';
+
+
+  style.textContent = `
+
+    #roomTypeModal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+    }
+
+    #roomTypeModal.show {
+      display: block;
+    }
+
+    .room-type-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .room-type-modal-card {
+      width: min(760px, 96vw);
+      max-height: 92vh;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.28);
+    }
+
+    .room-type-modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .room-type-modal-head h2 {
+      margin: 0 0 5px;
+      font-family: Georgia, serif;
+    }
+
+    .room-type-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .room-type-full {
+      grid-column: 1 / -1;
+    }
+
+    .room-type-form-grid label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #4d5651;
+    }
+
+    .room-type-form-grid input,
+    .room-type-form-grid textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #e2ded7;
+      border-radius: 8px;
+      background: #fff;
+      font: inherit;
+      color: #202723;
+    }
+
+    .room-type-form-grid textarea {
+      resize: vertical;
+    }
+
+    .room-type-help {
+      margin-top: 5px;
+      font-size: 11px;
+    }
+
+    .room-type-check {
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .room-type-check input {
+      width: auto;
+    }
+
+    .room-type-form-error {
+      color: #a33b34;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .room-type-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #e2ded7;
+    }
+
+    .room-type-edit-button,
+    .room-type-delete-button {
+      margin: 2px;
+    }
+
+    @media (max-width: 600px) {
+
+      .room-type-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .room-type-full {
+        grid-column: auto;
+      }
+
+      .room-type-modal-card {
+        padding: 16px;
+      }
+
+      .room-type-modal-actions {
+        flex-direction: column-reverse;
+      }
+
+      .room-type-modal-actions button {
+        width: 100%;
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+
+})();
+
+
+/* =========================
+   ROOM TYPE SECTION HOOK
+========================= */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
+
+    addRoomTypeToolbar();
+
+  }
+);
+
+
+addRoomTypeToolbar();
