@@ -5028,3 +5028,668 @@ document.addEventListener(
 
 
 addRoomTypeToolbar();
+/* =========================================================
+   PHASE 1 — RESERVATIONS / FRONT DESK
+   Complete Create / Edit / Cancel + double-booking check
+========================================================= */
+
+let editingBookingId = null;
+let bookingSearchTerm = '';
+
+/* =========================
+   BOOKING MODAL
+========================= */
+
+function createBookingModal() {
+  if ($('bookingModal')) return;
+
+  const modal = document.createElement('div');
+  modal.id = 'bookingModal';
+
+  modal.innerHTML = `
+    <div class="booking-modal-backdrop">
+      <div class="booking-modal-card">
+        <div class="booking-modal-head">
+          <div>
+            <h2 id="bookingModalTitle">New Reservation</h2>
+            <div class="muted">Reservation details</div>
+          </div>
+          <button type="button" class="secondary" id="closeBookingModal">✕</button>
+        </div>
+
+        <form id="bookingForm">
+          <div class="booking-form-grid">
+
+            <div class="booking-full">
+              <label>Guest</label>
+              <select id="bookingGuest" required>
+                <option value="">Select guest</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Room</label>
+              <select id="bookingRoom" required>
+                <option value="">Select room</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Status</label>
+              <select id="bookingStatus">
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="checked_in">Checked In</option>
+                <option value="checked_out">Checked Out</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Check-in</label>
+              <input id="bookingCheckIn" type="date" required>
+            </div>
+
+            <div>
+              <label>Check-out</label>
+              <input id="bookingCheckOut" type="date" required>
+            </div>
+
+            <div>
+              <label>Adults</label>
+              <input id="bookingAdults" type="number" min="1" value="1" required>
+            </div>
+
+            <div>
+              <label>Children</label>
+              <input id="bookingChildren" type="number" min="0" value="0">
+            </div>
+
+            <div class="booking-full">
+              <label>Notes</label>
+              <textarea id="bookingNotes" rows="3" placeholder="Internal notes"></textarea>
+            </div>
+
+            <div class="booking-full">
+              <label>Special requests</label>
+              <textarea id="bookingSpecialRequests" rows="2" placeholder="Guest special requests"></textarea>
+            </div>
+
+          </div>
+
+          <div id="bookingFormError" class="booking-form-error"></div>
+
+          <div class="booking-modal-actions">
+            <button type="button" class="secondary" id="cancelBooking">Cancel</button>
+            <button type="submit" class="primary" id="saveBooking">Save Reservation</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  $('closeBookingModal').addEventListener('click', closeBookingModal);
+  $('cancelBooking').addEventListener('click', closeBookingModal);
+  $('bookingForm').addEventListener('submit', saveBooking);
+}
+
+/* =========================
+   POPULATE DROPDOWNS
+========================= */
+
+async function populateBookingGuestOptions(selectedId = null) {
+  const select = $('bookingGuest');
+  if (!select) return;
+
+  if (!G.length) {
+    await loadGuests();
+  }
+
+  select.innerHTML = `<option value="">Select guest</option>`;
+
+  G.forEach(guest => {
+    const name = [guest.first_name, guest.last_name].filter(Boolean).join(' ') ||
+                 guest.full_name || guest.name || 'Unnamed Guest';
+
+    const option = document.createElement('option');
+    option.value = guest.id;
+    option.textContent = `\( {name} \){guest.email ? ' — ' + guest.email : ''}`;
+    select.appendChild(option);
+  });
+
+  if (selectedId) {
+    select.value = selectedId;
+  }
+}
+
+async function populateBookingRoomOptions(selectedId = null) {
+  const select = $('bookingRoom');
+  if (!select) return;
+
+  if (!R.length) {
+    await loadRooms();
+  }
+
+  select.innerHTML = `<option value="">Select room</option>`;
+
+  R.forEach(room => {
+    const type = RT.find(t => String(t.id) === String(room.room_type_id));
+    const typeName = type?.name || '';
+    const status = (room.status || 'available').replaceAll('_', ' ');
+
+    const option = document.createElement('option');
+    option.value = room.id;
+    option.textContent = `${room.room_number || '—'} ${typeName ? '(' + typeName + ')' : ''} — ${status}`;
+    select.appendChild(option);
+  });
+
+  if (selectedId) {
+    select.value = selectedId;
+  }
+}
+
+/* =========================
+   OPEN / CLOSE MODAL
+========================= */
+
+async function openBookingModal(booking = null) {
+  createBookingModal();
+
+  editingBookingId = booking?.id || null;
+
+  $('bookingModalTitle').textContent = booking ? 'Edit Reservation' : 'New Reservation';
+
+  await Promise.all([
+    populateBookingGuestOptions(booking?.guest_id || null),
+    populateBookingRoomOptions(booking?.room_id || null)
+  ]);
+
+  $('bookingCheckIn').value = booking?.check_in ? String(booking.check_in).slice(0, 10) : '';
+  $('bookingCheckOut').value = booking?.check_out ? String(booking.check_out).slice(0, 10) : '';
+  $('bookingStatus').value = booking?.status || 'pending';
+  $('bookingAdults').value = booking?.adults ?? 1;
+  $('bookingChildren').value = booking?.children ?? 0;
+  $('bookingNotes').value = booking?.notes || '';
+  $('bookingSpecialRequests').value = booking?.special_requests || '';
+
+  $('bookingFormError').textContent = '';
+  $('bookingModal').classList.add('show');
+}
+
+function closeBookingModal() {
+  const modal = $('bookingModal');
+  if (modal) modal.classList.remove('show');
+  editingBookingId = null;
+}
+
+/* =========================
+   DOUBLE-BOOKING CHECK (client-side)
+========================= */
+
+function isRoomAvailableClient(roomId, checkIn, checkOut, excludeId = null) {
+  const overlaps = B.filter(b => {
+    if (String(b.room_id) !== String(roomId)) return false;
+    if (['cancelled', 'checked_out'].includes(String(b.status || '').toLowerCase())) return false;
+    if (excludeId && String(b.id) === String(excludeId)) return false;
+
+    const bIn = new Date(b.check_in);
+    const bOut = new Date(b.check_out);
+    const nIn = new Date(checkIn);
+    const nOut = new Date(checkOut);
+
+    return nIn < bOut && nOut > bIn;
+  });
+
+  return overlaps.length === 0;
+}
+
+/* =========================
+   SAVE BOOKING
+========================= */
+
+async function saveBooking(event) {
+  event.preventDefault();
+
+  const errorBox = $('bookingFormError');
+  const saveButton = $('saveBooking');
+  errorBox.textContent = '';
+
+  const guestId = $('bookingGuest').value;
+  const roomId = $('bookingRoom').value;
+  const checkIn = $('bookingCheckIn').value;
+  const checkOut = $('bookingCheckOut').value;
+  const status = $('bookingStatus').value;
+  const adults = Number($('bookingAdults').value) || 1;
+  const children = Number($('bookingChildren').value) || 0;
+  const notes = $('bookingNotes').value.trim() || null;
+  const specialRequests = $('bookingSpecialRequests').value.trim() || null;
+
+  if (!guestId) {
+    errorBox.textContent = 'Please select a guest.';
+    return;
+  }
+  if (!roomId) {
+    errorBox.textContent = 'Please select a room.';
+    return;
+  }
+  if (!checkIn || !checkOut) {
+    errorBox.textContent = 'Check-in and check-out dates are required.';
+    return;
+  }
+  if (new Date(checkOut) <= new Date(checkIn)) {
+    errorBox.textContent = 'Check-out must be after check-in.';
+    return;
+  }
+
+  // Double-booking protection
+  if (status !== 'cancelled') {
+    const available = isRoomAvailableClient(roomId, checkIn, checkOut, editingBookingId);
+    if (!available) {
+      errorBox.textContent = 'This room is not available for the selected dates (overlapping reservation).';
+      return;
+    }
+  }
+
+  // Resolve denormalized fields
+  const guest = G.find(g => String(g.id) === String(guestId));
+  const room = R.find(r => String(r.id) === String(roomId));
+
+  const guestName = guest
+    ? [guest.first_name, guest.last_name].filter(Boolean).join(' ') || guest.full_name || guest.name || null
+    : null;
+
+  const payload = {
+    guest_id: guestId,
+    room_id: roomId,
+    check_in: checkIn,
+    check_out: checkOut,
+    status,
+    adults,
+    children,
+    notes,
+    special_requests: specialRequests,
+    guest_name: guestName,
+    email: guest?.email || null,
+    room_number: room?.room_number || null,
+    updated_at: new Date().toISOString()
+  };
+
+  const originalText = saveButton.textContent;
+  saveButton.disabled = true;
+  saveButton.textContent = editingBookingId ? 'Saving...' : 'Creating...';
+
+  try {
+    let result;
+
+    if (editingBookingId) {
+      result = await db
+        .from('bookings')
+        .update(payload)
+        .eq('id', editingBookingId)
+        .select()
+        .single();
+    } else {
+      result = await db
+        .from('bookings')
+        .insert(payload)
+        .select()
+        .single();
+    }
+
+    if (result.error) throw result.error;
+
+    // Audit
+    try {
+      await db.rpc('pms_audit', {
+        p_action: editingBookingId ? 'update_booking' : 'create_booking',
+        p_entity_type: 'booking',
+        p_entity_id: result.data?.id || editingBookingId,
+        p_details: {
+          guest_id: payload.guest_id,
+          room_id: payload.room_id,
+          check_in: payload.check_in,
+          check_out: payload.check_out,
+          status: payload.status
+        }
+      });
+    } catch (auditError) {
+      console.warn('Booking audit failed:', auditError);
+    }
+
+    closeBookingModal();
+    await loadBookings();
+    await loadDashboard();
+
+    alert(editingBookingId ? 'Reservation updated successfully.' : 'Reservation created successfully.');
+  } catch (error) {
+    console.error('Booking save error:', error);
+    errorBox.textContent = error?.message || 'Unable to save reservation.';
+  } finally {
+    saveButton.disabled = false;
+    saveButton.textContent = originalText;
+  }
+}
+
+/* =========================
+   CANCEL BOOKING
+========================= */
+
+async function cancelBooking(id) {
+  const booking = B.find(b => String(b.id) === String(id));
+  if (!booking) return;
+
+  const name = booking.guest_name || booking.full_name || 'this reservation';
+
+  const confirmed = confirm(
+    `Cancel reservation for "${name}"?\n\nThis will mark the booking as cancelled.`
+  );
+  if (!confirmed) return;
+
+  try {
+    const { error } = await db
+      .from('bookings')
+      .update({
+        status: 'cancelled',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id);
+
+    if (error) throw error;
+
+    try {
+      await db.rpc('pms_audit', {
+        p_action: 'cancel_booking',
+        p_entity_type: 'booking',
+        p_entity_id: id,
+        p_details: {
+          guest_name: booking.guest_name,
+          room_id: booking.room_id,
+          check_in: booking.check_in,
+          check_out: booking.check_out
+        }
+      });
+    } catch (auditError) {
+      console.warn('Cancel audit failed:', auditError);
+    }
+
+    await loadBookings();
+    await loadDashboard();
+    alert('Reservation cancelled.');
+  } catch (error) {
+    console.error('Cancel booking error:', error);
+    alert('Unable to cancel reservation: ' + (error?.message || 'Unknown error'));
+  }
+}
+
+/* =========================
+   REPLACE renderBookings
+========================= */
+
+function renderBookings() {
+  const table = $('bookingsTable');
+  if (!table) return;
+
+  // Ensure Actions header exists
+  const header = table.closest('table')?.querySelector('thead tr');
+  if (header && !header.querySelector('[data-booking-actions-header]')) {
+    const th = document.createElement('th');
+    th.textContent = 'Actions';
+    th.dataset.bookingActionsHeader = 'true';
+    header.appendChild(th);
+  }
+
+  let list = B;
+
+  if (bookingSearchTerm) {
+    const term = bookingSearchTerm.toLowerCase();
+    list = B.filter(b => {
+      const guest = (b.guest_name || b.full_name || '').toLowerCase();
+      const email = (b.email || '').toLowerCase();
+      const room = (b.room_number || b.room_id || '').toString().toLowerCase();
+      const status = (b.status || '').toLowerCase();
+      return guest.includes(term) || email.includes(term) || room.includes(term) || status.includes(term);
+    });
+  }
+
+  if (!list.length) {
+    table.innerHTML = `<tr><td colspan="100%">No bookings found.</td></tr>`;
+    return;
+  }
+
+  table.innerHTML = list.map(booking => {
+    let guestDisplay = booking.guest_name || booking.full_name || '-';
+    if (booking.guest_id && G.length) {
+      const g = G.find(item => String(item.id) === String(booking.guest_id));
+      if (g) {
+        guestDisplay = [g.first_name, g.last_name].filter(Boolean).join(' ') || g.full_name || guestDisplay;
+      }
+    }
+
+    let roomDisplay = booking.room_number || booking.room_id || '-';
+    if (booking.room_id && R.length) {
+      const r = R.find(item => String(item.id) === String(booking.room_id));
+      if (r) roomDisplay = r.room_number || roomDisplay;
+    }
+
+    const statusLabel = String(booking.status || '-')
+      .replaceAll('_', ' ')
+      .replace(/\b\w/g, c => c.toUpperCase());
+
+    return `
+      <tr>
+        <td>${escapeHtml(String(booking.id).slice(0, 8))}…</td>
+        <td>${escapeHtml(guestDisplay)}</td>
+        <td>${escapeHtml(booking.email || '-')}</td>
+        <td>${escapeHtml(roomDisplay)}</td>
+        <td>${dateValue(booking.check_in)}</td>
+        <td>${dateValue(booking.check_out)}</td>
+        <td><span class="badge">${escapeHtml(statusLabel)}</span></td>
+        <td>
+          <button type="button" class="secondary booking-edit-button" data-booking-id="${booking.id}">
+            Edit
+          </button>
+          ${booking.status !== 'cancelled' ? `
+            <button type="button" class="secondary booking-cancel-button" data-booking-id="${booking.id}">
+              Cancel
+            </button>
+          ` : ''}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  table.querySelectorAll('.booking-edit-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const booking = B.find(b => String(b.id) === String(btn.dataset.bookingId));
+      if (booking) openBookingModal(booking);
+    });
+  });
+
+  table.querySelectorAll('.booking-cancel-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cancelBooking(btn.dataset.bookingId);
+    });
+  });
+}
+
+/* =========================
+   TOOLBAR + SEARCH
+========================= */
+
+function addBookingToolbar() {
+  const section = $('bookings');
+  if (!section) return;
+
+  const head = section.querySelector('.head');
+  if (!head) return;
+
+  if (section.querySelector('#addBookingButton')) return;
+
+  const searchWrap = document.createElement('div');
+  searchWrap.style.display = 'flex';
+  searchWrap.style.gap = '10px';
+  searchWrap.style.marginTop = '12px';
+  searchWrap.style.flexWrap = 'wrap';
+  searchWrap.style.alignItems = 'center';
+
+  const searchInput = document.createElement('input');
+  searchInput.type = 'search';
+  searchInput.placeholder = 'Search guest, email, room, status…';
+  searchInput.style.padding = '10px 12px';
+  searchInput.style.border = '1px solid #e2ded7';
+  searchInput.style.borderRadius = '8px';
+  searchInput.style.minWidth = '220px';
+  searchInput.id = 'bookingSearch';
+
+  searchInput.addEventListener('input', () => {
+    bookingSearchTerm = searchInput.value.trim();
+    renderBookings();
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.id = 'addBookingButton';
+  addBtn.type = 'button';
+  addBtn.className = 'primary';
+  addBtn.textContent = '+ New Reservation';
+  addBtn.addEventListener('click', () => openBookingModal());
+
+  searchWrap.appendChild(searchInput);
+  searchWrap.appendChild(addBtn);
+  head.appendChild(searchWrap);
+}
+
+/* =========================
+   STYLES
+========================= */
+
+(function addBookingStyles() {
+  if (document.getElementById('bookingCrudStyles')) return;
+
+  const style = document.createElement('style');
+  style.id = 'bookingCrudStyles';
+  style.textContent = `
+    #bookingModal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+    }
+    #bookingModal.show { display: block; }
+
+    .booking-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .booking-modal-card {
+      width: min(720px, 96vw);
+      max-height: 92vh;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.28);
+    }
+
+    .booking-modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .booking-modal-head h2 {
+      margin: 0 0 5px;
+      font-family: Georgia, serif;
+    }
+
+    .booking-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .booking-full { grid-column: 1 / -1; }
+
+    .booking-form-grid label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #4d5651;
+    }
+
+    .booking-form-grid input,
+    .booking-form-grid select,
+    .booking-form-grid textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #e2ded7;
+      border-radius: 8px;
+      background: #fff;
+      font: inherit;
+      color: #202723;
+    }
+
+    .booking-form-grid textarea { resize: vertical; }
+
+    .booking-form-error {
+      color: #a33b34;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .booking-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #e2ded7;
+    }
+
+    .booking-edit-button,
+    .booking-cancel-button {
+      margin: 2px;
+    }
+
+    @media (max-width: 600px) {
+      .booking-form-grid { grid-template-columns: 1fr; }
+      .booking-full { grid-column: auto; }
+      .booking-modal-card { padding: 16px; }
+      .booking-modal-actions { flex-direction: column-reverse; }
+      .booking-modal-actions button { width: 100%; }
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+/* =========================
+   HOOKS
+========================= */
+
+document.addEventListener('DOMContentLoaded', () => {
+  addBookingToolbar();
+});
+
+addBookingToolbar();
+
+// Make sure guests + rooms are available when opening bookings
+const originalLoadBookings = loadBookings;
+loadBookings = async function () {
+  await Promise.allSettled([
+    originalLoadBookings(),
+    G.length ? Promise.resolve() : loadGuests(),
+    R.length ? Promise.resolve() : loadRooms(),
+    RT.length ? Promise.resolve() : loadRoomTypes()
+  ]);
+};
