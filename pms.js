@@ -5136,31 +5136,53 @@ function createBookingModal() {
 }
 
 /* =========================
-   POPULATE DROPDOWNS
+   POPULATE DROPDOWNS (fixed)
 ========================= */
 
 async function populateBookingGuestOptions(selectedId = null) {
   const select = $('bookingGuest');
   if (!select) return;
 
-  if (!G.length) {
-    await loadGuests();
-  }
+  select.innerHTML = `<option value="">Loading guests...</option>`;
 
-  select.innerHTML = `<option value="">Select guest</option>`;
+  try {
+    const { data, error } = await db
+      .from('guest_profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  G.forEach(guest => {
-    const name = [guest.first_name, guest.last_name].filter(Boolean).join(' ') ||
-                 guest.full_name || guest.name || 'Unnamed Guest';
+    if (error) {
+      console.error('Guest dropdown error:', error);
+      select.innerHTML = `<option value="">Unable to load guests</option>`;
+      return;
+    }
 
-    const option = document.createElement('option');
-    option.value = guest.id;
-    option.textContent = `\( {name} \){guest.email ? ' — ' + guest.email : ''}`;
-    select.appendChild(option);
-  });
+    G = data || [];
 
-  if (selectedId) {
-    select.value = selectedId;
+    select.innerHTML = `<option value="">Select guest</option>`;
+
+    if (!G.length) {
+      select.innerHTML = `<option value="">No guests found – add a guest first</option>`;
+      return;
+    }
+
+    G.forEach(guest => {
+      const name = [guest.first_name, guest.last_name].filter(Boolean).join(' ') ||
+                   guest.full_name || guest.name || 'Unnamed Guest';
+
+      const option = document.createElement('option');
+      option.value = guest.id;
+      option.textContent = `${name}${guest.email ? ' — ' + guest.email : ''}`;
+      select.appendChild(option);
+    });
+
+    if (selectedId) {
+      select.value = selectedId;
+    }
+
+  } catch (err) {
+    console.error('Guest dropdown failed:', err);
+    select.innerHTML = `<option value="">Error loading guests</option>`;
   }
 }
 
@@ -5168,25 +5190,51 @@ async function populateBookingRoomOptions(selectedId = null) {
   const select = $('bookingRoom');
   if (!select) return;
 
-  if (!R.length) {
-    await loadRooms();
-  }
+  select.innerHTML = `<option value="">Loading rooms...</option>`;
 
-  select.innerHTML = `<option value="">Select room</option>`;
+  try {
+    const { data, error } = await db
+      .from('rooms')
+      .select('*')
+      .order('room_number', { ascending: true });
 
-  R.forEach(room => {
-    const type = RT.find(t => String(t.id) === String(room.room_type_id));
-    const typeName = type?.name || '';
-    const status = (room.status || 'available').replaceAll('_', ' ');
+    if (error) {
+      console.error('Room dropdown error:', error);
+      select.innerHTML = `<option value="">Unable to load rooms</option>`;
+      return;
+    }
 
-    const option = document.createElement('option');
-    option.value = room.id;
-    option.textContent = `${room.room_number || '—'} ${typeName ? '(' + typeName + ')' : ''} — ${status}`;
-    select.appendChild(option);
-  });
+    R = data || [];
 
-  if (selectedId) {
-    select.value = selectedId;
+    if (!RT.length) {
+      await loadRoomTypes();
+    }
+
+    select.innerHTML = `<option value="">Select room</option>`;
+
+    if (!R.length) {
+      select.innerHTML = `<option value="">No rooms found</option>`;
+      return;
+    }
+
+    R.forEach(room => {
+      const type = RT.find(t => String(t.id) === String(room.room_type_id));
+      const typeName = type?.name || '';
+      const status = (room.status || 'available').replaceAll('_', ' ');
+
+      const option = document.createElement('option');
+      option.value = room.id;
+      option.textContent = `${room.room_number || '—'} ${typeName ? '(' + typeName + ')' : ''} — ${status}`;
+      select.appendChild(option);
+    });
+
+    if (selectedId) {
+      select.value = selectedId;
+    }
+
+  } catch (err) {
+    console.error('Room dropdown failed:', err);
+    select.innerHTML = `<option value="">Error loading rooms</option>`;
   }
 }
 
@@ -5283,7 +5331,6 @@ async function saveBooking(event) {
     return;
   }
 
-  // Double-booking protection
   if (status !== 'cancelled') {
     const available = isRoomAvailableClient(roomId, checkIn, checkOut, editingBookingId);
     if (!available) {
@@ -5292,7 +5339,6 @@ async function saveBooking(event) {
     }
   }
 
-  // Resolve denormalized fields
   const guest = G.find(g => String(g.id) === String(guestId));
   const room = R.find(r => String(r.id) === String(roomId));
 
@@ -5340,7 +5386,6 @@ async function saveBooking(event) {
 
     if (result.error) throw result.error;
 
-    // Audit
     try {
       await db.rpc('pms_audit', {
         p_action: editingBookingId ? 'update_booking' : 'create_booking',
@@ -5431,7 +5476,6 @@ function renderBookings() {
   const table = $('bookingsTable');
   if (!table) return;
 
-  // Ensure Actions header exists
   const header = table.closest('table')?.querySelector('thead tr');
   if (header && !header.querySelector('[data-booking-actions-header]')) {
     const th = document.createElement('th');
