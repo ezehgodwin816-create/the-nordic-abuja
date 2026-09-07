@@ -4,17 +4,13 @@ const URL_ =
 const KEY =
 'sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob';
 
-const db = supabase.createClient(
-URL_,
-KEY,
-{
+const db = supabase.createClient(URL_, KEY, {
 auth: {
 persistSession: true,
 autoRefreshToken: true,
 detectSessionInUrl: true
 }
-}
-);
+});
 
 let B = [];
 let R = [];
@@ -58,14 +54,11 @@ return String(value ?? '')
 function money(value) {
 const n = Number(value || 0);
 
-return new Intl.NumberFormat(
-'en-NG',
-{
+return new Intl.NumberFormat('en-NG', {
 style: 'currency',
 currency: 'NGN',
 maximumFractionDigits: 2
-}
-).format(n);
+}).format(n);
 }
 
 function dateValue(value) {
@@ -77,20 +70,11 @@ if (Number.isNaN(d.getTime())) {
 return value;
 }
 
-return d.toLocaleDateString(
-'en-GB',
-{
+return d.toLocaleDateString('en-GB', {
 day: '2-digit',
 month: 'short',
 year: 'numeric'
-}
-);
-}
-
-function statusClass(status) {
-return String(status || '')
-.toLowerCase()
-.replace(/\s+/g, '-');
+});
 }
 
 /* =========================
@@ -111,9 +95,7 @@ hide('login');
 hide('reset');
 show('app');
 
-if (typeof loadDashboard === 'function') {
 loadDashboard();
-}
 }
 
 function showReset() {
@@ -142,20 +124,32 @@ el.textContent = message || '';
 }
 
 /* =========================
-DETECT PASSWORD RECOVERY
+PASSWORD RECOVERY URL
 ========================= */
 
 function isRecoveryUrl() {
-const hash =
-window.location.hash || '';
-
-const search =
-window.location.search || '';
+const hash = window.location.hash || '';
+const search = window.location.search || '';
 
 return (
 hash.includes('type=recovery') ||
 search.includes('type=recovery')
 );
+}
+
+/* =========================
+ADMIN CHECK
+========================= */
+
+async function verifyAdmin() {
+const { data, error } =
+await db.rpc('is_admin_user');
+
+if (error) {
+throw error;
+}
+
+return data === true;
 }
 
 /* =========================
@@ -173,8 +167,7 @@ password
 
 if (error) {
 setLoginError(
-error.message ||
-'Invalid login credentials.'
+error.message || 'Invalid login credentials.'
 );
 
 return false;
@@ -190,24 +183,23 @@ return false;
 
 }
 
-const { data: adminData, error: adminError } =
-await db.rpc('is_admin_user');
+try {
+const isAdmin = await verifyAdmin();
 
-if (adminError) {
+if (!isAdmin) {
+  setLoginError(
+    'This account does not have administrator access.'
+  );
+
+  await db.auth.signOut();
+
+  return false;
+}
+
+} catch (adminError) {
 setLoginError(
 'Unable to verify administrator access: ' +
 adminError.message
-);
-
-await db.auth.signOut();
-
-return false;
-
-}
-
-if (adminData !== true) {
-setLoginError(
-'This account does not have administrator access.'
 );
 
 await db.auth.signOut();
@@ -228,61 +220,56 @@ LOGIN FORM
 const loginForm = $('loginForm');
 
 if (loginForm) {
-loginForm.addEventListener(
-'submit',
-async event => {
+loginForm.addEventListener('submit', async event => {
 event.preventDefault();
 
-  const email =
-    $('email')?.value.trim();
+const email =
+  $('email')?.value.trim();
 
-  const password =
-    $('password')?.value || '';
+const password =
+  $('password')?.value || '';
 
-  if (!email || !password) {
-    setLoginError(
-      'Please enter your email and password.'
-    );
+if (!email || !password) {
+  setLoginError(
+    'Please enter your email and password.'
+  );
 
-    return;
-  }
+  return;
+}
 
-  const button =
-    loginForm.querySelector(
-      'button[type="submit"]'
-    );
+const button =
+  loginForm.querySelector(
+    'button[type="submit"]'
+  );
 
+const originalText =
+  button?.textContent;
+
+if (button) {
+  button.disabled = true;
+  button.textContent = 'Signing in...';
+}
+
+try {
+  await login(email, password);
+
+} catch (error) {
+  console.error('Login error:', error);
+
+  setLoginError(
+    error?.message ||
+    'Unable to sign in.'
+  );
+
+} finally {
   if (button) {
-    button.disabled = true;
-    button.dataset.originalText =
-      button.textContent;
-
+    button.disabled = false;
     button.textContent =
-      'Signing in...';
-  }
-
-  try {
-    await login(
-      email,
-      password
-    );
-  } catch (error) {
-    setLoginError(
-      error?.message ||
-      'Unable to sign in.'
-    );
-  } finally {
-    if (button) {
-      button.disabled = false;
-
-      button.textContent =
-        button.dataset.originalText ||
-        'Sign In';
-    }
+      originalText || 'Sign In';
   }
 }
 
-);
+});
 }
 
 /* =========================
@@ -327,6 +314,11 @@ event.preventDefault();
       window.location.origin +
       window.location.pathname;
 
+    console.log(
+      'Password recovery redirect:',
+      redirectTo
+    );
+
     const { error } =
       await db.auth.resetPasswordForEmail(
         email,
@@ -336,6 +328,11 @@ event.preventDefault();
       );
 
     if (error) {
+      console.error(
+        'Password recovery error:',
+        error
+      );
+
       setLoginError(
         'Failed to send password recovery: ' +
         error.message
@@ -349,6 +346,11 @@ event.preventDefault();
     );
 
   } catch (error) {
+    console.error(
+      'Password recovery request failed:',
+      error
+    );
+
     setLoginError(
       'Failed to send password recovery: ' +
       (
@@ -356,6 +358,7 @@ event.preventDefault();
         'Network error.'
       )
     );
+
   } finally {
     forgotPassword.disabled = false;
     forgotPassword.textContent =
@@ -388,7 +391,7 @@ event.preventDefault();
 }
 
 /* =========================
-PASSWORD UPDATE
+RESET PASSWORD
 ========================= */
 
 const resetForm =
@@ -437,12 +440,11 @@ event.preventDefault();
       'button[type="submit"]'
     );
 
+  const originalText =
+    button?.textContent;
+
   if (button) {
     button.disabled = true;
-
-    button.dataset.originalText =
-      button.textContent;
-
     button.textContent =
       'Updating...';
   }
@@ -483,16 +485,21 @@ event.preventDefault();
     showLogin();
 
   } catch (error) {
+    console.error(
+      'Password update error:',
+      error
+    );
+
     setResetError(
       error?.message ||
       'Unable to update password.'
     );
+
   } finally {
     if (button) {
       button.disabled = false;
-
       button.textContent =
-        button.dataset.originalText ||
+        originalText ||
         'Update Password';
     }
   }
@@ -543,34 +550,13 @@ event.preventDefault();
 }
 
 /* =========================
-ADMIN CHECK
-========================= */
-
-async function verifyAdmin() {
-const {
-data,
-error
-} = await db.rpc(
-'is_admin_user'
-);
-
-if (error) {
-throw error;
-}
-
-return data === true;
-}
-
-/* =========================
 DASHBOARD
 ========================= */
 
 async function loadDashboard() {
 try {
-const {
-data,
-error
-} = await db.rpc(
+const { data, error } =
+await db.rpc(
 'pms_dashboard_stats'
 );
 
@@ -583,8 +569,7 @@ if (error) {
   return;
 }
 
-const stats =
-  data || {};
+const stats = data || {};
 
 text(
   'roomsTotal',
@@ -635,21 +620,17 @@ error
 }
 
 /* =========================
-LOAD BOOKINGS
+BOOKINGS
 ========================= */
 
 async function loadBookings() {
-const {
-data,
-error
-} = await db
+const { data, error } =
+await db
 .from('bookings')
 .select('*')
 .order(
 'created_at',
-{
-ascending: false
-}
+{ ascending: false }
 );
 
 if (error) {
@@ -683,26 +664,22 @@ return;
 
 table.innerHTML =
 B.map(
-booking => "<tr> <td>${escapeHtml(booking.id)}</td> <td>${escapeHtml(booking.guest_name || booking.full_name || '-')}</td> <td>${escapeHtml(booking.email || '-')}</td> <td>${escapeHtml(booking.room_id || booking.room_number || '-')}</td> <td>${dateValue(booking.check_in)}</td> <td>${dateValue(booking.check_out)}</td> <td>${escapeHtml(booking.status || '-')}</td> </tr>"
+booking => "<tr> <td>${escapeHtml(booking.id)}</td> <td>${escapeHtml( booking.guest_name || booking.full_name || '-' )}</td> <td>${escapeHtml( booking.email || '-' )}</td> <td>${escapeHtml( booking.room_id || booking.room_number || '-' )}</td> <td>${dateValue( booking.check_in )}</td> <td>${dateValue( booking.check_out )}</td> <td>${escapeHtml( booking.status || '-' )}</td> </tr>"
 ).join('');
 }
 
 /* =========================
-LOAD ROOMS
+ROOMS
 ========================= */
 
 async function loadRooms() {
-const {
-data,
-error
-} = await db
+const { data, error } =
+await db
 .from('rooms')
 .select('*')
 .order(
 'room_number',
-{
-ascending: true
-}
+{ ascending: true }
 );
 
 if (error) {
@@ -736,26 +713,22 @@ return;
 
 table.innerHTML =
 R.map(
-room => "<tr> <td>${escapeHtml(room.room_number || room.number || '-')}</td> <td>${escapeHtml(room.room_type_id || room.room_type || '-')}</td> <td>${escapeHtml(room.status || '-')}</td> <td>${escapeHtml(room.floor || '-')}</td> </tr>"
+room => "<tr> <td>${escapeHtml( room.room_number || room.number || '-' )}</td> <td>${escapeHtml( room.room_type_id || room.room_type || '-' )}</td> <td>${escapeHtml( room.status || '-' )}</td> <td>${escapeHtml( room.floor || '-' )}</td> </tr>"
 ).join('');
 }
 
 /* =========================
-LOAD ROOM TYPES
+ROOM TYPES
 ========================= */
 
 async function loadRoomTypes() {
-const {
-data,
-error
-} = await db
+const { data, error } =
+await db
 .from('room_types')
 .select('*')
 .order(
 'name',
-{
-ascending: true
-}
+{ ascending: true }
 );
 
 if (error) {
@@ -789,26 +762,22 @@ return;
 
 table.innerHTML =
 RT.map(
-roomType => "<tr> <td>${escapeHtml(roomType.name || '-')}</td> <td>${escapeHtml(roomType.description || '-')}</td> <td>${money(roomType.base_rate || roomType.price || 0)}</td> </tr>"
+roomType => "<tr> <td>${escapeHtml( roomType.name || '-' )}</td> <td>${escapeHtml( roomType.description || '-' )}</td> <td>${money( roomType.base_rate || roomType.price || 0 )}</td> </tr>"
 ).join('');
 }
 
 /* =========================
-LOAD GUESTS
+GUESTS
 ========================= */
 
 async function loadGuests() {
-const {
-data,
-error
-} = await db
+const { data, error } =
+await db
 .from('guest_profiles')
 .select('*')
 .order(
 'created_at',
-{
-ascending: false
-}
+{ ascending: false }
 );
 
 if (error) {
@@ -842,26 +811,22 @@ return;
 
 table.innerHTML =
 G.map(
-guest => "<tr> <td>${escapeHtml(guest.full_name || guest.name || '-')}</td> <td>${escapeHtml(guest.email || '-')}</td> <td>${escapeHtml(guest.phone || '-')}</td> <td>${dateValue(guest.created_at)}</td> </tr>"
+guest => "<tr> <td>${escapeHtml( guest.full_name || guest.name || '-' )}</td> <td>${escapeHtml( guest.email || '-' )}</td> <td>${escapeHtml( guest.phone || '-' )}</td> <td>${dateValue( guest.created_at )}</td> </tr>"
 ).join('');
 }
 
 /* =========================
-LOAD HOUSEKEEPING
+HOUSEKEEPING
 ========================= */
 
 async function loadHousekeeping() {
-const {
-data,
-error
-} = await db
+const { data, error } =
+await db
 .from('housekeeping_tasks')
 .select('*')
 .order(
 'created_at',
-{
-ascending: false
-}
+{ ascending: false }
 );
 
 if (error) {
@@ -895,26 +860,22 @@ return;
 
 table.innerHTML =
 HK.map(
-task => "<tr> <td>${escapeHtml(task.room_id || '-')}</td> <td>${escapeHtml(task.task_type || task.type || '-')}</td> <td>${escapeHtml(task.status || '-')}</td> <td>${escapeHtml(task.assigned_to || '-')}</td> <td>${dateValue(task.created_at)}</td> </tr>"
+task => "<tr> <td>${escapeHtml( task.room_id || '-' )}</td> <td>${escapeHtml( task.task_type || task.type || '-' )}</td> <td>${escapeHtml( task.status || '-' )}</td> <td>${escapeHtml( task.assigned_to || '-' )}</td> <td>${dateValue( task.created_at )}</td> </tr>"
 ).join('');
 }
 
 /* =========================
-LOAD MAINTENANCE
+MAINTENANCE
 ========================= */
 
 async function loadMaintenance() {
-const {
-data,
-error
-} = await db
+const { data, error } =
+await db
 .from('maintenance_tasks')
 .select('*')
 .order(
 'created_at',
-{
-ascending: false
-}
+{ ascending: false }
 );
 
 if (error) {
@@ -948,26 +909,22 @@ return;
 
 table.innerHTML =
 MT.map(
-task => "<tr> <td>${escapeHtml(task.room_id || '-')}</td> <td>${escapeHtml(task.title || task.task_type || '-')}</td> <td>${escapeHtml(task.status || '-')}</td> <td>${escapeHtml(task.priority || '-')}</td> <td>${dateValue(task.created_at)}</td> </tr>"
+task => "<tr> <td>${escapeHtml( task.room_id || '-' )}</td> <td>${escapeHtml( task.title || task.task_type || '-' )}</td> <td>${escapeHtml( task.status || '-' )}</td> <td>${escapeHtml( task.priority || '-' )}</td> <td>${dateValue( task.created_at )}</td> </tr>"
 ).join('');
 }
 
 /* =========================
-LOAD PAYMENTS
+PAYMENTS
 ========================= */
 
 async function loadPayments() {
-const {
-data,
-error
-} = await db
+const { data, error } =
+await db
 .from('payments')
 .select('*')
 .order(
 'created_at',
-{
-ascending: false
-}
+{ ascending: false }
 );
 
 if (error) {
@@ -1001,26 +958,22 @@ return;
 
 table.innerHTML =
 P.map(
-payment => "<tr> <td>${escapeHtml(payment.id)}</td> <td>${money(payment.amount)}</td> <td>${escapeHtml(payment.method || payment.payment_method || '-')}</td> <td>${escapeHtml(payment.status || '-')}</td> <td>${dateValue(payment.created_at)}</td> </tr>"
+payment => "<tr> <td>${escapeHtml( payment.id )}</td> <td>${money( payment.amount )}</td> <td>${escapeHtml( payment.method || payment.payment_method || '-' )}</td> <td>${escapeHtml( payment.status || '-' )}</td> <td>${dateValue( payment.created_at )}</td> </tr>"
 ).join('');
 }
 
 /* =========================
-LOAD FOLIOS
+FOLIOS
 ========================= */
 
 async function loadFolios() {
-const {
-data,
-error
-} = await db
+const { data, error } =
+await db
 .from('folios')
 .select('*')
 .order(
 'created_at',
-{
-ascending: false
-}
+{ ascending: false }
 );
 
 if (error) {
@@ -1054,26 +1007,22 @@ return;
 
 table.innerHTML =
 F.map(
-folio => "<tr> <td>${escapeHtml(folio.id)}</td> <td>${escapeHtml(folio.booking_id || '-')}</td> <td>${money(folio.total || folio.amount || 0)}</td> <td>${escapeHtml(folio.status || '-')}</td> <td>${dateValue(folio.created_at)}</td> </tr>"
+folio => "<tr> <td>${escapeHtml( folio.id )}</td> <td>${escapeHtml( folio.booking_id || '-' )}</td> <td>${money( folio.total || folio.amount || 0 )}</td> <td>${escapeHtml( folio.status || '-' )}</td> <td>${dateValue( folio.created_at )}</td> </tr>"
 ).join('');
 }
 
 /* =========================
-LOAD STAFF
+STAFF
 ========================= */
 
 async function loadStaff() {
-const {
-data,
-error
-} = await db
+const { data, error } =
+await db
 .from('staff_profiles')
 .select('*')
 .order(
 'created_at',
-{
-ascending: false
-}
+{ ascending: false }
 );
 
 if (error) {
@@ -1105,12 +1054,12 @@ return;
 
 table.innerHTML =
 staff.map(
-member => "<tr> <td>${escapeHtml(member.full_name || member.name || '-')}</td> <td>${escapeHtml(member.role || '-')}</td> <td>${escapeHtml(member.email || '-')}</td> <td>${escapeHtml(member.phone || '-')}</td> <td>${escapeHtml(member.status || '-')}</td> </tr>"
+member => "<tr> <td>${escapeHtml( member.full_name || member.name || '-' )}</td> <td>${escapeHtml( member.role || '-' )}</td> <td>${escapeHtml( member.email || '-' )}</td> <td>${escapeHtml( member.phone || '-' )}</td> <td>${escapeHtml( member.status || '-' )}</td> </tr>"
 ).join('');
 }
 
 /* =========================
-LOAD ALL DATA
+LOAD ALL
 ========================= */
 
 async function loadAll() {
@@ -1233,7 +1182,8 @@ if (
 }
 
 if (
-  event === 'SIGNED_OUT'
+  event ===
+  'SIGNED_OUT'
 ) {
   showLogin();
   return;
@@ -1288,12 +1238,6 @@ async function initialise() {
 
 try {
 
-/*
-  If Supabase has redirected us here
-  for password recovery, show the
-  password reset screen.
-*/
-
 if (isRecoveryUrl()) {
   showReset();
   return;
@@ -1326,6 +1270,7 @@ const isAdmin =
   await verifyAdmin();
 
 if (!isAdmin) {
+
   await db.auth.signOut();
 
   setLoginError(
