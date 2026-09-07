@@ -5277,19 +5277,32 @@ function closeBookingModal() {
 ========================= */
 
 function isRoomAvailableClient(roomId, checkIn, checkOut, excludeId = null) {
+  if (!roomId || !checkIn || !checkOut) return false;
+
+  const nIn = new Date(checkIn);
+  const nOut = new Date(checkOut);
+
+  if (isNaN(nIn.getTime()) || isNaN(nOut.getTime())) return false;
+
   const overlaps = B.filter(b => {
     if (String(b.room_id) !== String(roomId)) return false;
-    if (['cancelled', 'checked_out'].includes(String(b.status || '').toLowerCase())) return false;
+
+    const status = String(b.status || '').toLowerCase();
+    if (status === 'cancelled' || status === 'checked_out') return false;
+
     if (excludeId && String(b.id) === String(excludeId)) return false;
+
+    if (!b.check_in || !b.check_out) return false;
 
     const bIn = new Date(b.check_in);
     const bOut = new Date(b.check_out);
-    const nIn = new Date(checkIn);
-    const nOut = new Date(checkOut);
+
+    if (isNaN(bIn.getTime()) || isNaN(bOut.getTime())) return false;
 
     return nIn < bOut && nOut > bIn;
   });
 
+  console.log('Availability check for room', roomId, '→ overlaps found:', overlaps.length, overlaps);
   return overlaps.length === 0;
 }
 
