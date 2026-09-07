@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Nordic Abuja — Admin</title>
-<meta name="robots" content="noindex,nofollow">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
+<meta name="robots" content="noindex,nofollow"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
 :root{
   --bg:#f5f6f8;
   --card:#fff;
@@ -17,11 +12,9 @@
   --line:#e5e7eb;
   --dark:#111827;
   --accent:#9b7653;
-  --accent-dark:#795b3e;
   --green:#15803d;
   --red:#dc2626;
   --orange:#d97706;
-  --blue:#2563eb;
   --sidebar:250px;
   --radius:16px;
 }
@@ -35,14 +28,9 @@ body{
   color:var(--text);
 }
 
-button,input,select,textarea{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
 .hidden{display:none!important}
 
 .login-page{
@@ -79,9 +67,7 @@ button{
   font-weight:500;
 }
 
-.field{
-  margin-bottom:16px;
-}
+.field{margin-bottom:16px}
 
 .field label{
   display:block;
@@ -122,32 +108,11 @@ button{
 }
 
 .btn:hover{transform:translateY(-1px)}
-
-.btn-primary{
-  background:var(--dark);
-  color:#fff;
-}
-
-.btn-accent{
-  background:var(--accent);
-  color:#fff;
-}
-
-.btn-danger{
-  background:#fee2e2;
-  color:#991b1b;
-}
-
-.btn-success{
-  background:#dcfce7;
-  color:#166534;
-}
-
-.btn-light{
-  background:#f3f4f6;
-  color:#374151;
-}
-
+.btn-primary{background:var(--dark);color:#fff}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-danger{background:#fee2e2;color:#991b1b}
+.btn-success{background:#dcfce7;color:#166534}
+.btn-light{background:#f3f4f6;color:#374151}
 .full{width:100%}
 
 .login-error{
@@ -180,13 +145,8 @@ button{
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 
-.sidebar .brand{
-  font-size:18px;
-}
-
-.sidebar .brand small{
-  color:#9ca3af;
-}
+.sidebar .brand{font-size:18px}
+.sidebar .brand small{color:#9ca3af}
 
 .nav{
   padding:15px 10px;
@@ -246,17 +206,10 @@ button{
   padding:9px 12px;
 }
 
-.content{
-  padding:28px;
-}
+.content{padding:28px}
 
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
-}
+.page{display:none}
+.page.active{display:block}
 
 .page-title{
   margin:0 0 5px;
@@ -315,9 +268,7 @@ button{
   font-weight:800;
 }
 
-.card-body{
-  padding:20px;
-}
+.card-body{padding:20px}
 
 .toolbar{
   display:flex;
@@ -334,9 +285,7 @@ button{
   background:#fff;
 }
 
-.table-wrap{
-  overflow-x:auto;
-}
+.table-wrap{overflow-x:auto}
 
 table{
   width:100%;
@@ -360,9 +309,7 @@ th{
   letter-spacing:.04em;
 }
 
-tr:last-child td{
-  border-bottom:0;
-}
+tr:last-child td{border-bottom:0}
 
 .badge{
   display:inline-flex;
@@ -421,9 +368,7 @@ tr:last-child td{
   gap:15px;
 }
 
-.form-grid .full-field{
-  grid-column:1/-1;
-}
+.form-grid .full-field{grid-column:1/-1}
 
 .modal{
   position:fixed;
@@ -436,9 +381,7 @@ tr:last-child td{
   padding:20px;
 }
 
-.modal.open{
-  display:flex;
-}
+.modal.open{display:flex}
 
 .modal-box{
   background:#fff;
@@ -457,9 +400,7 @@ tr:last-child td{
   align-items:center;
 }
 
-.modal-body{
-  padding:20px;
-}
+.modal-body{padding:20px}
 
 .modal-close{
   border:0;
@@ -487,9 +428,7 @@ tr:last-child td{
   margin-bottom:4px;
 }
 
-.detail strong{
-  word-break:break-word;
-}
+.detail strong{word-break:break-word}
 
 .room-card{
   border:1px solid var(--line);
@@ -504,19 +443,9 @@ tr:last-child td{
   background:#eee;
 }
 
-.room-info{
-  padding:15px;
-}
-
-.room-info h3{
-  margin:0 0 5px;
-}
-
-.room-info p{
-  color:var(--muted);
-  font-size:13px;
-  margin:4px 0;
-}
+.room-info{padding:15px}
+.room-info h3{margin:0 0 5px}
+.room-info p{color:var(--muted);font-size:13px;margin:4px 0}
 
 .review-box{
   border:1px solid var(--line);
@@ -524,9 +453,7 @@ tr:last-child td{
   padding:17px;
 }
 
-.stars{
-  letter-spacing:2px;
-}
+.stars{letter-spacing:2px}
 
 .setting-row{
   display:grid;
@@ -537,9 +464,7 @@ tr:last-child td{
   border-bottom:1px solid var(--line);
 }
 
-.setting-row:last-child{
-  border-bottom:0;
-}
+.setting-row:last-child{border-bottom:0}
 
 .setting-key{
   font-weight:800;
@@ -565,24 +490,15 @@ tr:last-child td{
   display:none;
 }
 
-.toast.show{
-  display:block;
-}
+.toast.show{display:block}
 
 @media(max-width:1000px){
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .grid-3{
-    grid-template-columns:1fr 1fr;
-  }
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid-3{grid-template-columns:1fr 1fr}
 }
 
 @media(max-width:760px){
-  :root{
-    --sidebar:0px;
-  }
+  :root{--sidebar:0px}
 
   .sidebar{
     width:260px;
@@ -590,476 +506,585 @@ tr:last-child td{
     transition:.25s;
   }
 
-  .sidebar.open{
-    transform:translateX(0);
-  }
-
-  .main{
-    margin-left:0;
-  }
-
-  .menu-btn{
-    display:block;
-  }
-
-  .topbar{
-    padding:0 15px;
-  }
-
-  .content{
-    padding:18px 14px;
-  }
-
-  .stats{
-    grid-template-columns:1fr 1fr;
-  }
-
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .menu-btn{display:block}
+  .topbar{padding:0 15px}
+  .content{padding:18px 14px}
+  .stats{grid-template-columns:1fr 1fr}
   .grid-2,
   .grid-3,
   .form-grid,
   .detail-grid{
     grid-template-columns:1fr;
   }
-
-  .setting-row{
-    grid-template-columns:1fr;
-  }
+  .setting-row{grid-template-columns:1fr}
 }
 
 @media(max-width:450px){
-  .stats{
-    grid-template-columns:1fr;
-  }
-
-  .login-card{
-    padding:25px;
-  }
+  .stats{grid-template-columns:1fr}
+  .login-card{padding:25px}
 }
-</style>
-</head>
-
-<body>
-
-<!-- LOGIN -->
-<section id="loginPage" class="login-page">
-  <div class="login-card">
-    <div class="brand">
-      THE NORDIC ABUJA
-      <small>Administration Portal</small>
-    </div>
-
-    <div style="height:25px"></div>
-
-    <form id="loginForm">
-      <div class="field">
-        <label>Email</label>
-        <input id="loginEmail" type="email" required autocomplete="username">
-      </div>
-
-      <div class="field">
-        <label>Password</label>
-        <input id="loginPassword" type="password" required autocomplete="current-password">
-      </div>
-
-      <div id="loginError" class="login-error hidden"></div>
-
-      <button class="btn btn-primary full" type="submit">
-        Sign in
-      </button>
-    </form>
-  </div>
-</section>
-
-
-<!-- APP -->
-<div id="app" class="app">
-
-  <aside id="sidebar" class="sidebar">
-
-    <div class="sidebar-top">
-      <div class="brand">
-        THE NORDIC ABUJA
-        <small>Admin Dashboard</small>
-      </div>
-    </div>
-
-    <nav class="nav">
-
-      <button class="nav-btn active" data-page="dashboard">
-        📊 Dashboard
-      </button>
-
-      <button class="nav-btn" data-page="reservations">
-        📋 Reservations
-      </button>
-
-      <button class="nav-btn" data-page="roomTypes">
-        🛏️ Room Types
-      </button>
-
-      <button class="nav-btn" data-page="rooms">
-        🚪 Rooms
-      </button>
-
-      <button class="nav-btn" data-page="requests">
-        📨 Hotel Requests
-      </button>
-
-      <button class="nav-btn" data-page="reviews">
-        ⭐ Reviews
-      </button>
-
-      <button class="nav-btn" data-page="settings">
-        ⚙️ Site Settings
-      </button>
-
-    </nav>
-
-    <div class="sidebar-bottom">
-      <button id="logoutBtn" class="btn btn-light full">
-        Sign out
-      </button>
-    </div>
-
-  </aside>
-
-
-  <main class="main">
-
-    <header class="topbar">
-      <button id="menuBtn" class="menu-btn">☰</button>
-
-      <strong id="topTitle">Dashboard</strong>
-
-      <div style="font-size:12px;color:#718096">
-        Admin
-      </div>
-    </header>
-
-
-    <div class="content">
-
-
-      <!-- DASHBOARD -->
-      <section id="page-dashboard" class="page active">
-
-        <h1 class="page-title">Dashboard</h1>
-        <p class="page-subtitle">
-          Overview of The Nordic Abuja operations.
-        </p>
-
-        <div class="stats">
-
-          <div class="stat">
-            <div class="stat-label">Total Reservations</div>
-            <div id="statTotal" class="stat-value">—</div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Pending</div>
-            <div id="statPending" class="stat-value">—</div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Confirmed</div>
-            <div id="statConfirmed" class="stat-value">—</div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Unpaid</div>
-            <div id="statUnpaid" class="stat-value">—</div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Available Rooms</div>
-            <div id="statRooms" class="stat-value">—</div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">New Requests</div>
-            <div id="statRequests" class="stat-value">—</div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Published Reviews</div>
-            <div id="statReviews" class="stat-value">—</div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Room Types</div>
-            <div id="statRoomTypes" class="stat-value">—</div>
-          </div>
-
-        </div>
-
-        <div class="card">
-          <div class="card-head">
-            <span class="card-title">Recent Reservations</span>
-            <button class="btn btn-light" onclick="loadReservations()">Refresh</button>
-          </div>
-
-          <div id="dashboardReservations" class="card-body">
-            <div class="loading">Loading...</div>
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- RESERVATIONS -->
-      <section id="page-reservations" class="page">
-
-        <h1 class="page-title">Reservations</h1>
-        <p class="page-subtitle">
-          Manage hotel reservations and guest bookings.
-        </p>
-
-        <div class="card">
-
-          <div class="card-head">
-            <span class="card-title">All Reservations</span>
-            <button class="btn btn-light" onclick="loadReservations()">Refresh</button>
-          </div>
-
-          <div class="card-body">
-
-            <div class="toolbar">
-
-              <input
-                id="reservationSearch"
-                placeholder="Search guest, email or reference..."
-                oninput="renderReservations()"
-              >
-
-              <select id="reservationStatus" onchange="renderReservations()">
-                <option value="">All statuses</option>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-
-              <select id="reservationPayment" onchange="renderReservations()">
-                <option value="">All payments</option>
-                <option value="unpaid">Unpaid</option>
-                <option value="paid">Paid</option>
-              </select>
-
-            </div>
-
-            <div id="reservationsTable"></div>
-
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- ROOM TYPES -->
-      <section id="page-roomTypes" class="page">
-
-        <h1 class="page-title">Room Types</h1>
-        <p class="page-subtitle">
-          Manage the hotel room categories shown on the website.
-        </p>
-
-        <div class="card">
-
-          <div class="card-head">
-            <span class="card-title">Room Categories</span>
-
-            <button class="btn btn-accent" onclick="openRoomTypeModal()">
-              + Add Room Type
-            </button>
-          </div>
-
-          <div id="roomTypesList" class="card-body">
-            <div class="loading">Loading...</div>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ROOMS -->
-      <section id="page-rooms" class="page">
-
-        <h1 class="page-title">Rooms</h1>
-        <p class="page-subtitle">
-          Manage individual physical room inventory.
-        </p>
-
-        <div class="card">
-
-          <div class="card-head">
-            <span class="card-title">Room Inventory</span>
-
-            <button class="btn btn-accent" onclick="openRoomModal()">
-              + Add Room
-            </button>
-          </div>
-
-          <div class="card-body">
-
-            <div class="toolbar">
-              <select id="roomStatusFilter" onchange="renderRooms()">
-                <option value="">All statuses</option>
-                <option value="available">Available</option>
-                <option value="occupied">Occupied</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="out_of_service">Out of service</option>
-              </select>
-            </div>
-
-            <div id="roomsList"></div>
-
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- HOTEL REQUESTS -->
-      <section id="page-requests" class="page">
-
-        <h1 class="page-title">Hotel Requests</h1>
-        <p class="page-subtitle">
-          Manage guest enquiries, transfers, events and other requests.
-        </p>
-
-        <div class="card">
-
-          <div class="card-head">
-            <span class="card-title">Requests</span>
-
-            <button class="btn btn-light" onclick="loadRequests()">
-              Refresh
-            </button>
-          </div>
-
-          <div class="card-body">
-
-            <div class="toolbar">
-
-              <input
-                id="requestSearch"
-                placeholder="Search requests..."
-                oninput="renderRequests()"
-              >
-
-              <select id="requestStatus" onchange="renderRequests()">
-                <option value="">All statuses</option>
-                <option value="new">New</option>
-                <option value="in_progress">In progress</option>
-                <option value="resolved">Resolved</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-
-            </div>
-
-            <div id="requestsList"></div>
-
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- REVIEWS -->
-      <section id="page-reviews" class="page">
-
-        <h1 class="page-title">Reviews</h1>
-        <p class="page-subtitle">
-          Manage guest reviews and homepage publishing.
-        </p>
-
-        <div class="card">
-
-          <div class="card-head">
-            <span class="card-title">Guest Reviews</span>
-
-            <button class="btn btn-light" onclick="loadReviews()">
-              Refresh
-            </button>
-          </div>
-
-          <div class="card-body">
-
-            <div class="toolbar">
-
-              <select id="reviewPublished" onchange="renderReviews()">
-                <option value="">All reviews</option>
-                <option value="published">Published</option>
-                <option value="unpublished">Unpublished</option>
-              </select>
-
-              <select id="reviewFeatured" onchange="renderReviews()">
-                <option value="">All</option>
-                <option value="featured">Featured</option>
-                <option value="not_featured">Not featured</option>
-              </select>
-
-            </div>
-
-            <div id="reviewsList"></div>
-
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- SETTINGS -->
-      <section id="page-settings" class="page">
-
-        <h1 class="page-title">Site Settings</h1>
-        <p class="page-subtitle">
-          Manage the hotel's editable website settings.
-        </p>
-
-        <div class="card">
-
-          <div class="card-head">
-            <span class="card-title">Website Configuration</span>
-
-            <button class="btn btn-light" onclick="loadSettings()">
-              Refresh
-            </button>
-          </div>
-
-          <div id="settingsList" class="card-body">
-            <div class="loading">Loading...</div>
-          </div>
-
-        </div>
-
-      </section>
-
-    </div>
-
-  </main>
+</style></head><body><section id="loginPage" class="login-page">
+  <div class="login-card"><div class="brand">
+  THE NORDIC ABUJA
+  <small>Administration Portal</small>
 </div>
 
+<div style="height:25px"></div>
 
-<!-- GENERIC MODAL -->
-<div id="modal" class="modal">
-  <div class="modal-box">
+<form id="loginForm">
 
-    <div class="modal-head">
-      <strong id="modalTitle">Details</strong>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
+  <div class="field">
+    <label>Email</label>
+    <input
+      id="loginEmail"
+      type="email"
+      required
+      autocomplete="username"
+    >
+  </div>
 
-    <div id="modalBody" class="modal-body"></div>
+  <div class="field">
+    <label>Password</label>
+    <input
+      id="loginPassword"
+      type="password"
+      required
+      autocomplete="current-password"
+    >
+  </div>
 
+  <div id="loginError" class="login-error hidden"></div>
+
+  <button
+    id="loginButton"
+    class="btn btn-primary full"
+    type="submit">
+    Sign in
+  </button>
+
+</form>
+
+  </div>
+</section><div id="app" class="app">  <aside id="sidebar" class="sidebar"><div class="sidebar-top">
+  <div class="brand">
+    THE NORDIC ABUJA
+    <small>Admin Dashboard</small>
   </div>
 </div>
 
+<nav class="nav">
 
-<div id="toast" class="toast"></div>
+  <button class="nav-btn active" data-page="dashboard">
+    📊 Dashboard
+  </button>
+
+  <button class="nav-btn" data-page="reservations">
+    📋 Reservations
+  </button>
+
+  <button class="nav-btn" data-page="roomTypes">
+    🛏️ Room Types
+  </button>
+
+  <button class="nav-btn" data-page="rooms">
+    🚪 Rooms
+  </button>
+
+  <button class="nav-btn" data-page="requests">
+    📨 Hotel Requests
+  </button>
+
+  <button class="nav-btn" data-page="reviews">
+    ⭐ Reviews
+  </button>
+
+  <button class="nav-btn" data-page="settings">
+    ⚙️ Site Settings
+  </button>
+
+</nav>
+
+<div class="sidebar-bottom">
+  <button id="logoutBtn" class="btn btn-light full">
+    Sign out
+  </button>
+</div>
+
+  </aside>  <main class="main"><header class="topbar">
+
+  <button id="menuBtn" class="menu-btn">
+    ☰
+  </button>
+
+  <strong id="topTitle">Dashboard</strong>
+
+  <div style="font-size:12px;color:#718096">
+    Admin
+  </div>
+
+</header>
 
 
-<script>
+<div class="content">
+
+  <section id="page-dashboard" class="page active">
+
+    <h1 class="page-title">Dashboard</h1>
+
+    <p class="page-subtitle">
+      Overview of The Nordic Abuja operations.
+    </p>
+
+    <div class="stats">
+
+      <div class="stat">
+        <div class="stat-label">Total Reservations</div>
+        <div id="statTotal" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Pending</div>
+        <div id="statPending" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Confirmed</div>
+        <div id="statConfirmed" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Unpaid</div>
+        <div id="statUnpaid" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Available Rooms</div>
+        <div id="statRooms" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">New Requests</div>
+        <div id="statRequests" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Published Reviews</div>
+        <div id="statReviews" class="stat-value">—</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Room Types</div>
+        <div id="statRoomTypes" class="stat-value">—</div>
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-head">
+        <span class="card-title">
+          Recent Reservations
+        </span>
+
+        <button
+          class="btn btn-light"
+          onclick="loadReservations()">
+          Refresh
+        </button>
+      </div>
+
+      <div id="dashboardReservations" class="card-body">
+        <div class="loading">Loading...</div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section id="page-reservations" class="page">
+
+    <h1 class="page-title">Reservations</h1>
+
+    <p class="page-subtitle">
+      Manage hotel reservations and guest bookings.
+    </p>
+
+    <div class="card">
+
+      <div class="card-head">
+
+        <span class="card-title">
+          All Reservations
+        </span>
+
+        <button
+          class="btn btn-light"
+          onclick="loadReservations()">
+          Refresh
+        </button>
+
+      </div>
+
+      <div class="card-body">
+
+        <div class="toolbar">
+
+          <input
+            id="reservationSearch"
+            placeholder="Search guest, email or reference..."
+            oninput="renderReservations()"
+          >
+
+          <select
+            id="reservationStatus"
+            onchange="renderReservations()">
+
+            <option value="">
+              All statuses
+            </option>
+
+            <option value="pending">
+              Pending
+            </option>
+
+            <option value="confirmed">
+              Confirmed
+            </option>
+
+            <option value="cancelled">
+              Cancelled
+            </option>
+
+          </select>
+
+          <select
+            id="reservationPayment"
+            onchange="renderReservations()">
+
+            <option value="">
+              All payments
+            </option>
+
+            <option value="unpaid">
+              Unpaid
+            </option>
+
+            <option value="paid">
+              Paid
+            </option>
+
+          </select>
+
+        </div>
+
+        <div id="reservationsTable"></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section id="page-roomTypes" class="page">
+
+    <h1 class="page-title">Room Types</h1>
+
+    <p class="page-subtitle">
+      Manage the hotel room categories shown on the website.
+    </p>
+
+    <div class="card">
+
+      <div class="card-head">
+
+        <span class="card-title">
+          Room Categories
+        </span>
+
+        <button
+          class="btn btn-accent"
+          onclick="openRoomTypeModal()">
+          + Add Room Type
+        </button>
+
+      </div>
+
+      <div id="roomTypesList" class="card-body">
+        <div class="loading">Loading...</div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section id="page-rooms" class="page">
+
+    <h1 class="page-title">Rooms</h1>
+
+    <p class="page-subtitle">
+      Manage individual physical room inventory.
+    </p>
+
+    <div class="card">
+
+      <div class="card-head">
+
+        <span class="card-title">
+          Room Inventory
+        </span>
+
+        <button
+          class="btn btn-accent"
+          onclick="openRoomModal()">
+          + Add Room
+        </button>
+
+      </div>
+
+      <div class="card-body">
+
+        <div class="toolbar">
+
+          <select
+            id="roomStatusFilter"
+            onchange="renderRooms()">
+
+            <option value="">
+              All statuses
+            </option>
+
+            <option value="available">
+              Available
+            </option>
+
+            <option value="occupied">
+              Occupied
+            </option>
+
+            <option value="maintenance">
+              Maintenance
+            </option>
+
+            <option value="out_of_service">
+              Out of service
+            </option>
+
+          </select>
+
+        </div>
+
+        <div id="roomsList"></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section id="page-requests" class="page">
+
+    <h1 class="page-title">Hotel Requests</h1>
+
+    <p class="page-subtitle">
+      Manage guest enquiries, transfers, events and other requests.
+    </p>
+
+    <div class="card">
+
+      <div class="card-head">
+
+        <span class="card-title">
+          Requests
+        </span>
+
+        <button
+          class="btn btn-light"
+          onclick="loadRequests()">
+          Refresh
+        </button>
+
+      </div>
+
+      <div class="card-body">
+
+        <div class="toolbar">
+
+          <input
+            id="requestSearch"
+            placeholder="Search requests..."
+            oninput="renderRequests()"
+          >
+
+          <select
+            id="requestStatus"
+            onchange="renderRequests()">
+
+            <option value="">
+              All statuses
+            </option>
+
+            <option value="new">
+              New
+            </option>
+
+            <option value="in_progress">
+              In progress
+            </option>
+
+            <option value="resolved">
+              Resolved
+            </option>
+
+            <option value="cancelled">
+              Cancelled
+            </option>
+
+          </select>
+
+        </div>
+
+        <div id="requestsList"></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section id="page-reviews" class="page">
+
+    <h1 class="page-title">Reviews</h1>
+
+    <p class="page-subtitle">
+      Manage guest reviews and homepage publishing.
+    </p>
+
+    <div class="card">
+
+      <div class="card-head">
+
+        <span class="card-title">
+          Guest Reviews
+        </span>
+
+        <button
+          class="btn btn-light"
+          onclick="loadReviews()">
+          Refresh
+        </button>
+
+      </div>
+
+      <div class="card-body">
+
+        <div class="toolbar">
+
+          <select
+            id="reviewPublished"
+            onchange="renderReviews()">
+
+            <option value="">
+              All reviews
+            </option>
+
+            <option value="published">
+              Published
+            </option>
+
+            <option value="unpublished">
+              Unpublished
+            </option>
+
+          </select>
+
+          <select
+            id="reviewFeatured"
+            onchange="renderReviews()">
+
+            <option value="">
+              All
+            </option>
+
+            <option value="featured">
+              Featured
+            </option>
+
+            <option value="not_featured">
+              Not featured
+            </option>
+
+          </select>
+
+        </div>
+
+        <div id="reviewsList"></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section id="page-settings" class="page">
+
+    <h1 class="page-title">Site Settings</h1>
+
+    <p class="page-subtitle">
+      Manage the hotel's editable website settings.
+    </p>
+
+    <div class="card">
+
+      <div class="card-head">
+
+        <span class="card-title">
+          Website Configuration
+        </span>
+
+        <button
+          class="btn btn-light"
+          onclick="loadSettings()">
+          Refresh
+        </button>
+
+      </div>
+
+      <div id="settingsList" class="card-body">
+        <div class="loading">Loading...</div>
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+  </main></div><div id="modal" class="modal">  <div class="modal-box"><div class="modal-head">
+
+  <strong id="modalTitle">
+    Details
+  </strong>
+
+  <button
+    class="modal-close"
+    onclick="closeModal()">
+    ×
+  </button>
+
+</div>
+
+<div id="modalBody" class="modal-body"></div>
+
+  </div></div><div id="toast" class="toast"></div><script>
+
 /* =========================================================
    SUPABASE
    ========================================================= */
@@ -1096,7 +1121,14 @@ let settings = [];
    ========================================================= */
 
 function esc(value){
-  if(value === null || value === undefined) return "";
+
+  if(
+    value === null ||
+    value === undefined
+  ){
+    return "";
+  }
+
   return String(value)
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
@@ -1105,26 +1137,35 @@ function esc(value){
     .replaceAll("'","&#039;");
 }
 
+
 function money(value){
-  const n = Number(value || 0);
+
+  const n =
+    Number(value || 0);
 
   if(!n){
     return "Rate on request";
   }
 
-  return "₦" + n.toLocaleString(
-    "en-NG",
-    {
-      minimumFractionDigits:2,
-      maximumFractionDigits:2
-    }
-  );
+  return "₦" +
+    n.toLocaleString(
+      "en-NG",
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    );
 }
 
-function dateFormat(value){
-  if(!value) return "—";
 
-  const d = new Date(value);
+function dateFormat(value){
+
+  if(!value){
+    return "—";
+  }
+
+  const d =
+    new Date(value);
 
   if(Number.isNaN(d.getTime())){
     return value;
@@ -1140,36 +1181,62 @@ function dateFormat(value){
   );
 }
 
+
 function badge(value){
-  const v = String(value || "unknown").toLowerCase();
+
+  const v =
+    String(value || "unknown")
+      .toLowerCase();
 
   let cls = "gray";
 
-  if(
-    ["confirmed","paid","available","resolved","published"].includes(v)
-  ){
+  if([
+    "confirmed",
+    "paid",
+    "available",
+    "resolved",
+    "published",
+    "active",
+    "featured"
+  ].includes(v)){
     cls = "green";
   }
 
-  if(
-    ["cancelled","unpaid","maintenance","out_of_service"].includes(v)
-  ){
+  if([
+    "cancelled",
+    "unpaid",
+    "maintenance",
+    "out_of_service",
+    "inactive",
+    "unpublished"
+  ].includes(v)){
     cls = "red";
   }
 
-  if(
-    ["pending","new","in_progress","occupied"].includes(v)
-  ){
+  if([
+    "pending",
+    "new",
+    "in_progress",
+    "occupied"
+  ].includes(v)){
     cls = "orange";
   }
 
-  return `<span class="badge ${cls}">${esc(v.replaceAll("_"," "))}</span>`;
+  return `
+    <span class="badge ${cls}">
+      ${esc(v.replaceAll("_"," "))}
+    </span>
+  `;
 }
 
+
 function toast(message){
-  const el = document.getElementById("toast");
+
+  const el =
+    document.getElementById("toast");
 
   el.textContent = message;
+
   el.classList.add("show");
 
   setTimeout(()=>{
@@ -1177,17 +1244,29 @@ function toast(message){
   },3000);
 }
 
+
 function openModal(title,body){
-  document.getElementById("modalTitle").textContent = title;
-  document.getElementById("modalBody").innerHTML = body;
-  document.getElementById("modal").classList.add("open");
+
+  document.getElementById("modalTitle")
+    .textContent = title;
+
+  document.getElementById("modalBody")
+    .innerHTML = body;
+
+  document.getElementById("modal")
+    .classList.add("open");
 }
+
 
 function closeModal(){
-  document.getElementById("modal").classList.remove("open");
+
+  document.getElementById("modal")
+    .classList.remove("open");
 }
 
+
 function jsonPretty(value){
+
   try{
     return JSON.stringify(value,null,2);
   }catch{
@@ -1197,119 +1276,319 @@ function jsonPretty(value){
 
 
 /* =========================================================
-   AUTH
+   AUTHENTICATION
    ========================================================= */
+
+/*
+  IMPORTANT FIX:
+
+  The old version directly queried admin_users.
+
+  This version uses the SECURITY DEFINER RPC:
+
+      public.is_admin_user()
+
+  The database has already been tested with your
+  administrator UUID and returns TRUE.
+*/
+
 
 async function checkSession(){
 
-  const {
-    data:{
-      session
+  try{
+
+    const {
+      data:sessionData,
+      error:sessionError
+    } =
+      await supabaseClient.auth.getSession();
+
+    if(sessionError){
+
+      console.error(
+        "Session error:",
+        sessionError
+      );
+
+      showLogin();
+
+      return;
     }
-  } = await supabaseClient.auth.getSession();
 
-  if(!session){
-    showLogin();
-    return;
-  }
+    const session =
+      sessionData?.session;
 
-  const {
-    data:{
-      user
+    if(!session){
+
+      showLogin();
+
+      return;
     }
-  } = await supabaseClient.auth.getUser();
 
-  if(!user){
-    showLogin();
-    return;
-  }
 
-  const {
-    data:admin,
-    error
-  } = await supabaseClient
-    .from("admin_users")
-    .select("user_id")
-    .eq("user_id",user.id)
-    .maybeSingle();
+    const {
+      data:userData,
+      error:userError
+    } =
+      await supabaseClient.auth.getUser();
 
-  if(error || !admin){
-    await supabaseClient.auth.signOut();
+    if(
+      userError ||
+      !userData?.user
+    ){
 
-    showLogin();
+      console.error(
+        "User error:",
+        userError
+      );
 
-    document.getElementById("loginError").textContent =
-      "This account is not authorized as an administrator.";
+      showLogin();
+
+      return;
+    }
+
+
+    const user =
+      userData.user;
+
+
+    /*
+      Verify administrator using the
+      security-definer database function.
+    */
+
+    const {
+      data:isAdmin,
+      error:adminError
+    } =
+      await supabaseClient
+        .rpc("is_admin_user");
+
+
+    console.log(
+      "Administrator verification:",
+      {
+        user_id:user.id,
+        email:user.email,
+        is_admin:isAdmin,
+        error:adminError
+      }
+    );
+
+
+    if(adminError){
+
+      console.error(
+        "Administrator verification failed:",
+        adminError
+      );
+
+      showLogin();
+
+      const errorBox =
+        document.getElementById("loginError");
+
+      errorBox.textContent =
+        "Administrator verification failed: " +
+        adminError.message;
+
+      errorBox.classList.remove("hidden");
+
+      return;
+    }
+
+
+    if(isAdmin !== true){
+
+      console.error(
+        "Administrator verification returned:",
+        isAdmin
+      );
+
+      showLogin();
+
+      const errorBox =
+        document.getElementById("loginError");
+
+      errorBox.textContent =
+        "This account is not authorized as an administrator.";
+
+      errorBox.classList.remove("hidden");
+
+      return;
+    }
+
+
+    /*
+      ADMIN VERIFIED
+    */
+
+    currentUser =
+      user;
+
+    showApp();
 
     document.getElementById("loginError")
-      .classList.remove("hidden");
+      .classList.add("hidden");
 
-    return;
-  }
+    await loadEverything();
 
-  currentUser = user;
+  }catch(error){
 
-  showApp();
+    console.error(
+      "Unexpected authentication error:",
+      error
+    );
 
-  await loadEverything();
-}
+    showLogin();
 
-function showLogin(){
-  document.getElementById("loginPage").style.display = "flex";
-  document.getElementById("app").style.display = "none";
-}
-
-function showApp(){
-  document.getElementById("loginPage").style.display = "none";
-  document.getElementById("app").style.display = "block";
-}
-
-document.getElementById("loginForm")
-.addEventListener("submit",async e=>{
-
-  e.preventDefault();
-
-  const email =
-    document.getElementById("loginEmail").value.trim();
-
-  const password =
-    document.getElementById("loginPassword").value;
-
-  const errorBox =
-    document.getElementById("loginError");
-
-  errorBox.classList.add("hidden");
-
-  const {
-    error
-  } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if(error){
+    const errorBox =
+      document.getElementById("loginError");
 
     errorBox.textContent =
+      "Unable to verify administrator access: " +
       error.message;
 
     errorBox.classList.remove("hidden");
-
-    return;
   }
+}
 
-  await checkSession();
-});
+
+function showLogin(){
+
+  document.getElementById("loginPage")
+    .style.display = "flex";
+
+  document.getElementById("app")
+    .style.display = "none";
+}
+
+
+function showApp(){
+
+  document.getElementById("loginPage")
+    .style.display = "none";
+
+  document.getElementById("app")
+    .style.display = "block";
+}
+
+
+document.getElementById("loginForm")
+.addEventListener(
+  "submit",
+  async e=>{
+
+    e.preventDefault();
+
+    const email =
+      document.getElementById("loginEmail")
+        .value
+        .trim();
+
+    const password =
+      document.getElementById("loginPassword")
+        .value;
+
+    const errorBox =
+      document.getElementById("loginError");
+
+    const button =
+      document.getElementById("loginButton");
+
+    errorBox.classList.add("hidden");
+
+    button.disabled = true;
+    button.textContent = "Signing in...";
+
+
+    try{
+
+      const {
+        error
+      } =
+        await supabaseClient.auth
+          .signInWithPassword({
+            email,
+            password
+          });
+
+
+      if(error){
+
+        errorBox.textContent =
+          error.message;
+
+        errorBox.classList.remove("hidden");
+
+        return;
+      }
+
+
+      await checkSession();
+
+    }catch(error){
+
+      console.error(error);
+
+      errorBox.textContent =
+        error.message ||
+        "Unable to sign in.";
+
+      errorBox.classList.remove("hidden");
+
+    }finally{
+
+      button.disabled = false;
+      button.textContent = "Sign in";
+
+    }
+
+  }
+);
 
 
 document.getElementById("logoutBtn")
-.addEventListener("click",async()=>{
+.addEventListener(
+  "click",
+  async()=>{
 
-  await supabaseClient.auth.signOut();
+    await supabaseClient.auth.signOut();
 
-  currentUser = null;
+    currentUser = null;
 
-  showLogin();
-});
+    showLogin();
+
+  }
+);
+
+
+/*
+  Only react to an actual SIGNED_OUT event.
+
+  We deliberately do NOT sign the user out when
+  administrator verification fails.
+*/
+
+supabaseClient.auth
+.onAuthStateChange(
+  (event,session)=>{
+
+    console.log(
+      "Supabase auth event:",
+      event
+    );
+
+    if(event === "SIGNED_OUT"){
+
+      currentUser = null;
+
+      showLogin();
+
+    }
+
+  }
+);
 
 
 /* =========================================================
@@ -1319,42 +1598,52 @@ document.getElementById("logoutBtn")
 document.querySelectorAll(".nav-btn")
 .forEach(button=>{
 
-  button.addEventListener("click",()=>{
+  button.addEventListener(
+    "click",
+    ()=>{
 
-    document
-      .querySelectorAll(".nav-btn")
-      .forEach(b=>b.classList.remove("active"));
+      document
+        .querySelectorAll(".nav-btn")
+        .forEach(
+          b=>b.classList.remove("active")
+        );
 
-    button.classList.add("active");
+      button.classList.add("active");
 
-    const page =
-      button.dataset.page;
+      const page =
+        button.dataset.page;
 
-    document
-      .querySelectorAll(".page")
-      .forEach(p=>p.classList.remove("active"));
+      document
+        .querySelectorAll(".page")
+        .forEach(
+          p=>p.classList.remove("active")
+        );
 
-    document
-      .getElementById("page-"+page)
-      .classList.add("active");
+      document
+        .getElementById("page-"+page)
+        .classList.add("active");
 
-    document.getElementById("topTitle")
-      .textContent =
-      button.textContent.trim();
+      document.getElementById("topTitle")
+        .textContent =
+        button.textContent.trim();
 
-    document.getElementById("sidebar")
-      .classList.remove("open");
+      document.getElementById("sidebar")
+        .classList.remove("open");
 
-  });
+    }
+  );
 
 });
 
 
 document.getElementById("menuBtn")
-.addEventListener("click",()=>{
-  document.getElementById("sidebar")
-    .classList.toggle("open");
-});
+.addEventListener(
+  "click",
+  ()=>{
+    document.getElementById("sidebar")
+      .classList.toggle("open");
+  }
+);
 
 
 /* =========================================================
@@ -1385,48 +1674,60 @@ async function loadReservations(){
   const {
     data,
     error
-  } = await supabaseClient
-    .from("bookings")
-    .select(`
-      id,
-      booking_reference,
-      room_type_id,
-      room_id,
-      guest_first_name,
-      guest_last_name,
-      guest_email,
-      guest_phone,
-      adults,
-      children,
-      check_in,
-      check_out,
-      nights,
-      room_price,
-      extras_total,
-      discount_total,
-      total_amount,
-      special_requests,
-      status,
-      payment_status,
-      payment_reference,
-      created_at,
-      updated_at,
-      room_types(name),
-      rooms(room_number)
-    `)
-    .order("created_at",{ascending:false});
+  } =
+    await supabaseClient
+      .from("bookings")
+      .select(`
+        id,
+        booking_reference,
+        room_type_id,
+        room_id,
+        guest_first_name,
+        guest_last_name,
+        guest_email,
+        guest_phone,
+        adults,
+        children,
+        check_in,
+        check_out,
+        nights,
+        room_price,
+        extras_total,
+        discount_total,
+        total_amount,
+        special_requests,
+        status,
+        payment_status,
+        payment_reference,
+        created_at,
+        updated_at,
+        room_types(name),
+        rooms(room_number)
+      `)
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
 
   if(error){
 
     console.error(error);
 
-    document.getElementById("reservationsTable").innerHTML =
-      `<div class="empty">Unable to load reservations.<br>${esc(error.message)}</div>`;
+    document.getElementById(
+      "reservationsTable"
+    ).innerHTML =
+      `<div class="empty">
+        Unable to load reservations.<br>
+        ${esc(error.message)}
+      </div>`;
 
     return;
   }
 
-  reservations = data || [];
+
+  reservations =
+    data || [];
 
   renderReservations();
 
@@ -1439,18 +1740,22 @@ async function loadReservations(){
 function filteredReservations(){
 
   const search =
-    document.getElementById("reservationSearch")
-      ?.value
+    document.getElementById(
+      "reservationSearch"
+    )?.value
       .trim()
       .toLowerCase() || "";
 
   const status =
-    document.getElementById("reservationStatus")
-      ?.value || "";
+    document.getElementById(
+      "reservationStatus"
+    )?.value || "";
 
   const payment =
-    document.getElementById("reservationPayment")
-      ?.value || "";
+    document.getElementById(
+      "reservationPayment"
+    )?.value || "";
+
 
   return reservations.filter(r=>{
 
@@ -1460,10 +1765,11 @@ function filteredReservations(){
       r.guest_last_name,
       r.guest_email
     ]
-    .join(" ")
-    .toLowerCase();
+      .join(" ")
+      .toLowerCase();
 
-    return (
+
+    return(
       (!search || text.includes(search)) &&
       (!status || r.status === status) &&
       (!payment || r.payment_status === payment)
@@ -1475,19 +1781,27 @@ function filteredReservations(){
 
 function renderReservations(){
 
-  const list = filteredReservations();
+  const list =
+    filteredReservations();
+
 
   if(!list.length){
 
-    document.getElementById("reservationsTable").innerHTML =
-      `<div class="empty">No reservations found.</div>`;
+    document.getElementById(
+      "reservationsTable"
+    ).innerHTML =
+      `<div class="empty">
+        No reservations found.
+      </div>`;
 
     return;
   }
 
+
   let html = `
     <div class="table-wrap">
     <table>
+
       <thead>
         <tr>
           <th>Reference</th>
@@ -1500,13 +1814,16 @@ function renderReservations(){
           <th>Actions</th>
         </tr>
       </thead>
+
       <tbody>
   `;
+
 
   list.forEach(r=>{
 
     const guest =
-      `${r.guest_first_name || ""} ${r.guest_last_name || ""}`.trim();
+      `${r.guest_first_name || ""}
+       ${r.guest_last_name || ""}`.trim();
 
     const roomType =
       r.room_types?.name || "—";
@@ -1516,21 +1833,29 @@ function renderReservations(){
       ? `Room ${r.rooms.room_number}`
       : "Not assigned";
 
+
     html += `
       <tr>
 
         <td>
-          <strong>${esc(r.booking_reference)}</strong><br>
-          <small>${dateFormat(r.created_at)}</small>
+          <strong>
+            ${esc(r.booking_reference)}
+          </strong>
+          <br>
+          <small>
+            ${dateFormat(r.created_at)}
+          </small>
         </td>
 
         <td>
-          <strong>${esc(guest)}</strong><br>
+          <strong>${esc(guest)}</strong>
+          <br>
           <small>${esc(r.guest_email)}</small>
         </td>
 
         <td>
-          ${esc(roomType)}<br>
+          ${esc(roomType)}
+          <br>
           <small>${esc(roomNumber)}</small>
         </td>
 
@@ -1539,7 +1864,9 @@ function renderReservations(){
           →
           ${dateFormat(r.check_out)}
           <br>
-          <small>${esc(r.nights)} night(s)</small>
+          <small>
+            ${esc(r.nights)} night(s)
+          </small>
         </td>
 
         <td>
@@ -1555,6 +1882,7 @@ function renderReservations(){
         </td>
 
         <td>
+
           <div class="actions">
 
             <button
@@ -1565,40 +1893,55 @@ function renderReservations(){
 
             ${
               r.status !== "confirmed"
-              ? `<button
-                   class="btn btn-success"
-                   onclick="updateBooking('${r.id}',{status:'confirmed'})">
-                   Confirm
-                 </button>`
+              ? `
+                <button
+                  class="btn btn-success"
+                  onclick="updateBooking(
+                    '${r.id}',
+                    {status:'confirmed'}
+                  )">
+                  Confirm
+                </button>
+              `
               : ""
             }
 
             ${
               r.status !== "cancelled"
-              ? `<button
-                   class="btn btn-danger"
-                   onclick="updateBooking('${r.id}',{status:'cancelled'})">
-                   Cancel
-                 </button>`
+              ? `
+                <button
+                  class="btn btn-danger"
+                  onclick="updateBooking(
+                    '${r.id}',
+                    {status:'cancelled'}
+                  )">
+                  Cancel
+                </button>
+              `
               : ""
             }
 
             ${
               r.payment_status !== "paid"
-              ? `<button
-                   class="btn btn-accent"
-                   onclick="markPaid('${r.id}')">
-                   Paid
-                 </button>`
+              ? `
+                <button
+                  class="btn btn-accent"
+                  onclick="markPaid('${r.id}')">
+                  Paid
+                </button>
+              `
               : ""
             }
 
           </div>
+
         </td>
 
       </tr>
     `;
+
   });
+
 
   html += `
       </tbody>
@@ -1606,8 +1949,10 @@ function renderReservations(){
     </div>
   `;
 
-  document.getElementById("reservationsTable")
-    .innerHTML = html;
+
+  document.getElementById(
+    "reservationsTable"
+  ).innerHTML = html;
 }
 
 
@@ -1616,18 +1961,24 @@ function renderDashboardReservations(){
   const list =
     reservations.slice(0,6);
 
+
   if(!list.length){
 
-    document.getElementById("dashboardReservations")
-      .innerHTML =
-      `<div class="empty">No reservations yet.</div>`;
+    document.getElementById(
+      "dashboardReservations"
+    ).innerHTML =
+      `<div class="empty">
+        No reservations yet.
+      </div>`;
 
     return;
   }
 
+
   let html = `
     <div class="table-wrap">
     <table>
+
       <thead>
         <tr>
           <th>Reference</th>
@@ -1637,8 +1988,10 @@ function renderDashboardReservations(){
           <th></th>
         </tr>
       </thead>
+
       <tbody>
   `;
+
 
   list.forEach(r=>{
 
@@ -1646,12 +1999,15 @@ function renderDashboardReservations(){
       <tr>
 
         <td>
-          <strong>${esc(r.booking_reference)}</strong>
+          <strong>
+            ${esc(r.booking_reference)}
+          </strong>
         </td>
 
         <td>
           ${esc(
-            `${r.guest_first_name || ""} ${r.guest_last_name || ""}`
+            `${r.guest_first_name || ""}
+             ${r.guest_last_name || ""}`
           )}
         </td>
 
@@ -1661,7 +2017,9 @@ function renderDashboardReservations(){
           ${dateFormat(r.check_out)}
         </td>
 
-        <td>${badge(r.status)}</td>
+        <td>
+          ${badge(r.status)}
+        </td>
 
         <td>
           <button
@@ -1673,7 +2031,9 @@ function renderDashboardReservations(){
 
       </tr>
     `;
+
   });
+
 
   html += `
       </tbody>
@@ -1681,34 +2041,47 @@ function renderDashboardReservations(){
     </div>
   `;
 
-  document.getElementById("dashboardReservations")
-    .innerHTML = html;
+
+  document.getElementById(
+    "dashboardReservations"
+  ).innerHTML = html;
 }
 
 
 function viewReservation(id){
 
   const r =
-    reservations.find(x=>x.id===id);
+    reservations.find(
+      x=>x.id===id
+    );
 
   if(!r) return;
 
+
   const guest =
-    `${r.guest_first_name || ""} ${r.guest_last_name || ""}`.trim();
+    `${r.guest_first_name || ""}
+     ${r.guest_last_name || ""}`.trim();
+
 
   const room =
     r.rooms?.room_number
     ? `Room ${r.rooms.room_number}`
     : "Not assigned";
 
+
   openModal(
-    "Reservation " + r.booking_reference,
+    "Reservation " +
+    r.booking_reference,
+
     `
+
       <div class="detail-grid">
 
         <div class="detail">
           <small>Booking reference</small>
-          <strong>${esc(r.booking_reference)}</strong>
+          <strong>
+            ${esc(r.booking_reference)}
+          </strong>
         </div>
 
         <div class="detail">
@@ -1741,7 +2114,9 @@ function viewReservation(id){
 
         <div class="detail">
           <small>Room type</small>
-          <strong>${esc(r.room_types?.name || "—")}</strong>
+          <strong>
+            ${esc(r.room_types?.name || "—")}
+          </strong>
         </div>
 
         <div class="detail">
@@ -1751,12 +2126,16 @@ function viewReservation(id){
 
         <div class="detail">
           <small>Check-in</small>
-          <strong>${dateFormat(r.check_in)}</strong>
+          <strong>
+            ${dateFormat(r.check_in)}
+          </strong>
         </div>
 
         <div class="detail">
           <small>Check-out</small>
-          <strong>${dateFormat(r.check_out)}</strong>
+          <strong>
+            ${dateFormat(r.check_out)}
+          </strong>
         </div>
 
         <div class="detail">
@@ -1791,7 +2170,9 @@ function viewReservation(id){
 
         <div class="detail">
           <small>Payment reference</small>
-          <strong>${esc(r.payment_reference || "—")}</strong>
+          <strong>
+            ${esc(r.payment_reference || "—")}
+          </strong>
         </div>
 
       </div>
@@ -1799,8 +2180,13 @@ function viewReservation(id){
       <div style="margin-top:16px">
 
         <div class="detail">
+
           <small>Special requests</small>
-          <strong>${esc(r.special_requests || "None")}</strong>
+
+          <strong>
+            ${esc(r.special_requests || "None")}
+          </strong>
+
         </div>
 
       </div>
@@ -1809,31 +2195,52 @@ function viewReservation(id){
 
         ${
           r.status !== "confirmed"
-          ? `<button
+          ? `
+            <button
               class="btn btn-success"
-              onclick="updateBooking('${r.id}',{status:'confirmed'});closeModal()">
+              onclick="
+                updateBooking(
+                  '${r.id}',
+                  {status:'confirmed'}
+                );
+                closeModal();
+              ">
               Confirm reservation
-             </button>`
+            </button>
+          `
           : ""
         }
 
         ${
           r.status !== "cancelled"
-          ? `<button
+          ? `
+            <button
               class="btn btn-danger"
-              onclick="updateBooking('${r.id}',{status:'cancelled'});closeModal()">
+              onclick="
+                updateBooking(
+                  '${r.id}',
+                  {status:'cancelled'}
+                );
+                closeModal();
+              ">
               Cancel reservation
-             </button>`
+            </button>
+          `
           : ""
         }
 
         ${
           r.payment_status !== "paid"
-          ? `<button
+          ? `
+            <button
               class="btn btn-accent"
-              onclick="markPaid('${r.id}');closeModal()">
+              onclick="
+                markPaid('${r.id}');
+                closeModal();
+              ">
               Mark paid
-             </button>`
+            </button>
+          `
           : ""
         }
 
@@ -1847,19 +2254,27 @@ async function updateBooking(id,changes){
 
   const {
     error
-  } = await supabaseClient
-    .from("bookings")
-    .update(changes)
-    .eq("id",id);
+  } =
+    await supabaseClient
+      .from("bookings")
+      .update(changes)
+      .eq("id",id);
+
 
   if(error){
 
-    toast("Update failed: " + error.message);
+    toast(
+      "Update failed: " +
+      error.message
+    );
 
     return;
   }
 
-  toast("Reservation updated.");
+
+  toast(
+    "Reservation updated."
+  );
 
   await loadReservations();
 }
@@ -1885,21 +2300,31 @@ async function loadRoomTypes(){
   const {
     data,
     error
-  } = await supabaseClient
-    .from("room_types")
-    .select("*")
-    .order("created_at",{ascending:true});
+  } =
+    await supabaseClient
+      .from("room_types")
+      .select("*")
+      .order(
+        "created_at",
+        {ascending:true}
+      );
+
 
   if(error){
 
-    document.getElementById("roomTypesList")
-      .innerHTML =
-      `<div class="empty">${esc(error.message)}</div>`;
+    document.getElementById(
+      "roomTypesList"
+    ).innerHTML =
+      `<div class="empty">
+        ${esc(error.message)}
+      </div>`;
 
     return;
   }
 
-  roomTypes = data || [];
+
+  roomTypes =
+    data || [];
 
   renderRoomTypes();
 
@@ -1911,23 +2336,30 @@ function renderRoomTypes(){
 
   if(!roomTypes.length){
 
-    document.getElementById("roomTypesList")
-      .innerHTML =
-      `<div class="empty">No room types found.</div>`;
+    document.getElementById(
+      "roomTypesList"
+    ).innerHTML =
+      `<div class="empty">
+        No room types found.
+      </div>`;
 
     return;
   }
 
+
   let html =
     `<div class="grid-3">`;
 
+
   roomTypes.forEach(r=>{
 
-    let image =
+    const image =
       r.image_url ||
       "images/room.jpg";
 
+
     html += `
+
       <div class="room-card">
 
         <img
@@ -1940,41 +2372,70 @@ function renderRoomTypes(){
 
           <h3>${esc(r.name)}</h3>
 
-          <p>${esc(
-            r.short_description ||
-            r.description ||
-            "No description"
-          )}</p>
-
           <p>
-            <strong>${money(r.price_per_night)}</strong>
+            ${esc(
+              r.short_description ||
+              r.description ||
+              "No description"
+            )}
           </p>
 
           <p>
-            Up to ${esc(r.max_guests)} guest(s)
+            <strong>
+              ${money(r.price_per_night)}
+            </strong>
           </p>
 
           <p>
-            ${badge(r.is_active ? "active" : "inactive")}
+            Up to
+            ${esc(r.max_guests)}
+            guest(s)
           </p>
 
-          <div class="actions" style="margin-top:12px">
+          <p>
+            ${badge(
+              r.is_active
+              ? "active"
+              : "inactive"
+            )}
+          </p>
+
+          <div
+            class="actions"
+            style="margin-top:12px">
 
             <button
               class="btn btn-light"
-              onclick="openRoomTypeModal('${r.id}')">
+              onclick="
+                openRoomTypeModal('${r.id}')
+              ">
               Edit
             </button>
 
             <button
-              class="btn ${r.is_active ? "btn-danger" : "btn-success"}"
-              onclick="toggleRoomType('${r.id}',${!r.is_active})">
-              ${r.is_active ? "Deactivate" : "Activate"}
+              class="btn ${
+                r.is_active
+                ? "btn-danger"
+                : "btn-success"
+              }"
+              onclick="
+                toggleRoomType(
+                  '${r.id}',
+                  ${!r.is_active}
+                )
+              ">
+              ${
+                r.is_active
+                ? "Deactivate"
+                : "Activate"
+              }
             </button>
 
             <button
               class="btn btn-danger"
-              onclick="deleteRoomType('${r.id}')">
+              onclick="
+                deleteRoomType('${r.id}')
+              ">
               Delete
             </button>
 
@@ -1984,12 +2445,16 @@ function renderRoomTypes(){
 
       </div>
     `;
+
   });
+
 
   html += `</div>`;
 
-  document.getElementById("roomTypesList")
-    .innerHTML = html;
+
+  document.getElementById(
+    "roomTypesList"
+  ).innerHTML = html;
 }
 
 
@@ -1997,11 +2462,17 @@ function openRoomTypeModal(id=null){
 
   const r =
     id
-    ? roomTypes.find(x=>x.id===id)
+    ? roomTypes.find(
+        x=>x.id===id
+      )
     : null;
 
+
   openModal(
-    id ? "Edit Room Type" : "Add Room Type",
+    id
+    ? "Edit Room Type"
+    : "Add Room Type",
+
     `
 
       <form id="roomTypeForm">
@@ -2039,7 +2510,9 @@ function openRoomTypeModal(id=null){
               type="number"
               min="0"
               step="0.01"
-              value="${esc(r?.price_per_night ?? 0)}"
+              value="${esc(
+                r?.price_per_night ?? 0
+              )}"
             >
           </div>
 
@@ -2049,7 +2522,9 @@ function openRoomTypeModal(id=null){
               id="rtGuests"
               type="number"
               min="1"
-              value="${esc(r?.max_guests ?? 2)}"
+              value="${esc(
+                r?.max_guests ?? 2
+              )}"
             >
           </div>
 
@@ -2057,7 +2532,9 @@ function openRoomTypeModal(id=null){
             <label>Bed type</label>
             <input
               id="rtBed"
-              value="${esc(r?.bed_type || "")}"
+              value="${esc(
+                r?.bed_type || ""
+              )}"
             >
           </div>
 
@@ -2065,7 +2542,9 @@ function openRoomTypeModal(id=null){
             <label>Room size</label>
             <input
               id="rtSize"
-              value="${esc(r?.room_size || "")}"
+              value="${esc(
+                r?.room_size || ""
+              )}"
             >
           </div>
 
@@ -2073,7 +2552,9 @@ function openRoomTypeModal(id=null){
             <label>View type</label>
             <input
               id="rtView"
-              value="${esc(r?.view_type || "")}"
+              value="${esc(
+                r?.view_type || ""
+              )}"
             >
           </div>
 
@@ -2081,1436 +2562,1964 @@ function openRoomTypeModal(id=null){
             <label>Image URL</label>
             <input
               id="rtImage"
-              value="${esc(r?.image_url || "")}"
+              value="${esc(
+                r?.image_url || ""
+              )}"
               placeholder="images/room.jpg"
             >
           </div>
 
           <div class="field full-field">
             <label>Short description</label>
-            <textarea id="rtShort">${esc(r?.short_description || "")}</textarea>
-          </div>
+            <textarea id="rtShort">${esc(
+              r?.short_description || ""
+            )}</textarea>      </div>
 
-          <div class="field full-field">
-            <label>Description</label>
-            <textarea id="rtDescription">${esc(r?.description || "")}</textarea>
-          </div>
+      <div class="field full-field">
+        <label>Description</label>
+        <textarea id="rtDescription">${esc(
+          r?.description || ""
+        )}</textarea>
+      </div>
 
-          <div class="field full-field">
-            <label>Amenities JSON</label>
-            <textarea id="rtAmenities">${esc(
-              jsonPretty(r?.amenities || [])
-            )}</textarea>
-          </div>
+      <div class="field full-field">
+        <label>Amenities JSON</label>
+        <textarea id="rtAmenities">${esc(
+          jsonPretty(
+            r?.amenities || []
+          )
+        )}</textarea>
+      </div>
 
-          <div class="field full-field">
-            <label>Gallery JSON</label>
-            <textarea id="rtGallery">${esc(
-              jsonPretty(r?.gallery || [])
-            )}</textarea>
-          </div>
+      <div class="field full-field">
+        <label>Gallery JSON</label>
+        <textarea id="rtGallery">${esc(
+          jsonPretty(
+            r?.gallery || []
+          )
+        )}</textarea>
+      </div>
 
-        </div>
+    </div>
 
-        <button class="btn btn-accent" type="submit">
-          Save Room Type
-        </button>
+    <button
+      class="btn btn-accent"
+      type="submit">
+      Save Room Type
+    </button>
 
-      </form>
+  </form>
+`
 
-    `
-  );
+);
 
-  document.getElementById("roomTypeForm")
-    .addEventListener("submit",saveRoomType);
+document.getElementById(
+"roomTypeForm"
+)
+.addEventListener(
+"submit",
+saveRoomType
+);
 }
-
 
 async function saveRoomType(e){
 
-  e.preventDefault();
+e.preventDefault();
 
-  let amenities;
-  let gallery;
+let amenities;
+let gallery;
 
-  try{
+try{
 
-    amenities =
-      JSON.parse(
-        document.getElementById("rtAmenities").value || "[]"
-      );
+amenities =
+  JSON.parse(
+    document.getElementById(
+      "rtAmenities"
+    ).value || "[]"
+  );
 
-    gallery =
-      JSON.parse(
-        document.getElementById("rtGallery").value || "[]"
-      );
+gallery =
+  JSON.parse(
+    document.getElementById(
+      "rtGallery"
+    ).value || "[]"
+  );
 
-  }catch{
+}catch{
 
-    toast("Amenities and gallery must contain valid JSON.");
+toast(
+  "Amenities and gallery must contain valid JSON."
+);
 
-    return;
-  }
+return;
 
-  const id =
-    document.getElementById("rtId").value;
-
-  const payload = {
-
-    name:
-      document.getElementById("rtName").value.trim(),
-
-    slug:
-      document.getElementById("rtSlug").value.trim(),
-
-    price_per_night:
-      Number(document.getElementById("rtPrice").value || 0),
-
-    max_guests:
-      Number(document.getElementById("rtGuests").value || 2),
-
-    bed_type:
-      document.getElementById("rtBed").value.trim() || null,
-
-    room_size:
-      document.getElementById("rtSize").value.trim() || null,
-
-    view_type:
-      document.getElementById("rtView").value.trim() || null,
-
-    image_url:
-      document.getElementById("rtImage").value.trim() || null,
-
-    short_description:
-      document.getElementById("rtShort").value.trim() || null,
-
-    description:
-      document.getElementById("rtDescription").value.trim() || null,
-
-    amenities,
-
-    gallery,
-
-    updated_at:
-      new Date().toISOString()
-
-  };
-
-  let error;
-
-  if(id){
-
-    ({
-      error
-    } =
-      await supabaseClient
-        .from("room_types")
-        .update(payload)
-        .eq("id",id));
-
-  }else{
-
-    ({
-      error
-    } =
-      await supabaseClient
-        .from("room_types")
-        .insert(payload));
-
-  }
-
-  if(error){
-
-    toast("Could not save room type: " + error.message);
-
-    return;
-  }
-
-  closeModal();
-
-  toast("Room type saved.");
-
-  await loadRoomTypes();
 }
 
+const id =
+document.getElementById(
+"rtId"
+).value;
+
+const payload = {
+
+name:
+  document.getElementById(
+    "rtName"
+  ).value.trim(),
+
+slug:
+  document.getElementById(
+    "rtSlug"
+  ).value.trim(),
+
+price_per_night:
+  Number(
+    document.getElementById(
+      "rtPrice"
+    ).value || 0
+  ),
+
+max_guests:
+  Number(
+    document.getElementById(
+      "rtGuests"
+    ).value || 2
+  ),
+
+bed_type:
+  document.getElementById(
+    "rtBed"
+  ).value.trim() || null,
+
+room_size:
+  document.getElementById(
+    "rtSize"
+  ).value.trim() || null,
+
+view_type:
+  document.getElementById(
+    "rtView"
+  ).value.trim() || null,
+
+image_url:
+  document.getElementById(
+    "rtImage"
+  ).value.trim() || null,
+
+short_description:
+  document.getElementById(
+    "rtShort"
+  ).value.trim() || null,
+
+description:
+  document.getElementById(
+    "rtDescription"
+  ).value.trim() || null,
+
+amenities,
+
+gallery,
+
+updated_at:
+  new Date().toISOString()
+
+};
+
+let error;
+
+if(id){
+
+({
+  error
+} =
+  await supabaseClient
+    .from("room_types")
+    .update(payload)
+    .eq("id",id));
+
+}else{
+
+({
+  error
+} =
+  await supabaseClient
+    .from("room_types")
+    .insert(payload));
+
+}
+
+if(error){
+
+toast(
+  "Could not save room type: " +
+  error.message
+);
+
+return;
+
+}
+
+closeModal();
+
+toast(
+"Room type saved."
+);
+
+await loadRoomTypes();
+}
 
 async function toggleRoomType(id,value){
 
-  const {
-    error
-  } = await supabaseClient
-    .from("room_types")
-    .update({
-      is_active:value,
-      updated_at:new Date().toISOString()
-    })
-    .eq("id",id);
+const {
+error
+} =
+await supabaseClient
+.from("room_types")
+.update({
+is_active:value,
+updated_at:
+new Date().toISOString()
+})
+.eq("id",id);
 
-  if(error){
+if(error){
 
-    toast(error.message);
+toast(error.message);
 
-    return;
-  }
+return;
 
-  await loadRoomTypes();
-
-  toast("Room type updated.");
 }
 
+await loadRoomTypes();
+
+toast(
+"Room type updated."
+);
+}
 
 async function deleteRoomType(id){
 
-  const r =
-    roomTypes.find(x=>x.id===id);
+const r =
+roomTypes.find(
+x=>x.id===id
+);
 
-  if(!r) return;
+if(!r) return;
 
-  if(!confirm(
-    `Delete "${r.name}"?\n\nThis can fail if rooms are still assigned to this room type.`
-  )){
-    return;
-  }
-
-  const {
-    error
-  } = await supabaseClient
-    .from("room_types")
-    .delete()
-    .eq("id",id);
-
-  if(error){
-
-    toast("Delete failed: " + error.message);
-
-    return;
-  }
-
-  toast("Room type deleted.");
-
-  await loadRoomTypes();
+if(!confirm(
+"Delete "${r.name}"?\n\n" +
+"This can fail if rooms are still " +
+"assigned to this room type."
+)){
+return;
 }
 
+const {
+error
+} =
+await supabaseClient
+.from("room_types")
+.delete()
+.eq("id",id);
+
+if(error){
+
+toast(
+  "Delete failed: " +
+  error.message
+);
+
+return;
+
+}
+
+toast(
+"Room type deleted."
+);
+
+await loadRoomTypes();
+}
 
 /* =========================================================
-   ROOMS
-   ========================================================= */
+ROOMS
+========================================================= */
 
 async function loadRooms(){
 
-  const {
-    data,
-    error
-  } = await supabaseClient
-    .from("rooms")
-    .select(`
-      *,
-      room_types(name)
-    `)
-    .order("room_number",{ascending:true});
+const {
+data,
+error
+} =
+await supabaseClient
+.from("rooms")
+.select("*, room_types(name)")
+.order(
+"room_number",
+{ascending:true}
+);
 
-  if(error){
+if(error){
 
-    document.getElementById("roomsList")
-      .innerHTML =
-      `<div class="empty">${esc(error.message)}</div>`;
+document.getElementById(
+  "roomsList"
+).innerHTML =
+  `<div class="empty">
+    ${esc(error.message)}
+  </div>`;
 
-    return;
-  }
+return;
 
-  rooms = data || [];
-
-  renderRooms();
-
-  updateDashboard();
 }
 
+rooms =
+data || [];
+
+renderRooms();
+
+updateDashboard();
+}
 
 function renderRooms(){
 
-  const filter =
-    document.getElementById("roomStatusFilter")
-      ?.value || "";
+const filter =
+document.getElementById(
+"roomStatusFilter"
+)?.value || "";
 
-  const list =
-    rooms.filter(r=>
-      !filter ||
-      r.status === filter
-    );
+const list =
+rooms.filter(
+r=>
+!filter ||
+r.status === filter
+);
 
-  if(!list.length){
+if(!list.length){
 
-    document.getElementById("roomsList")
-      .innerHTML =
-      `<div class="empty">No rooms found.</div>`;
+document.getElementById(
+  "roomsList"
+).innerHTML =
+  `<div class="empty">
+    No rooms found.
+  </div>`;
 
-    return;
-  }
+return;
 
-  let html = `
-    <div class="table-wrap">
-    <table>
-
-      <thead>
-        <tr>
-          <th>Room</th>
-          <th>Room Type</th>
-          <th>Floor</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-
-      <tbody>
-  `;
-
-  list.forEach(r=>{
-
-    html += `
-      <tr>
-
-        <td>
-          <strong>Room ${esc(r.room_number)}</strong>
-        </td>
-
-        <td>
-          ${esc(r.room_types?.name || "—")}
-        </td>
-
-        <td>
-          ${esc(r.floor || "—")}
-        </td>
-
-        <td>
-          ${badge(r.status)}
-        </td>
-
-        <td>
-
-          <div class="actions">
-
-            <button
-              class="btn btn-light"
-              onclick="openRoomModal('${r.id}')">
-              Edit
-            </button>
-
-            <button
-              class="btn btn-danger"
-              onclick="deleteRoom('${r.id}')">
-              Delete
-            </button>
-
-          </div>
-
-        </td>
-
-      </tr>
-    `;
-  });
-
-  html += `
-      </tbody>
-    </table>
-    </div>
-  `;
-
-  document.getElementById("roomsList")
-    .innerHTML = html;
 }
 
+let html = `
+<div class="table-wrap">
+<table>
+
+  <thead>
+    <tr>
+      <th>Room</th>
+      <th>Room Type</th>
+      <th>Floor</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+`;
+
+list.forEach(r=>{
+
+html += `
+
+  <tr>
+
+    <td>
+      <strong>
+        Room ${esc(r.room_number)}
+      </strong>
+    </td>
+
+    <td>
+      ${esc(
+        r.room_types?.name || "—"
+      )}
+    </td>
+
+    <td>
+      ${esc(r.floor || "—")}
+    </td>
+
+    <td>
+      ${badge(r.status)}
+    </td>
+
+    <td>
+
+      <div class="actions">
+
+        <button
+          class="btn btn-light"
+          onclick="
+            openRoomModal('${r.id}')
+          ">
+          Edit
+        </button>
+
+        <button
+          class="btn btn-danger"
+          onclick="
+            deleteRoom('${r.id}')
+          ">
+          Delete
+        </button>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+`;
+
+});
+
+html += "</tbody> </table> </div>";
+
+document.getElementById(
+"roomsList"
+).innerHTML = html;
+}
 
 function openRoomModal(id=null){
 
-  const r =
-    id
-    ? rooms.find(x=>x.id===id)
-    : null;
+const r =
+id
+? rooms.find(
+x=>x.id===id
+)
+: null;
 
-  const options =
-    roomTypes
-      .map(rt=>`
-        <option
-          value="${esc(rt.id)}"
-          ${r?.room_type_id===rt.id ? "selected":""}
-        >
-          ${esc(rt.name)}
+const options =
+roomTypes
+.map(
+rt=>`
+
+      <option
+        value="${esc(rt.id)}"
+        ${
+          r?.room_type_id === rt.id
+          ? "selected"
+          : ""
+        }
+      >
+        ${esc(rt.name)}
+      </option>
+
+    `
+  )
+  .join("");
+
+openModal(
+id
+? "Edit Room"
+: "Add Room",
+
+`
+
+  <form id="roomForm">
+
+    <input
+      type="hidden"
+      id="roomId"
+      value="${esc(r?.id || "")}"
+    >
+
+    <div class="field">
+
+      <label>Room type</label>
+
+      <select
+        id="roomTypeId"
+        required>
+
+        <option value="">
+          Select room type
         </option>
-      `)
-      .join("");
 
-  openModal(
-    id ? "Edit Room" : "Add Room",
-    `
+        ${options}
 
-      <form id="roomForm">
+      </select>
 
-        <input
-          type="hidden"
-          id="roomId"
-          value="${esc(r?.id || "")}"
-        >
+    </div>
 
-        <div class="field">
-          <label>Room type</label>
-          <select id="roomTypeId" required>
-            <option value="">Select room type</option>
-            ${options}
-          </select>
-        </div>
+    <div class="field">
 
-        <div class="field">
-          <label>Room number</label>
-          <input
-            id="roomNumber"
-            required
-            value="${esc(r?.room_number || "")}"
-          >
-        </div>
+      <label>Room number</label>
 
-        <div class="field">
-          <label>Floor</label>
-          <input
-            id="roomFloor"
-            value="${esc(r?.floor || "")}"
-          >
-        </div>
+      <input
+        id="roomNumber"
+        required
+        value="${esc(
+          r?.room_number || ""
+        )}"
+      >
 
-        <div class="field">
-          <label>Status</label>
-          <select id="roomStatus">
-            ${["available","occupied","maintenance","out_of_service"]
-              .map(s=>`
-                <option
-                  value="${s}"
-                  ${r?.status===s ? "selected":""}
-                >
-                  ${s.replaceAll("_"," ")}
-                </option>
-              `).join("")
-            }
-          </select>
-        </div>
+    </div>
 
-        <button class="btn btn-accent" type="submit">
-          Save Room
-        </button>
+    <div class="field">
 
-      </form>
+      <label>Floor</label>
 
-    `
-  );
+      <input
+        id="roomFloor"
+        value="${esc(
+          r?.floor || ""
+        )}"
+      >
 
-  document.getElementById("roomForm")
-    .addEventListener("submit",saveRoom);
+    </div>
+
+    <div class="field">
+
+      <label>Status</label>
+
+      <select id="roomStatus">
+
+        ${
+          [
+            "available",
+            "occupied",
+            "maintenance",
+            "out_of_service"
+          ]
+          .map(
+            s=>`
+
+              <option
+                value="${s}"
+                ${
+                  r?.status === s
+                  ? "selected"
+                  : ""
+                }
+              >
+                ${s.replaceAll(
+                  "_",
+                  " "
+                )}
+              </option>
+
+            `
+          )
+          .join("")
+        }
+
+      </select>
+
+    </div>
+
+    <button
+      class="btn btn-accent"
+      type="submit">
+      Save Room
+    </button>
+
+  </form>
+
+`
+
+);
+
+document.getElementById(
+"roomForm"
+)
+.addEventListener(
+"submit",
+saveRoom
+);
 }
-
 
 async function saveRoom(e){
 
-  e.preventDefault();
+e.preventDefault();
 
-  const id =
-    document.getElementById("roomId").value;
+const id =
+document.getElementById(
+"roomId"
+).value;
 
-  const payload = {
+const payload = {
 
-    room_type_id:
-      document.getElementById("roomTypeId").value,
+room_type_id:
+  document.getElementById(
+    "roomTypeId"
+  ).value,
 
-    room_number:
-      document.getElementById("roomNumber").value.trim(),
+room_number:
+  document.getElementById(
+    "roomNumber"
+  ).value.trim(),
 
-    floor:
-      document.getElementById("roomFloor").value.trim() || null,
+floor:
+  document.getElementById(
+    "roomFloor"
+  ).value.trim() || null,
 
-    status:
-      document.getElementById("roomStatus").value,
+status:
+  document.getElementById(
+    "roomStatus"
+  ).value,
 
-    updated_at:
-      new Date().toISOString()
+updated_at:
+  new Date().toISOString()
 
-  };
+};
 
-  let error;
+let error;
 
-  if(id){
+if(id){
 
-    ({
-      error
-    } =
-      await supabaseClient
-        .from("rooms")
-        .update(payload)
-        .eq("id",id));
+({
+  error
+} =
+  await supabaseClient
+    .from("rooms")
+    .update(payload)
+    .eq("id",id));
 
-  }else{
+}else{
 
-    ({
-      error
-    } =
-      await supabaseClient
-        .from("rooms")
-        .insert(payload));
+({
+  error
+} =
+  await supabaseClient
+    .from("rooms")
+    .insert(payload));
 
-  }
-
-  if(error){
-
-    toast("Could not save room: " + error.message);
-
-    return;
-  }
-
-  closeModal();
-
-  toast("Room saved.");
-
-  await loadRooms();
 }
 
+if(error){
+
+toast(
+  "Could not save room: " +
+  error.message
+);
+
+return;
+
+}
+
+closeModal();
+
+toast(
+"Room saved."
+);
+
+await loadRooms();
+}
 
 async function deleteRoom(id){
 
-  if(!confirm("Delete this room?")){
-    return;
-  }
-
-  const {
-    error
-  } = await supabaseClient
-    .from("rooms")
-    .delete()
-    .eq("id",id);
-
-  if(error){
-
-    toast("Delete failed: " + error.message);
-
-    return;
-  }
-
-  toast("Room deleted.");
-
-  await loadRooms();
+if(!confirm(
+"Delete this room?"
+)){
+return;
 }
 
+const {
+error
+} =
+await supabaseClient
+.from("rooms")
+.delete()
+.eq("id",id);
+
+if(error){
+
+toast(
+  "Delete failed: " +
+  error.message
+);
+
+return;
+
+}
+
+toast(
+"Room deleted."
+);
+
+await loadRooms();
+}
 
 /* =========================================================
-   HOTEL REQUESTS
-   ========================================================= */
+HOTEL REQUESTS
+========================================================= */
 
 async function loadRequests(){
 
-  const {
-    data,
-    error
-  } = await supabaseClient
-    .from("hotel_requests")
-    .select("*")
-    .order("created_at",{ascending:false});
+const {
+data,
+error
+} =
+await supabaseClient
+.from("hotel_requests")
+.select("*")
+.order(
+"created_at",
+{ascending:false}
+);
 
-  if(error){
+if(error){
 
-    document.getElementById("requestsList")
-      .innerHTML =
-      `<div class="empty">${esc(error.message)}</div>`;
+document.getElementById(
+  "requestsList"
+).innerHTML =
+  `<div class="empty">
+    ${esc(error.message)}
+  </div>`;
 
-    return;
-  }
+return;
 
-  requests = data || [];
-
-  renderRequests();
-
-  updateDashboard();
 }
 
+requests =
+data || [];
+
+renderRequests();
+
+updateDashboard();
+}
 
 function renderRequests(){
 
-  const search =
-    document.getElementById("requestSearch")
-      ?.value
-      .trim()
-      .toLowerCase() || "";
+const search =
+document.getElementById(
+"requestSearch"
+)?.value
+.trim()
+.toLowerCase() || "";
 
-  const status =
-    document.getElementById("requestStatus")
-      ?.value || "";
+const status =
+document.getElementById(
+"requestStatus"
+)?.value || "";
 
-  const list =
-    requests.filter(r=>{
+const list =
+requests.filter(r=>{
 
-      const text = [
-        r.request_type,
-        r.first_name,
-        r.last_name,
-        r.email,
-        r.phone,
-        r.subject,
-        r.message
-      ]
-      .join(" ")
-      .toLowerCase();
+  const text = [
+    r.request_type,
+    r.first_name,
+    r.last_name,
+    r.email,
+    r.phone,
+    r.subject,
+    r.message
+  ]
+  .join(" ")
+  .toLowerCase();
 
-      return (
-        (!search || text.includes(search)) &&
-        (!status || r.status===status)
-      );
-    });
 
-  if(!list.length){
+  return(
+    (!search ||
+      text.includes(search)) &&
+    (!status ||
+      r.status === status)
+  );
 
-    document.getElementById("requestsList")
-      .innerHTML =
-      `<div class="empty">No hotel requests found.</div>`;
+});
 
-    return;
-  }
+if(!list.length){
 
-  let html = `
-    <div class="table-wrap">
-    <table>
+document.getElementById(
+  "requestsList"
+).innerHTML =
+  `<div class="empty">
+    No hotel requests found.
+  </div>`;
 
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Guest</th>
-          <th>Request</th>
-          <th>Requested Date</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
+return;
 
-      <tbody>
-  `;
-
-  list.forEach(r=>{
-
-    html += `
-      <tr>
-
-        <td>
-          ${dateFormat(r.created_at)}
-        </td>
-
-        <td>
-          <strong>
-            ${esc(
-              `${r.first_name || ""} ${r.last_name || ""}`
-            )}
-          </strong>
-          <br>
-          <small>${esc(r.email || r.phone || "—")}</small>
-        </td>
-
-        <td>
-          <strong>${esc(r.request_type)}</strong>
-          <br>
-          <small>${esc(r.subject || "")}</small>
-        </td>
-
-        <td>
-          ${dateFormat(r.requested_date)}
-          ${r.requested_time
-            ? `<br><small>${esc(r.requested_time)}</small>`
-            : ""}
-        </td>
-
-        <td>
-          ${badge(r.status)}
-        </td>
-
-        <td>
-
-          <div class="actions">
-
-            <button
-              class="btn btn-light"
-              onclick="viewRequest('${r.id}')">
-              View
-            </button>
-
-            <button
-              class="btn btn-accent"
-              onclick="editRequest('${r.id}')">
-              Update
-            </button>
-
-            <button
-              class="btn btn-danger"
-              onclick="deleteRequest('${r.id}')">
-              Delete
-            </button>
-
-          </div>
-
-        </td>
-
-      </tr>
-    `;
-  });
-
-  html += `
-      </tbody>
-    </table>
-    </div>
-  `;
-
-  document.getElementById("requestsList")
-    .innerHTML = html;
 }
 
+let html = `
+<div class="table-wrap">
+<table>
+
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Guest</th>
+      <th>Request</th>
+      <th>Requested Date</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+`;
+
+list.forEach(r=>{
+
+html += `
+
+  <tr>
+
+    <td>
+      ${dateFormat(r.created_at)}
+    </td>
+
+    <td>
+
+      <strong>
+        ${esc(
+          `${r.first_name || ""}
+           ${r.last_name || ""}`
+        )}
+      </strong>
+
+      <br>
+
+      <small>
+        ${esc(
+          r.email ||
+          r.phone ||
+          "—"
+        )}
+      </small>
+
+    </td>
+
+    <td>
+
+      <strong>
+        ${esc(r.request_type)}
+      </strong>
+
+      <br>
+
+      <small>
+        ${esc(r.subject || "")}
+      </small>
+
+    </td>
+
+    <td>
+
+      ${dateFormat(
+        r.requested_date
+      )}
+
+      ${
+        r.requested_time
+        ? `
+          <br>
+          <small>
+            ${esc(
+              r.requested_time
+            )}
+          </small>
+        `
+        : ""
+      }
+
+    </td>
+
+    <td>
+      ${badge(r.status)}
+    </td>
+
+    <td>
+
+      <div class="actions">
+
+        <button
+          class="btn btn-light"
+          onclick="
+            viewRequest('${r.id}')
+          ">
+          View
+        </button>
+
+        <button
+          class="btn btn-accent"
+          onclick="
+            editRequest('${r.id}')
+          ">
+          Update
+        </button>
+
+        <button
+          class="btn btn-danger"
+          onclick="
+            deleteRequest('${r.id}')
+          ">
+          Delete
+        </button>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+`;
+
+});
+
+html += "</tbody> </table> </div>";
+
+document.getElementById(
+"requestsList"
+).innerHTML = html;
+}
 
 function viewRequest(id){
 
-  const r =
-    requests.find(x=>x.id===id);
+const r =
+requests.find(
+x=>x.id===id
+);
 
-  if(!r) return;
+if(!r) return;
 
-  openModal(
-    "Hotel Request",
-    `
+openModal(
+"Hotel Request",
 
-      <div class="detail-grid">
+`
 
-        <div class="detail">
-          <small>Request type</small>
-          <strong>${esc(r.request_type)}</strong>
-        </div>
+  <div class="detail-grid">
 
-        <div class="detail">
-          <small>Status</small>
-          <strong>${badge(r.status)}</strong>
-        </div>
+    <div class="detail">
+      <small>Request type</small>
+      <strong>
+        ${esc(r.request_type)}
+      </strong>
+    </div>
 
-        <div class="detail">
-          <small>Guest</small>
-          <strong>
-            ${esc(
-              `${r.first_name || ""} ${r.last_name || ""}`
-            )}
-          </strong>
-        </div>
+    <div class="detail">
+      <small>Status</small>
+      <strong>
+        ${badge(r.status)}
+      </strong>
+    </div>
 
-        <div class="detail">
-          <small>Email</small>
-          <strong>${esc(r.email || "—")}</strong>
-        </div>
+    <div class="detail">
+      <small>Guest</small>
+      <strong>
+        ${esc(
+          `${r.first_name || ""}
+           ${r.last_name || ""}`
+        )}
+      </strong>
+    </div>
 
-        <div class="detail">
-          <small>Phone</small>
-          <strong>${esc(r.phone || "—")}</strong>
-        </div>
+    <div class="detail">
+      <small>Email</small>
+      <strong>
+        ${esc(r.email || "—")}
+      </strong>
+    </div>
 
-        <div class="detail">
-          <small>Guests</small>
-          <strong>${esc(r.guests || "—")}</strong>
-        </div>
+    <div class="detail">
+      <small>Phone</small>
+      <strong>
+        ${esc(r.phone || "—")}
+      </strong>
+    </div>
 
-        <div class="detail">
-          <small>Requested date</small>
-          <strong>${dateFormat(r.requested_date)}</strong>
-        </div>
+    <div class="detail">
+      <small>Guests</small>
+      <strong>
+        ${esc(r.guests || "—")}
+      </strong>
+    </div>
 
-        <div class="detail">
-          <small>Requested time</small>
-          <strong>${esc(r.requested_time || "—")}</strong>
-        </div>
+    <div class="detail">
+      <small>Requested date</small>
+      <strong>
+        ${dateFormat(
+          r.requested_date
+        )}
+      </strong>
+    </div>
 
-      </div>
+    <div class="detail">
+      <small>Requested time</small>
+      <strong>
+        ${esc(
+          r.requested_time || "—"
+        )}
+      </strong>
+    </div>
 
-      <div style="margin-top:15px" class="detail">
-        <small>Subject</small>
-        <strong>${esc(r.subject || "—")}</strong>
-      </div>
+  </div>
 
-      <div style="margin-top:12px" class="detail">
-        <small>Message</small>
-        <strong>${esc(r.message || "—")}</strong>
-      </div>
+  <div
+    style="margin-top:15px"
+    class="detail">
 
-      <div style="margin-top:12px" class="detail">
-        <small>Admin notes</small>
-        <strong>${esc(r.admin_notes || "—")}</strong>
-      </div>
+    <small>Subject</small>
 
-    `
-  );
+    <strong>
+      ${esc(
+        r.subject || "—"
+      )}
+    </strong>
+
+  </div>
+
+  <div
+    style="margin-top:12px"
+    class="detail">
+
+    <small>Message</small>
+
+    <strong>
+      ${esc(
+        r.message || "—"
+      )}
+    </strong>
+
+  </div>
+
+  <div
+    style="margin-top:12px"
+    class="detail">
+
+    <small>Admin notes</small>
+
+    <strong>
+      ${esc(
+        r.admin_notes || "—"
+      )}
+    </strong>
+
+  </div>
+
+`
+
+);
 }
-
 
 function editRequest(id){
 
-  const r =
-    requests.find(x=>x.id===id);
+const r =
+requests.find(
+x=>x.id===id
+);
 
-  if(!r) return;
+if(!r) return;
 
-  openModal(
-    "Update Hotel Request",
-    `
+openModal(
+"Update Hotel Request",
 
-      <form id="requestForm">
+`
 
-        <div class="field">
-          <label>Status</label>
+  <form id="requestForm">
 
-          <select id="reqStatus">
+    <div class="field">
 
-            ${[
-              "new",
-              "in_progress",
-              "resolved",
-              "cancelled"
-            ].map(s=>`
+      <label>Status</label>
+
+      <select id="reqStatus">
+
+        ${
+          [
+            "new",
+            "in_progress",
+            "resolved",
+            "cancelled"
+          ]
+          .map(
+            s=>`
+
               <option
                 value="${s}"
-                ${r.status===s ? "selected":""}
+                ${
+                  r.status === s
+                  ? "selected"
+                  : ""
+                }
               >
-                ${s.replaceAll("_"," ")}
+                ${s.replaceAll(
+                  "_",
+                  " "
+                )}
               </option>
-            `).join("")}
 
-          </select>
-        </div>
+            `
+          )
+          .join("")
+        }
 
-        <div class="field">
-          <label>Admin notes</label>
+      </select>
 
-          <textarea id="reqNotes">${esc(
-            r.admin_notes || ""
-          )}</textarea>
-        </div>
+    </div>
 
-        <button class="btn btn-accent">
-          Save
-        </button>
+    <div class="field">
 
-      </form>
+      <label>Admin notes</label>
 
-    `
+      <textarea id="reqNotes">${esc(
+        r.admin_notes || ""
+      )}</textarea>
+
+    </div>
+
+    <button
+      class="btn btn-accent"
+      type="submit">
+      Save
+    </button>
+
+  </form>
+
+`
+
+);
+
+document.getElementById(
+"requestForm"
+)
+.addEventListener(
+"submit",
+async e=>{
+
+  e.preventDefault();
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("hotel_requests")
+      .update({
+
+        status:
+          document.getElementById(
+            "reqStatus"
+          ).value,
+
+        admin_notes:
+          document.getElementById(
+            "reqNotes"
+          ).value.trim() ||
+          null,
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq("id",id);
+
+
+  if(error){
+
+    toast(
+      error.message
+    );
+
+    return;
+  }
+
+
+  closeModal();
+
+  toast(
+    "Request updated."
   );
 
-  document.getElementById("requestForm")
-    .addEventListener("submit",async e=>{
+  await loadRequests();
 
-      e.preventDefault();
-
-      const {
-        error
-      } = await supabaseClient
-        .from("hotel_requests")
-        .update({
-          status:
-            document.getElementById("reqStatus").value,
-
-          admin_notes:
-            document.getElementById("reqNotes").value.trim() || null,
-
-          updated_at:
-            new Date().toISOString()
-        })
-        .eq("id",id);
-
-      if(error){
-
-        toast(error.message);
-
-        return;
-      }
-
-      closeModal();
-
-      toast("Request updated.");
-
-      await loadRequests();
-
-    });
 }
 
+);
+}
 
 async function deleteRequest(id){
 
-  if(!confirm("Delete this hotel request?")){
-    return;
-  }
-
-  const {
-    error
-  } = await supabaseClient
-    .from("hotel_requests")
-    .delete()
-    .eq("id",id);
-
-  if(error){
-
-    toast(error.message);
-
-    return;
-  }
-
-  toast("Request deleted.");
-
-  await loadRequests();
+if(!confirm(
+"Delete this hotel request?"
+)){
+return;
 }
 
+const {
+error
+} =
+await supabaseClient
+.from("hotel_requests")
+.delete()
+.eq("id",id);
+
+if(error){
+
+toast(
+  error.message
+);
+
+return;
+
+}
+
+toast(
+"Request deleted."
+);
+
+await loadRequests();
+}
 
 /* =========================================================
-   REVIEWS
-   ========================================================= */
+REVIEWS
+========================================================= */
 
 async function loadReviews(){
 
-  const {
-    data,
-    error
-  } = await supabaseClient
-    .from("reviews")
-    .select("*")
-    .order("created_at",{ascending:false});
+const {
+data,
+error
+} =
+await supabaseClient
+.from("reviews")
+.select("*")
+.order(
+"created_at",
+{ascending:false}
+);
 
-  if(error){
+if(error){
 
-    document.getElementById("reviewsList")
-      .innerHTML =
-      `<div class="empty">${esc(error.message)}</div>`;
+document.getElementById(
+  "reviewsList"
+).innerHTML =
+  `<div class="empty">
+    ${esc(error.message)}
+  </div>`;
 
-    return;
-  }
+return;
 
-  reviews = data || [];
-
-  renderReviews();
-
-  updateDashboard();
 }
 
+reviews =
+data || [];
+
+renderReviews();
+
+updateDashboard();
+}
 
 function renderReviews(){
 
-  const published =
-    document.getElementById("reviewPublished")
-      ?.value || "";
+const published =
+document.getElementById(
+"reviewPublished"
+)?.value || "";
 
-  const featured =
-    document.getElementById("reviewFeatured")
-      ?.value || "";
+const featured =
+document.getElementById(
+"reviewFeatured"
+)?.value || "";
 
-  const list =
-    reviews.filter(r=>{
+const list =
+reviews.filter(r=>{
 
-      return (
-        (!published ||
-          (published==="published"
-            ? r.is_published
-            : !r.is_published
-          )
-        ) &&
-        (!featured ||
-          (featured==="featured"
-            ? r.is_featured
-            : !r.is_featured
-          )
-        )
-      );
+  return(
 
-    });
+    (
+      !published ||
+      (
+        published === "published"
+        ? r.is_published
+        : !r.is_published
+      )
+    )
 
-  if(!list.length){
+    &&
 
-    document.getElementById("reviewsList")
-      .innerHTML =
-      `<div class="empty">No reviews found.</div>`;
+    (
+      !featured ||
+      (
+        featured === "featured"
+        ? r.is_featured
+        : !r.is_featured
+      )
+    )
 
-    return;
-  }
+  );
 
-  let html =
-    `<div style="display:grid;gap:14px">`;
+});
 
-  list.forEach(r=>{
+if(!list.length){
 
-    html += `
-      <div class="review-box">
+document.getElementById(
+  "reviewsList"
+).innerHTML =
+  `<div class="empty">
+    No reviews found.
+  </div>`;
 
-        <div style="display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap">
+return;
 
-          <div>
+}
 
-            <strong>${esc(r.guest_name)}</strong>
+let html =
+"<div style="display:grid;gap:14px">";
 
-            ${
-              r.guest_location
-              ? `<small style="color:#718096">
-                   — ${esc(r.guest_location)}
-                 </small>`
-              : ""
-            }
+list.forEach(r=>{
 
-            <div class="stars">
-              ${"★".repeat(Math.max(0,Math.min(5,r.rating)))}
-              ${"☆".repeat(Math.max(0,5-r.rating))}
-            </div>
+const rating =
+  Math.max(
+    0,
+    Math.min(
+      5,
+      Number(r.rating || 0)
+    )
+  );
 
-          </div>
 
-          <div class="actions">
+html += `
 
-            ${badge(r.is_published ? "published":"unpublished")}
+  <div class="review-box">
 
-            ${r.is_featured ? badge("featured") : ""}
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        gap:15px;
+        flex-wrap:wrap;
+      ">
 
-          </div>
+      <div>
 
-        </div>
+        <strong>
+          ${esc(r.guest_name)}
+        </strong>
 
-        <p style="line-height:1.7">
-          ${esc(r.review_text)}
-        </p>
+        ${
+          r.guest_location
+          ? `
+            <small
+              style="color:#718096">
+              —
+              ${esc(
+                r.guest_location
+              )}
+            </small>
+          `
+          : ""
+        }
 
-        <small style="color:#718096">
-          Stay:
-          ${dateFormat(r.stay_date)}
-          · Added:
-          ${dateFormat(r.created_at)}
-        </small>
+        <div class="stars">
 
-        <div class="actions" style="margin-top:14px">
-
-          <button
-            class="btn ${r.is_published ? "btn-danger":"btn-success"}"
-            onclick="toggleReviewPublished('${r.id}',${!r.is_published})">
-            ${r.is_published ? "Unpublish":"Publish"}
-          </button>
-
-          <button
-            class="btn ${r.is_featured ? "btn-danger":"btn-accent"}"
-            onclick="toggleReviewFeatured('${r.id}',${!r.is_featured})">
-            ${r.is_featured ? "Unfeature":"Feature"}
-          </button>
-
-          <button
-            class="btn btn-danger"
-            onclick="deleteReview('${r.id}')">
-            Delete
-          </button>
+          ${"★".repeat(rating)}
+          ${"☆".repeat(5-rating)}
 
         </div>
 
       </div>
-    `;
-  });
 
-  html += `</div>`;
+      <div class="actions">
 
-  document.getElementById("reviewsList")
-    .innerHTML = html;
+        ${
+          badge(
+            r.is_published
+            ? "published"
+            : "unpublished"
+          )
+        }
+
+        ${
+          r.is_featured
+          ? badge("featured")
+          : ""
+        }
+
+      </div>
+
+    </div>
+
+    <p style="line-height:1.7">
+
+      ${esc(r.review_text)}
+
+    </p>
+
+    <small
+      style="color:#718096">
+
+      Stay:
+      ${dateFormat(r.stay_date)}
+
+      · Added:
+      ${dateFormat(r.created_at)}
+
+    </small>
+
+    <div
+      class="actions"
+      style="margin-top:14px">
+
+      <button
+        class="btn ${
+          r.is_published
+          ? "btn-danger"
+          : "btn-success"
+        }"
+        onclick="
+          toggleReviewPublished(
+            '${r.id}',
+            ${!r.is_published}
+          )
+        ">
+
+        ${
+          r.is_published
+          ? "Unpublish"
+          : "Publish"
+        }
+
+      </button>
+
+      <button
+        class="btn ${
+          r.is_featured
+          ? "btn-danger"
+          : "btn-accent"
+        }"
+        onclick="
+          toggleReviewFeatured(
+            '${r.id}',
+            ${!r.is_featured}
+          )
+        ">
+
+        ${
+          r.is_featured
+          ? "Unfeature"
+          : "Feature"
+        }
+
+      </button>
+
+      <button
+        class="btn btn-danger"
+        onclick="
+          deleteReview('${r.id}')
+        ">
+        Delete
+      </button>
+
+    </div>
+
+  </div>
+
+`;
+
+});
+
+html += "</div>";
+
+document.getElementById(
+"reviewsList"
+).innerHTML = html;
 }
 
+async function toggleReviewPublished(
+id,
+value
+){
 
-async function toggleReviewPublished(id,value){
+const {
+error
+} =
+await supabaseClient
+.from("reviews")
+.update({
+is_published:value
+})
+.eq("id",id);
 
-  const {
-    error
-  } = await supabaseClient
-    .from("reviews")
-    .update({
-      is_published:value
-    })
-    .eq("id",id);
+if(error){
 
-  if(error){
+toast(
+  error.message
+);
 
-    toast(error.message);
+return;
 
-    return;
-  }
-
-  toast(
-    value
-    ? "Review published."
-    : "Review unpublished."
-  );
-
-  await loadReviews();
 }
 
+toast(
+value
+? "Review published."
+: "Review unpublished."
+);
 
-async function toggleReviewFeatured(id,value){
-
-  const {
-    error
-  } = await supabaseClient
-    .from("reviews")
-    .update({
-      is_featured:value
-    })
-    .eq("id",id);
-
-  if(error){
-
-    toast(error.message);
-
-    return;
-  }
-
-  toast("Review updated.");
-
-  await loadReviews();
+await loadReviews();
 }
 
+async function toggleReviewFeatured(
+id,
+value
+){
+
+const {
+error
+} =
+await supabaseClient
+.from("reviews")
+.update({
+is_featured:value
+})
+.eq("id",id);
+
+if(error){
+
+toast(
+  error.message
+);
+
+return;
+
+}
+
+toast(
+"Review updated."
+);
+
+await loadReviews();
+}
 
 async function deleteReview(id){
 
-  if(!confirm("Delete this review?")){
-    return;
-  }
-
-  const {
-    error
-  } = await supabaseClient
-    .from("reviews")
-    .delete()
-    .eq("id",id);
-
-  if(error){
-
-    toast(error.message);
-
-    return;
-  }
-
-  toast("Review deleted.");
-
-  await loadReviews();
+if(!confirm(
+"Delete this review?"
+)){
+return;
 }
 
+const {
+error
+} =
+await supabaseClient
+.from("reviews")
+.delete()
+.eq("id",id);
+
+if(error){
+
+toast(
+  error.message
+);
+
+return;
+
+}
+
+toast(
+"Review deleted."
+);
+
+await loadReviews();
+}
 
 /* =========================================================
-   SITE SETTINGS
-   ========================================================= */
+SITE SETTINGS
+========================================================= */
 
 async function loadSettings(){
 
-  const {
-    data,
-    error
-  } = await supabaseClient
-    .from("site_settings")
-    .select("*")
-    .order("setting_key",{ascending:true});
+const {
+data,
+error
+} =
+await supabaseClient
+.from("site_settings")
+.select("*")
+.order(
+"setting_key",
+{ascending:true}
+);
 
-  if(error){
+if(error){
 
-    document.getElementById("settingsList")
-      .innerHTML =
-      `<div class="empty">${esc(error.message)}</div>`;
+document.getElementById(
+  "settingsList"
+).innerHTML =
+  `<div class="empty">
+    ${esc(error.message)}
+  </div>`;
 
-    return;
-  }
+return;
 
-  settings = data || [];
-
-  renderSettings();
 }
 
+settings =
+data || [];
+
+renderSettings();
+}
 
 function settingDisplay(value){
 
-  if(typeof value === "boolean"){
-    return value ? "Enabled" : "Disabled";
-  }
-
-  if(value === null || value === undefined){
-    return "—";
-  }
-
-  if(typeof value === "object"){
-    return jsonPretty(value);
-  }
-
-  return String(value);
+if(typeof value === "boolean"){
+return value
+? "Enabled"
+: "Disabled";
 }
 
+if(
+value === null ||
+value === undefined
+){
+return "—";
+}
+
+if(typeof value === "object"){
+return jsonPretty(value);
+}
+
+return String(value);
+}
 
 function renderSettings(){
 
-  if(!settings.length){
+if(!settings.length){
 
-    document.getElementById("settingsList")
-      .innerHTML =
-      `<div class="empty">No site settings found.</div>`;
+document.getElementById(
+  "settingsList"
+).innerHTML =
+  `<div class="empty">
+    No site settings found.
+  </div>`;
+
+return;
+
+}
+
+let html = "";
+
+settings.forEach(s=>{
+
+html += `
+
+  <div class="setting-row">
+
+    <div class="setting-key">
+      ${esc(s.setting_key)}
+    </div>
+
+    <div class="setting-value">
+      ${esc(
+        settingDisplay(
+          s.setting_value
+        )
+      )}
+    </div>
+
+    <div>
+
+      <button
+        class="btn btn-light"
+        onclick="
+          editSetting('${s.id}')
+        ">
+        Edit
+      </button>
+
+    </div>
+
+  </div>
+
+`;
+
+});
+
+document.getElementById(
+"settingsList"
+).innerHTML = html;
+}
+
+function editSetting(id){
+
+const s =
+settings.find(
+x=>x.id===id
+);
+
+if(!s) return;
+
+let raw =
+s.setting_value;
+
+let type =
+typeof raw;
+
+if(raw === null){
+
+type = "string";
+
+raw = "";
+
+}
+
+let input = "";
+
+if(type === "boolean"){
+
+input = `
+
+  <select id="settingInput">
+
+    <option
+      value="true"
+      ${
+        raw
+        ? "selected"
+        : ""
+      }>
+      Enabled
+    </option>
+
+    <option
+      value="false"
+      ${
+        !raw
+        ? "selected"
+        : ""
+      }>
+      Disabled
+    </option>
+
+  </select>
+
+`;
+
+}else if(type === "object"){
+
+input = `
+
+  <textarea
+    id="settingInput"
+    style="min-height:220px"
+  >${esc(
+    jsonPretty(raw)
+  )}</textarea>
+
+`;
+
+}else{
+
+input = `
+
+  <input
+    id="settingInput"
+    value="${esc(raw)}"
+  >
+
+`;
+
+}
+
+openModal(
+"Edit " +
+s.setting_key,
+
+`
+
+  <form id="settingForm">
+
+    <div class="field">
+
+      <label>
+        ${esc(s.setting_key)}
+      </label>
+
+      ${input}
+
+    </div>
+
+    <button
+      class="btn btn-accent"
+      type="submit">
+      Save Setting
+    </button>
+
+  </form>
+
+`
+
+);
+
+document.getElementById(
+"settingForm"
+)
+.addEventListener(
+"submit",
+async e=>{
+
+  e.preventDefault();
+
+
+  const valueEl =
+    document.getElementById(
+      "settingInput"
+    );
+
+
+  let value;
+
+
+  try{
+
+    if(type === "boolean"){
+
+      value =
+        valueEl.value === "true";
+
+    }else if(type === "object"){
+
+      value =
+        JSON.parse(
+          valueEl.value
+        );
+
+    }else{
+
+      value =
+        valueEl.value;
+
+    }
+
+  }catch{
+
+    toast(
+      "Invalid JSON."
+    );
 
     return;
   }
 
-  let html = "";
 
-  settings.forEach(s=>{
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("site_settings")
+      .update({
 
-    html += `
-      <div class="setting-row">
+        setting_value:value,
 
-        <div class="setting-key">
-          ${esc(s.setting_key)}
-        </div>
+        updated_at:
+          new Date().toISOString()
 
-        <div class="setting-value">
-          ${esc(settingDisplay(s.setting_value))}
-        </div>
-
-        <div>
-          <button
-            class="btn btn-light"
-            onclick="editSetting('${s.id}')">
-            Edit
-          </button>
-        </div>
-
-      </div>
-    `;
-  });
-
-  document.getElementById("settingsList")
-    .innerHTML = html;
-}
+      })
+      .eq("id",id);
 
 
-function editSetting(id){
+  if(error){
 
-  const s =
-    settings.find(x=>x.id===id);
+    toast(
+      "Could not save setting: " +
+      error.message
+    );
 
-  if(!s) return;
-
-  let raw =
-    s.setting_value;
-
-  let type =
-    typeof raw;
-
-  if(raw === null){
-    type = "string";
-    raw = "";
+    return;
   }
 
-  let input = "";
 
-  if(type === "boolean"){
+  closeModal();
 
-    input = `
-      <select id="settingInput">
-
-        <option
-          value="true"
-          ${raw ? "selected":""}>
-          Enabled
-        </option>
-
-        <option
-          value="false"
-          ${!raw ? "selected":""}>
-          Disabled
-        </option>
-
-      </select>
-    `;
-
-  }else if(type === "object"){
-
-    input = `
-      <textarea
-        id="settingInput"
-        style="min-height:220px"
-      >${esc(jsonPretty(raw))}</textarea>
-    `;
-
-  }else{
-
-    input = `
-      <input
-        id="settingInput"
-        value="${esc(raw)}"
-      >
-    `;
-
-  }
-
-  openModal(
-    "Edit " + s.setting_key,
-    `
-
-      <form id="settingForm">
-
-        <div class="field">
-
-          <label>
-            ${esc(s.setting_key)}
-          </label>
-
-          ${input}
-
-        </div>
-
-        <button class="btn btn-accent">
-          Save Setting
-        </button>
-
-      </form>
-
-    `
+  toast(
+    "Setting saved."
   );
 
-  document.getElementById("settingForm")
-    .addEventListener("submit",async e=>{
+  await loadSettings();
 
-      e.preventDefault();
-
-      const valueEl =
-        document.getElementById("settingInput");
-
-      let value;
-
-      try{
-
-        if(type === "boolean"){
-
-          value =
-            valueEl.value === "true";
-
-        }else if(type === "object"){
-
-          value =
-            JSON.parse(valueEl.value);
-
-        }else{
-
-          value =
-            valueEl.value;
-        }
-
-      }catch{
-
-        toast("Invalid JSON.");
-
-        return;
-      }
-
-      const {
-        error
-      } = await supabaseClient
-        .from("site_settings")
-        .update({
-          setting_value:value,
-          updated_at:new Date().toISOString()
-        })
-        .eq("id",id);
-
-      if(error){
-
-        toast(
-          "Could not save setting: " +
-          error.message
-        );
-
-        return;
-      }
-
-      closeModal();
-
-      toast("Setting saved.");
-
-      await loadSettings();
-
-    });
 }
 
+);
+}
 
 /* =========================================================
-   DASHBOARD
-   ========================================================= */
+DASHBOARD
+========================================================= */
 
 function updateDashboard(){
 
-  const total =
-    reservations.length;
+const total =
+reservations.length;
 
-  const pending =
-    reservations.filter(
-      r=>r.status==="pending"
-    ).length;
+const pending =
+reservations.filter(
+r=>r.status === "pending"
+).length;
 
-  const confirmed =
-    reservations.filter(
-      r=>r.status==="confirmed"
-    ).length;
+const confirmed =
+reservations.filter(
+r=>r.status === "confirmed"
+).length;
 
-  const unpaid =
-    reservations.filter(
-      r=>r.payment_status==="unpaid"
-    ).length;
+const unpaid =
+reservations.filter(
+r=>r.payment_status === "unpaid"
+).length;
 
-  const availableRooms =
-    rooms.filter(
-      r=>r.status==="available"
-    ).length;
+const availableRooms =
+rooms.filter(
+r=>r.status === "available"
+).length;
 
-  const newRequests =
-    requests.filter(
-      r=>r.status==="new"
-    ).length;
+const newRequests =
+requests.filter(
+r=>r.status === "new"
+).length;
 
-  const publishedReviews =
-    reviews.filter(
-      r=>r.is_published
-    ).length;
+const publishedReviews =
+reviews.filter(
+r=>r.is_published
+).length;
 
-  document.getElementById("statTotal")
-    .textContent = total;
+document.getElementById(
+"statTotal"
+).textContent = total;
 
-  document.getElementById("statPending")
-    .textContent = pending;
+document.getElementById(
+"statPending"
+).textContent = pending;
 
-  document.getElementById("statConfirmed")
-    .textContent = confirmed;
+document.getElementById(
+"statConfirmed"
+).textContent = confirmed;
 
-  document.getElementById("statUnpaid")
-    .textContent = unpaid;
+document.getElementById(
+"statUnpaid"
+).textContent = unpaid;
 
-  document.getElementById("statRooms")
-    .textContent = availableRooms;
+document.getElementById(
+"statRooms"
+).textContent = availableRooms;
 
-  document.getElementById("statRequests")
-    .textContent = newRequests;
+document.getElementById(
+"statRequests"
+).textContent = newRequests;
 
-  document.getElementById("statReviews")
-    .textContent = publishedReviews;
+document.getElementById(
+"statReviews"
+).textContent = publishedReviews;
 
-  document.getElementById("statRoomTypes")
-    .textContent = roomTypes.length;
+document.getElementById(
+"statRoomTypes"
+).textContent =
+roomTypes.length;
 }
 
-
 /* =========================================================
-   START
-   ========================================================= */
-
-supabaseClient.auth
-  .onAuthStateChange((event,session)=>{
-
-    if(event === "SIGNED_OUT"){
-      showLogin();
-    }
-
-  });
+START APPLICATION
+========================================================= */
 
 checkSession();
 
-</script>
-
-</body>
+</script></body>
 </html>
