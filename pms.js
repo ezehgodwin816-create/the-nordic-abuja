@@ -1533,3 +1533,1128 @@ START PMS
 ========================= */
 
 initialise();
+/* =========================================================
+   GUESTS & CRM — EDIT / ADD / DELETE
+========================================================= */
+
+let editingGuestId = null;
+
+
+/* =========================
+   GUEST MODAL
+========================= */
+
+function createGuestModal() {
+
+  if ($('guestModal')) return;
+
+  const modal = document.createElement('div');
+
+  modal.id = 'guestModal';
+
+  modal.innerHTML = `
+    <div class="guest-modal-backdrop">
+
+      <div class="guest-modal-card">
+
+        <div class="guest-modal-head">
+
+          <div>
+            <h2 id="guestModalTitle">
+              Add Guest
+            </h2>
+
+            <div class="muted">
+              Guest profile information
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="secondary"
+            id="closeGuestModal"
+          >
+            ✕
+          </button>
+
+        </div>
+
+
+        <form id="guestForm">
+
+          <div class="guest-form-grid">
+
+            <div>
+              <label>First name</label>
+
+              <input
+                id="guestFirstName"
+                type="text"
+                required
+              >
+            </div>
+
+
+            <div>
+              <label>Last name</label>
+
+              <input
+                id="guestLastName"
+                type="text"
+              >
+            </div>
+
+
+            <div>
+              <label>Email</label>
+
+              <input
+                id="guestEmail"
+                type="email"
+              >
+            </div>
+
+
+            <div>
+              <label>Phone</label>
+
+              <input
+                id="guestPhone"
+                type="text"
+              >
+            </div>
+
+
+            <div>
+              <label>Address</label>
+
+              <input
+                id="guestAddress"
+                type="text"
+              >
+            </div>
+
+
+            <div>
+              <label>City</label>
+
+              <input
+                id="guestCity"
+                type="text"
+              >
+            </div>
+
+
+            <div>
+              <label>Country</label>
+
+              <input
+                id="guestCountry"
+                type="text"
+                value="Nigeria"
+              >
+            </div>
+
+
+            <div>
+              <label>Nationality</label>
+
+              <input
+                id="guestNationality"
+                type="text"
+              >
+            </div>
+
+
+            <div>
+              <label>ID type</label>
+
+              <select id="guestIdType">
+
+                <option value="">
+                  Select ID type
+                </option>
+
+                <option value="passport">
+                  Passport
+                </option>
+
+                <option value="national_id">
+                  National ID
+                </option>
+
+                <option value="drivers_license">
+                  Driver's License
+                </option>
+
+                <option value="voters_card">
+                  Voter's Card
+                </option>
+
+                <option value="other">
+                  Other
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div>
+              <label>ID number</label>
+
+              <input
+                id="guestIdNumber"
+                type="text"
+              >
+            </div>
+
+
+            <div class="guest-full">
+
+              <label>Notes</label>
+
+              <textarea
+                id="guestNotes"
+                rows="4"
+              ></textarea>
+
+            </div>
+
+
+            <div class="guest-full">
+
+              <label class="guest-check">
+
+                <input
+                  id="guestVip"
+                  type="checkbox"
+                >
+
+                <span>
+                  VIP guest
+                </span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="guestFormError"
+            class="guest-form-error"
+          ></div>
+
+
+          <div class="guest-modal-actions">
+
+            <button
+              type="button"
+              class="secondary"
+              id="cancelGuest"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="primary"
+              id="saveGuest"
+            >
+              Save Guest
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+
+  $('closeGuestModal')
+    .addEventListener(
+      'click',
+      closeGuestModal
+    );
+
+
+  $('cancelGuest')
+    .addEventListener(
+      'click',
+      closeGuestModal
+    );
+
+
+  $('guestForm')
+    .addEventListener(
+      'submit',
+      saveGuest
+    );
+
+}
+
+
+/* =========================
+   OPEN MODAL
+========================= */
+
+function openGuestModal(guest = null) {
+
+  createGuestModal();
+
+  editingGuestId =
+    guest?.id || null;
+
+  $('guestModalTitle').textContent =
+    guest
+      ? 'Edit Guest'
+      : 'Add Guest';
+
+  $('guestFirstName').value =
+    guest?.first_name || '';
+
+  $('guestLastName').value =
+    guest?.last_name || '';
+
+  $('guestEmail').value =
+    guest?.email || '';
+
+  $('guestPhone').value =
+    guest?.phone || '';
+
+  $('guestAddress').value =
+    guest?.address || '';
+
+  $('guestCity').value =
+    guest?.city || '';
+
+  $('guestCountry').value =
+    guest?.country || 'Nigeria';
+
+  $('guestNationality').value =
+    guest?.nationality || '';
+
+  $('guestIdType').value =
+    guest?.id_type || '';
+
+  $('guestIdNumber').value =
+    guest?.id_number || '';
+
+  $('guestNotes').value =
+    guest?.notes || '';
+
+  $('guestVip').checked =
+    guest?.vip === true;
+
+  $('guestFormError').textContent =
+    '';
+
+  $('guestModal')
+    .classList.add('show');
+
+}
+
+
+/* =========================
+   CLOSE MODAL
+========================= */
+
+function closeGuestModal() {
+
+  const modal =
+    $('guestModal');
+
+  if (modal) {
+    modal.classList.remove('show');
+  }
+
+  editingGuestId = null;
+
+}
+
+
+/* =========================
+   SAVE GUEST
+========================= */
+
+async function saveGuest(event) {
+
+  event.preventDefault();
+
+  const errorBox =
+    $('guestFormError');
+
+  const saveButton =
+    $('saveGuest');
+
+  errorBox.textContent = '';
+
+  const firstName =
+    $('guestFirstName')
+      .value
+      .trim();
+
+  if (!firstName) {
+
+    errorBox.textContent =
+      'First name is required.';
+
+    return;
+  }
+
+
+  const payload = {
+
+    first_name:
+      firstName,
+
+    last_name:
+      $('guestLastName')
+        .value
+        .trim() || null,
+
+    email:
+      $('guestEmail')
+        .value
+        .trim() || null,
+
+    phone:
+      $('guestPhone')
+        .value
+        .trim() || null,
+
+    address:
+      $('guestAddress')
+        .value
+        .trim() || null,
+
+    city:
+      $('guestCity')
+        .value
+        .trim() || null,
+
+    country:
+      $('guestCountry')
+        .value
+        .trim() ||
+      'Nigeria',
+
+    nationality:
+      $('guestNationality')
+        .value
+        .trim() || null,
+
+    id_type:
+      $('guestIdType')
+        .value || null,
+
+    id_number:
+      $('guestIdNumber')
+        .value
+        .trim() || null,
+
+    notes:
+      $('guestNotes')
+        .value
+        .trim() || null,
+
+    vip:
+      $('guestVip').checked
+
+  };
+
+
+  const originalText =
+    saveButton.textContent;
+
+  saveButton.disabled = true;
+
+  saveButton.textContent =
+    editingGuestId
+      ? 'Saving...'
+      : 'Creating...';
+
+
+  try {
+
+    let result;
+
+
+    if (editingGuestId) {
+
+      result =
+        await db
+          .from('guest_profiles')
+          .update(payload)
+          .eq(
+            'id',
+            editingGuestId
+          )
+          .select()
+          .single();
+
+    } else {
+
+      result =
+        await db
+          .from('guest_profiles')
+          .insert(payload)
+          .select()
+          .single();
+
+    }
+
+
+    if (result.error) {
+      throw result.error;
+    }
+
+
+    try {
+
+      await db.rpc(
+        'pms_audit',
+        {
+          p_action:
+            editingGuestId
+              ? 'update_guest'
+              : 'create_guest',
+
+          p_entity_type:
+            'guest_profile',
+
+          p_entity_id:
+            result.data?.id ||
+            editingGuestId,
+
+          p_details:
+            {
+              first_name:
+                payload.first_name,
+
+              last_name:
+                payload.last_name,
+
+              vip:
+                payload.vip
+            }
+        }
+      );
+
+    } catch (auditError) {
+
+      console.warn(
+        'Guest audit log failed:',
+        auditError
+      );
+
+    }
+
+
+    closeGuestModal();
+
+    await loadGuests();
+
+    alert(
+      editingGuestId
+        ? 'Guest updated successfully.'
+        : 'Guest added successfully.'
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'Guest save error:',
+      error
+    );
+
+    errorBox.textContent =
+      error?.message ||
+      'Unable to save guest.';
+
+
+  } finally {
+
+    saveButton.disabled =
+      false;
+
+    saveButton.textContent =
+      originalText;
+
+  }
+
+}
+
+
+/* =========================
+   DELETE GUEST
+========================= */
+
+async function deleteGuest(id) {
+
+  const guest =
+    G.find(
+      item =>
+        item.id === id
+    );
+
+  if (!guest) return;
+
+
+  const name =
+    [
+      guest.first_name,
+      guest.last_name
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+
+  const confirmed =
+    confirm(
+      `Delete guest "${name || 'this guest'}"?\n\nThis action cannot be undone.`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const { error } =
+      await db
+        .from('guest_profiles')
+        .delete()
+        .eq(
+          'id',
+          id
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    try {
+
+      await db.rpc(
+        'pms_audit',
+        {
+          p_action:
+            'delete_guest',
+
+          p_entity_type:
+            'guest_profile',
+
+          p_entity_id:
+            id,
+
+          p_details:
+            {
+              first_name:
+                guest.first_name,
+
+              last_name:
+                guest.last_name
+            }
+        }
+      );
+
+    } catch (auditError) {
+
+      console.warn(
+        'Guest audit log failed:',
+        auditError
+      );
+
+    }
+
+
+    await loadGuests();
+
+    alert(
+      'Guest deleted successfully.'
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'Guest delete error:',
+      error
+    );
+
+    alert(
+      'Unable to delete guest: ' +
+      (
+        error?.message ||
+        'Unknown error.'
+      )
+    );
+
+  }
+
+}
+
+
+/* =========================
+   REPLACE GUEST RENDERER
+========================= */
+
+function renderGuests() {
+
+  const table =
+    $('guestsTable');
+
+  if (!table) return;
+
+
+  if (!G.length) {
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="100%">
+          No guests found.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+
+  table.innerHTML =
+    G.map(
+      guest => {
+
+        const name =
+          [
+            guest.first_name,
+            guest.last_name
+          ]
+            .filter(Boolean)
+            .join(' ');
+
+
+        return `
+          <tr>
+
+            <td>
+              ${escapeHtml(
+                name || '-'
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                guest.email || '-'
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                guest.phone || '-'
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                guest.country || '-'
+              )}
+            </td>
+
+            <td>
+              ${
+                guest.vip
+                  ? '⭐ VIP'
+                  : '—'
+              }
+            </td>
+
+            <td>
+
+              <button
+                type="button"
+                class="secondary guest-edit-button"
+                data-guest-id="${guest.id}"
+              >
+                Edit
+              </button>
+
+              <button
+                type="button"
+                class="secondary guest-delete-button"
+                data-guest-id="${guest.id}"
+              >
+                Delete
+              </button>
+
+            </td>
+
+          </tr>
+        `;
+
+      }
+    ).join('');
+
+
+  /*
+   * Add Actions header automatically.
+   */
+
+  const header =
+    table
+      .closest('table')
+      ?.querySelector('thead tr');
+
+
+  if (header) {
+
+    const alreadyExists =
+      header.querySelector(
+        '[data-guest-actions-header]'
+      );
+
+    if (!alreadyExists) {
+
+      const th =
+        document.createElement('th');
+
+      th.textContent =
+        'Actions';
+
+      th.dataset.guestActionsHeader =
+        'true';
+
+      header.appendChild(th);
+
+    }
+
+  }
+
+
+  table
+    .querySelectorAll(
+      '.guest-edit-button'
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        'click',
+        () => {
+
+          const guest =
+            G.find(
+              item =>
+                String(item.id) ===
+                String(
+                  button.dataset.guestId
+                )
+            );
+
+          if (guest) {
+            openGuestModal(guest);
+          }
+
+        }
+      );
+
+    });
+
+
+  table
+    .querySelectorAll(
+      '.guest-delete-button'
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        'click',
+        () => {
+
+          deleteGuest(
+            button.dataset.guestId
+          );
+
+        }
+      );
+
+    });
+
+}
+
+
+/* =========================
+   ADD GUEST BUTTON
+========================= */
+
+function addGuest() {
+
+  openGuestModal();
+
+}
+
+
+/* =========================
+   GUEST TOOLBAR
+========================= */
+
+function addGuestToolbar() {
+
+  const section =
+    $('guests');
+
+  if (!section) return;
+
+
+  const head =
+    section.querySelector(
+      '.head'
+    );
+
+  if (!head) return;
+
+
+  if (
+    section.querySelector(
+      '#addGuestButton'
+    )
+  ) {
+    return;
+  }
+
+
+  const button =
+    document.createElement(
+      'button'
+    );
+
+  button.id =
+    'addGuestButton';
+
+  button.type =
+    'button';
+
+  button.className =
+    'primary';
+
+  button.textContent =
+    '+ Add Guest';
+
+  button.style.marginTop =
+    '12px';
+
+  button.addEventListener(
+    'click',
+    addGuest
+  );
+
+
+  head.appendChild(button);
+
+}
+
+
+/* =========================
+   GUEST CSS
+========================= */
+
+(function addGuestStyles() {
+
+  if (
+    document.getElementById(
+      'guestCrudStyles'
+    )
+  ) {
+    return;
+  }
+
+
+  const style =
+    document.createElement(
+      'style'
+    );
+
+  style.id =
+    'guestCrudStyles';
+
+
+  style.textContent = `
+
+    #guestModal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+    }
+
+    #guestModal.show {
+      display: block;
+    }
+
+    .guest-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .guest-modal-card {
+      width: min(760px, 96vw);
+      max-height: 92vh;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.28);
+    }
+
+    .guest-modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .guest-modal-head h2 {
+      margin: 0 0 5px;
+      font-family: Georgia, serif;
+    }
+
+    .guest-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .guest-form-grid > div {
+      min-width: 0;
+    }
+
+    .guest-full {
+      grid-column: 1 / -1;
+    }
+
+    .guest-form-grid label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #4d5651;
+    }
+
+    .guest-form-grid input,
+    .guest-form-grid select,
+    .guest-form-grid textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #e2ded7;
+      border-radius: 8px;
+      background: #fff;
+      font: inherit;
+      color: #202723;
+    }
+
+    .guest-form-grid textarea {
+      resize: vertical;
+    }
+
+    .guest-check {
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .guest-check input {
+      width: auto;
+    }
+
+    .guest-form-error {
+      color: #a33b34;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .guest-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #e2ded7;
+    }
+
+    .guest-edit-button,
+    .guest-delete-button {
+      margin: 2px;
+    }
+
+    @media (max-width: 600px) {
+
+      .guest-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .guest-full {
+        grid-column: auto;
+      }
+
+      .guest-modal-card {
+        padding: 16px;
+      }
+
+      .guest-modal-actions {
+        flex-direction: column-reverse;
+      }
+
+      .guest-modal-actions button {
+        width: 100%;
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(style);
+
+})();
+
+
+/* =========================
+   GUEST SECTION HOOK
+========================= */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
+
+    addGuestToolbar();
+
+  }
+);
+
+
+/*
+ * If the PMS is already loaded when this
+ * code runs, create the button immediately.
+ */
+
+addGuestToolbar();
