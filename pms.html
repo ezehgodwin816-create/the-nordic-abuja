@@ -1,956 +1,1236 @@
 <!doctype html>
-
 <html lang="en">
+
 <head>
+
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>The Nordic Abuja — PMS</title>  <link rel="stylesheet" href="pms.css">  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>  <!-- =========================
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>The Nordic Abuja — PMS</title>
+
+  <link
+    rel="stylesheet"
+    href="pms.css"
+  >
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+<body>
+
+  <!-- =========================
        LOGIN
-  ========================== -->  <div id="login"><div class="login-card">
+  ========================== -->
 
-  <div class="logo">N</div>
+  <!--
+    Hidden initially so the login screen does not
+    flash while Supabase checks the saved session.
+    pms.js will show it automatically when needed.
+  -->
 
-  <h1>The Nordic Abuja</h1>
+  <div
+    id="login"
+    class="hidden"
+  >
 
-  <p>Property Management System</p>
+    <div class="login-card">
 
-  <form id="loginForm">
+      <div class="logo">
+        N
+      </div>
 
-    <input
-      id="email"
-      type="email"
-      placeholder="Admin email"
-      autocomplete="email"
-      required
-    >
+      <h1>
+        The Nordic Abuja
+      </h1>
 
-    <input
-      id="password"
-      type="password"
-      placeholder="Password"
-      autocomplete="current-password"
-      required
-    >
+      <p>
+        Property Management System
+      </p>
 
-    <button type="submit">
-      Sign in
-    </button>
+      <form id="loginForm">
 
-    <button
-      type="button"
-      id="forgotPassword"
-      class="secondary"
-    >
-      Forgot password?
-    </button>
+        <input
+          id="email"
+          type="email"
+          placeholder="Admin email"
+          autocomplete="email"
+          required
+        >
 
-    <div id="loginError"></div>
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          autocomplete="current-password"
+          required
+        >
 
-  </form>
+        <button type="submit">
+          Sign in
+        </button>
 
-</div>
+        <button
+          type="button"
+          id="forgotPassword"
+          class="secondary"
+        >
+          Forgot password?
+        </button>
 
-  </div>  <!-- =========================
+        <div id="loginError"></div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
        PASSWORD RESET
-  ========================== -->  <div id="reset" class="hidden"><div class="login-card">
+  ========================== -->
 
-  <div class="logo">N</div>
+  <div
+    id="reset"
+    class="hidden"
+  >
 
-  <h1>Set New Password</h1>
+    <div class="login-card">
 
-  <p>
-    Create a new password for your administrator account.
-  </p>
+      <div class="logo">
+        N
+      </div>
 
-  <form id="resetForm">
+      <h1>
+        Set New Password
+      </h1>
 
-    <input
-      id="newPassword"
-      type="password"
-      placeholder="New password"
-      autocomplete="new-password"
-      minlength="8"
-      required
-    >
+      <p>
+        Create a new password for your administrator account.
+      </p>
 
-    <input
-      id="confirmPassword"
-      type="password"
-      placeholder="Confirm new password"
-      autocomplete="new-password"
-      minlength="8"
-      required
-    >
+      <form id="resetForm">
 
-    <button type="submit">
-      Update Password
-    </button>
+        <input
+          id="newPassword"
+          type="password"
+          placeholder="New password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        >
 
-    <button
-      type="button"
-      id="backToLogin"
-      class="secondary"
-    >
-      Back to login
-    </button>
+        <input
+          id="confirmPassword"
+          type="password"
+          placeholder="Confirm new password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        >
 
-    <div id="resetError"></div>
+        <button type="submit">
+          Update Password
+        </button>
 
-  </form>
+        <button
+          type="button"
+          id="backToLogin"
+          class="secondary"
+        >
+          Back to login
+        </button>
 
-</div>
+        <div id="resetError"></div>
 
-  </div>  <!-- =========================
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
        PMS APPLICATION
-  ========================== -->  <div id="app" class="hidden"><!-- HEADER -->
-<header>
+  ========================== -->
 
-  <button id="menu" type="button">
-    ☰
-  </button>
-
-  <b>
-    THE NORDIC ABUJA
-  </b>
-
-  <span id="who">
-    Administrator
-  </span>
-
-  <button id="logout" type="button">
-    Sign out
-  </button>
-
-</header>
-
-
-<!-- SIDEBAR -->
-<aside id="side">
-
-  <button
-    type="button"
-    data-section="dashboard"
-    class="active"
+  <div
+    id="app"
+    class="hidden"
   >
-    Dashboard
-  </button>
-
-  <button
-    type="button"
-    data-section="bookings"
-  >
-    Front Desk
-  </button>
-
-  <button
-    type="button"
-    data-section="calendar"
-  >
-    Calendar
-  </button>
-
-  <button
-    type="button"
-    data-section="guests"
-  >
-    Guests &amp; CRM
-  </button>
-
-  <button
-    type="button"
-    data-section="housekeeping"
-  >
-    Housekeeping
-  </button>
-
-  <button
-    type="button"
-    data-section="maintenance"
-  >
-    Maintenance
-  </button>
-
-  <button
-    type="button"
-    data-section="folios"
-  >
-    Folios &amp; Billing
-  </button>
-
-  <button
-    type="button"
-    data-section="payments"
-  >
-    Payments
-  </button>
-
-  <button
-    type="button"
-    data-section="rates"
-  >
-    Rates &amp; Promotions
-  </button>
-
-  <button
-    type="button"
-    data-section="extras"
-  >
-    Extras
-  </button>
-
-  <button
-    type="button"
-    data-section="reports"
-  >
-    Reports
-  </button>
-
-  <button
-    type="button"
-    data-section="staff"
-  >
-    Staff &amp; Permissions
-  </button>
-
-  <button
-    type="button"
-    data-section="audit"
-  >
-    Audit Log
-  </button>
-
-</aside>
 
 
-<!-- MAIN PMS CONTENT -->
-<main id="main">
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <header>
+
+      <!--
+        Direct menu control.
+        This works independently of pms.js.
+      -->
+
+      <button
+        id="menu"
+        type="button"
+        aria-label="Open navigation menu"
+        aria-controls="side"
+        aria-expanded="false"
+        onclick="
+          const sidebar = document.getElementById('side');
+          const isOpen = sidebar.classList.toggle('open');
+          this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        "
+      >
+        ☰
+      </button>
+
+      <b>
+        THE NORDIC ABUJA
+      </b>
+
+      <span id="who">
+        Administrator
+      </span>
+
+      <button
+        id="logout"
+        type="button"
+      >
+        Sign out
+      </button>
+
+    </header>
+
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside id="side">
+
+      <button
+        type="button"
+        data-section="dashboard"
+        class="active"
+      >
+        Dashboard
+      </button>
+
+      <button
+        type="button"
+        data-section="bookings"
+      >
+        Front Desk
+      </button>
+
+      <button
+        type="button"
+        data-section="calendar"
+      >
+        Calendar
+      </button>
+
+      <button
+        type="button"
+        data-section="rooms"
+      >
+        Rooms
+      </button>
+
+      <button
+        type="button"
+        data-section="guests"
+      >
+        Guests &amp; CRM
+      </button>
+
+      <button
+        type="button"
+        data-section="housekeeping"
+      >
+        Housekeeping
+      </button>
+
+      <button
+        type="button"
+        data-section="maintenance"
+      >
+        Maintenance
+      </button>
+
+      <button
+        type="button"
+        data-section="folios"
+      >
+        Folios &amp; Billing
+      </button>
+
+      <button
+        type="button"
+        data-section="payments"
+      >
+        Payments
+      </button>
+
+      <button
+        type="button"
+        data-section="rates"
+      >
+        Rates &amp; Promotions
+      </button>
+
+      <button
+        type="button"
+        data-section="extras"
+      >
+        Extras
+      </button>
+
+      <button
+        type="button"
+        data-section="reports"
+      >
+        Reports
+      </button>
+
+      <button
+        type="button"
+        data-section="staff"
+      >
+        Staff &amp; Permissions
+      </button>
+
+      <button
+        type="button"
+        data-section="audit"
+      >
+        Audit Log
+      </button>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN PMS CONTENT
+    ========================== -->
+
+    <main id="main">
+
+
+      <!-- =========================
+           DASHBOARD
+      ========================== -->
+
+      <section
+        id="dashboard"
+        class="pms-section"
+      >
+
+        <div class="head">
+
+          <h1>
+            Dashboard
+          </h1>
+
+          <div class="muted">
+            The Nordic Abuja — Property Management System
+          </div>
+
+        </div>
+
+
+        <div class="grid">
+
+          <div class="card">
+
+            <div class="muted">
+              Total Rooms
+            </div>
+
+            <div
+              id="roomsTotal"
+              class="stat"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="muted">
+              Available
+            </div>
+
+            <div
+              id="roomsAvailable"
+              class="stat"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="muted">
+              Occupied
+            </div>
+
+            <div
+              id="roomsOccupied"
+              class="stat"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="muted">
+              Maintenance
+            </div>
+
+            <div
+              id="roomsMaintenance"
+              class="stat"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="muted">
+              Pending Bookings
+            </div>
+
+            <div
+              id="bookingsPending"
+              class="stat"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="muted">
+              Confirmed Bookings
+            </div>
+
+            <div
+              id="bookingsConfirmed"
+              class="stat"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="muted">
+              Revenue Paid
+            </div>
+
+            <div
+              id="revenuePaid"
+              class="stat"
+            >
+              ₦0.00
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="muted">
+              Open Maintenance
+            </div>
+
+            <div
+              id="openMaintenance"
+              class="stat"
+            >
+              0
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="grid2">
+
+          <div class="card">
+
+            <h2>
+              Hotel Operations
+            </h2>
+
+            <p class="muted">
+              Monitor rooms, bookings, guests,
+              housekeeping, maintenance and payments
+              from one place.
+            </p>
+
+          </div>
+
+
+          <div class="card">
+
+            <h2>
+              System Status
+            </h2>
+
+            <p class="muted">
+              Connected to the Nordic Abuja
+              property management database.
+            </p>
+
+            <span class="badge">
+              Online
+            </span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           BOOKINGS / FRONT DESK
+      ========================== -->
+
+      <section
+        id="bookings"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Front Desk
+          </h1>
+
+          <div class="muted">
+            Reservations and current booking activity
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tablewrap">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+                  <th>ID</th>
+                  <th>Guest</th>
+                  <th>Email</th>
+                  <th>Room</th>
+                  <th>Check In</th>
+                  <th>Check Out</th>
+                  <th>Status</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="bookingsTable">
+
+                <tr>
+
+                  <td colspan="7">
+                    Loading bookings...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           CALENDAR
+      ========================== -->
+
+      <section
+        id="calendar"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Calendar
+          </h1>
+
+          <div class="muted">
+            Reservation calendar
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <h2>
+            Booking Calendar
+          </h2>
+
+          <p class="muted">
+            Your reservation calendar interface
+            can be connected to booking availability
+            and room schedules here.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           ROOMS
+      ========================== -->
+
+      <section
+        id="rooms"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Rooms
+          </h1>
+
+          <div class="muted">
+            Room inventory and current status
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tablewrap">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+                  <th>Room</th>
+                  <th>Room Type</th>
+                  <th>Status</th>
+                  <th>Floor</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="roomsTable">
+
+                <tr>
+
+                  <td colspan="4">
+                    Loading rooms...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           GUESTS
+      ========================== -->
+
+      <section
+        id="guests"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Guests &amp; CRM
+          </h1>
+
+          <div class="muted">
+            Guest profiles and customer information
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tablewrap">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Created</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="guestsTable">
+
+                <tr>
+
+                  <td colspan="4">
+                    Loading guests...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           HOUSEKEEPING
+      ========================== -->
+
+      <section
+        id="housekeeping"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Housekeeping
+          </h1>
+
+          <div class="muted">
+            Room cleaning and housekeeping tasks
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tablewrap">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+                  <th>Room</th>
+                  <th>Task</th>
+                  <th>Status</th>
+                  <th>Assigned To</th>
+                  <th>Created</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="housekeepingTable">
+
+                <tr>
+
+                  <td colspan="5">
+                    Loading housekeeping...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           MAINTENANCE
+      ========================== -->
+
+      <section
+        id="maintenance"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Maintenance
+          </h1>
+
+          <div class="muted">
+            Maintenance requests and property issues
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tablewrap">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+                  <th>Room</th>
+                  <th>Task</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  <th>Created</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="maintenanceTable">
+
+                <tr>
+
+                  <td colspan="5">
+                    Loading maintenance...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           FOLIOS
+      ========================== -->
+
+      <section
+        id="folios"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Folios &amp; Billing
+          </h1>
+
+          <div class="muted">
+            Guest folios and billing information
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tablewrap">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+                  <th>Folio</th>
+                  <th>Booking</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="foliosTable">
+
+                <tr>
+
+                  <td colspan="5">
+                    Loading folios...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           PAYMENTS
+      ========================== -->
+
+      <section
+        id="payments"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Payments
+          </h1>
+
+          <div class="muted">
+            Payment records and transaction history
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tablewrap">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+                  <th>ID</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="paymentsTable">
+
+                <tr>
+
+                  <td colspan="5">
+                    Loading payments...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           RATES
+      ========================== -->
+
+      <section
+        id="rates"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Rates &amp; Promotions
+          </h1>
+
+          <div class="muted">
+            Room types, rates and promotional pricing
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tablewrap">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Base Rate</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="roomTypesTable">
+
+                <tr>
+
+                  <td colspan="3">
+                    Loading room types...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           EXTRAS
+      ========================== -->
+
+      <section
+        id="extras"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Extras
+          </h1>
+
+          <div class="muted">
+            Additional hotel services and charges
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <h2>
+            Extras Catalogue
+          </h2>
+
+          <p class="muted">
+            Manage additional services such as
+            breakfast, airport transfers, laundry,
+            minibar and other guest extras here.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           REPORTS
+      ========================== -->
+
+      <section
+        id="reports"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Reports
+          </h1>
+
+          <div class="muted">
+            Hotel performance and operational reports
+          </div>
+
+        </div>
+
+        <div class="grid2">
+
+          <div class="card">
+
+            <h2>
+              Occupancy
+            </h2>
+
+            <p class="muted">
+              Review room occupancy and availability.
+            </p>
+
+          </div>
+
+          <div class="card">
+
+            <h2>
+              Revenue
+            </h2>
+
+            <p class="muted">
+              Review recorded hotel payment revenue.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           STAFF
+      ========================== -->
+
+      <section
+        id="staff"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Staff &amp; Permissions
+          </h1>
+
+          <div class="muted">
+            Hotel staff profiles and roles
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tablewrap">
+
+            <table class="table">
+
+              <thead>
+
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Status</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="staffTable">
+
+                <tr>
+
+                  <td colspan="5">
+                    Loading staff...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           AUDIT LOG
+      ========================== -->
+
+      <section
+        id="audit"
+        class="pms-section hidden"
+      >
+
+        <div class="head">
+
+          <h1>
+            Audit Log
+          </h1>
+
+          <div class="muted">
+            Administrative activity and system events
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <h2>
+            Activity Log
+          </h2>
+
+          <p class="muted">
+            Administrative activity tracking will
+            appear here as audit records are added.
+          </p>
+
+        </div>
+
+      </section>
+
+
+    </main>
+
+  </div>
 
 
   <!-- =========================
-       DASHBOARD
+       PMS JAVASCRIPT
   ========================== -->
-  <section
-    id="dashboard"
-    class="pms-section"
-  >
 
-    <div class="head">
-      <h1>Dashboard</h1>
-      <div class="muted">
-        The Nordic Abuja — Property Management System
-      </div>
-    </div>
+  <script src="pms.js"></script>
 
+</body>
 
-    <div class="grid">
-
-      <div class="card">
-        <div class="muted">
-          Total Rooms
-        </div>
-        <div
-          id="roomsTotal"
-          class="stat"
-        >
-          0
-        </div>
-      </div>
-
-
-      <div class="card">
-        <div class="muted">
-          Available
-        </div>
-        <div
-          id="roomsAvailable"
-          class="stat"
-        >
-          0
-        </div>
-      </div>
-
-
-      <div class="card">
-        <div class="muted">
-          Occupied
-        </div>
-        <div
-          id="roomsOccupied"
-          class="stat"
-        >
-          0
-        </div>
-      </div>
-
-
-      <div class="card">
-        <div class="muted">
-          Maintenance
-        </div>
-        <div
-          id="roomsMaintenance"
-          class="stat"
-        >
-          0
-        </div>
-      </div>
-
-
-      <div class="card">
-        <div class="muted">
-          Pending Bookings
-        </div>
-        <div
-          id="bookingsPending"
-          class="stat"
-        >
-          0
-        </div>
-      </div>
-
-
-      <div class="card">
-        <div class="muted">
-          Confirmed Bookings
-        </div>
-        <div
-          id="bookingsConfirmed"
-          class="stat"
-        >
-          0
-        </div>
-      </div>
-
-
-      <div class="card">
-        <div class="muted">
-          Revenue Paid
-        </div>
-        <div
-          id="revenuePaid"
-          class="stat"
-        >
-          ₦0.00
-        </div>
-      </div>
-
-
-      <div class="card">
-        <div class="muted">
-          Open Maintenance
-        </div>
-        <div
-          id="openMaintenance"
-          class="stat"
-        >
-          0
-        </div>
-      </div>
-
-    </div>
-
-
-    <div class="grid2">
-
-      <div class="card">
-
-        <h2>
-          Hotel Operations
-        </h2>
-
-        <p class="muted">
-          Monitor rooms, bookings, guests,
-          housekeeping, maintenance and payments
-          from one place.
-        </p>
-
-      </div>
-
-
-      <div class="card">
-
-        <h2>
-          System Status
-        </h2>
-
-        <p class="muted">
-          Connected to the Nordic Abuja
-          property management database.
-        </p>
-
-        <span class="badge">
-          Online
-        </span>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       BOOKINGS / FRONT DESK
-  ========================== -->
-  <section
-    id="bookings"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Front Desk</h1>
-      <div class="muted">
-        Reservations and current booking activity
-      </div>
-    </div>
-
-    <div class="card">
-
-      <div class="tablewrap">
-
-        <table class="table">
-
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Guest</th>
-              <th>Email</th>
-              <th>Room</th>
-              <th>Check In</th>
-              <th>Check Out</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody id="bookingsTable">
-            <tr>
-              <td colspan="7">
-                Loading bookings...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       CALENDAR
-  ========================== -->
-  <section
-    id="calendar"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Calendar</h1>
-      <div class="muted">
-        Reservation calendar
-      </div>
-    </div>
-
-    <div class="card">
-
-      <h2>
-        Booking Calendar
-      </h2>
-
-      <p class="muted">
-        Your reservation calendar interface
-        can be connected to booking availability
-        and room schedules here.
-      </p>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       ROOMS
-  ========================== -->
-  <section
-    id="rooms"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Rooms</h1>
-      <div class="muted">
-        Room inventory and current status
-      </div>
-    </div>
-
-    <div class="card">
-
-      <div class="tablewrap">
-
-        <table class="table">
-
-          <thead>
-            <tr>
-              <th>Room</th>
-              <th>Room Type</th>
-              <th>Status</th>
-              <th>Floor</th>
-            </tr>
-          </thead>
-
-          <tbody id="roomsTable">
-            <tr>
-              <td colspan="4">
-                Loading rooms...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       GUESTS
-  ========================== -->
-  <section
-    id="guests"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Guests &amp; CRM</h1>
-      <div class="muted">
-        Guest profiles and customer information
-      </div>
-    </div>
-
-    <div class="card">
-
-      <div class="tablewrap">
-
-        <table class="table">
-
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-
-          <tbody id="guestsTable">
-            <tr>
-              <td colspan="4">
-                Loading guests...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       HOUSEKEEPING
-  ========================== -->
-  <section
-    id="housekeeping"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Housekeeping</h1>
-      <div class="muted">
-        Room cleaning and housekeeping tasks
-      </div>
-    </div>
-
-    <div class="card">
-
-      <div class="tablewrap">
-
-        <table class="table">
-
-          <thead>
-            <tr>
-              <th>Room</th>
-              <th>Task</th>
-              <th>Status</th>
-              <th>Assigned To</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-
-          <tbody id="housekeepingTable">
-            <tr>
-              <td colspan="5">
-                Loading housekeeping...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       MAINTENANCE
-  ========================== -->
-  <section
-    id="maintenance"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Maintenance</h1>
-      <div class="muted">
-        Maintenance requests and property issues
-      </div>
-    </div>
-
-    <div class="card">
-
-      <div class="tablewrap">
-
-        <table class="table">
-
-          <thead>
-            <tr>
-              <th>Room</th>
-              <th>Task</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-
-          <tbody id="maintenanceTable">
-            <tr>
-              <td colspan="5">
-                Loading maintenance...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       FOLIOS
-  ========================== -->
-  <section
-    id="folios"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Folios &amp; Billing</h1>
-      <div class="muted">
-        Guest folios and billing information
-      </div>
-    </div>
-
-    <div class="card">
-
-      <div class="tablewrap">
-
-        <table class="table">
-
-          <thead>
-            <tr>
-              <th>Folio</th>
-              <th>Booking</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-
-          <tbody id="foliosTable">
-            <tr>
-              <td colspan="5">
-                Loading folios...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       PAYMENTS
-  ========================== -->
-  <section
-    id="payments"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Payments</h1>
-      <div class="muted">
-        Payment records and transaction history
-      </div>
-    </div>
-
-    <div class="card">
-
-      <div class="tablewrap">
-
-        <table class="table">
-
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Amount</th>
-              <th>Method</th>
-              <th>Status</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-
-          <tbody id="paymentsTable">
-            <tr>
-              <td colspan="5">
-                Loading payments...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       RATES
-  ========================== -->
-  <section
-    id="rates"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Rates &amp; Promotions</h1>
-      <div class="muted">
-        Room types, rates and promotional pricing
-      </div>
-    </div>
-
-    <div class="card">
-
-      <div class="tablewrap">
-
-        <table class="table">
-
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Base Rate</th>
-            </tr>
-          </thead>
-
-          <tbody id="roomTypesTable">
-            <tr>
-              <td colspan="3">
-                Loading room types...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       EXTRAS
-  ========================== -->
-  <section
-    id="extras"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Extras</h1>
-      <div class="muted">
-        Additional hotel services and charges
-      </div>
-    </div>
-
-    <div class="card">
-
-      <h2>
-        Extras Catalogue
-      </h2>
-
-      <p class="muted">
-        Manage additional services such as
-        breakfast, airport transfers, laundry,
-        minibar and other guest extras here.
-      </p>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       REPORTS
-  ========================== -->
-  <section
-    id="reports"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Reports</h1>
-      <div class="muted">
-        Hotel performance and operational reports
-      </div>
-    </div>
-
-    <div class="grid2">
-
-      <div class="card">
-        <h2>Occupancy</h2>
-        <p class="muted">
-          Review room occupancy and availability.
-        </p>
-      </div>
-
-      <div class="card">
-        <h2>Revenue</h2>
-        <p class="muted">
-          Review recorded hotel payment revenue.
-        </p>
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       STAFF
-  ========================== -->
-  <section
-    id="staff"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Staff &amp; Permissions</h1>
-      <div class="muted">
-        Hotel staff profiles and roles
-      </div>
-    </div>
-
-    <div class="card">
-
-      <div class="tablewrap">
-
-        <table class="table">
-
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody id="staffTable">
-            <tr>
-              <td colspan="5">
-                Loading staff...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       AUDIT LOG
-  ========================== -->
-  <section
-    id="audit"
-    class="pms-section hidden"
-  >
-
-    <div class="head">
-      <h1>Audit Log</h1>
-      <div class="muted">
-        Administrative activity and system events
-      </div>
-    </div>
-
-    <div class="card">
-
-      <h2>
-        Activity Log
-      </h2>
-
-      <p class="muted">
-        Administrative activity tracking will
-        appear here as audit records are added.
-      </p>
-
-    </div>
-
-  </section>
-
-
-</main>
-
-  </div>  <!-- SUPABASE / PMS JAVASCRIPT -->  <script src="pms.js"></script></body>
 </html>
