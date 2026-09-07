@@ -2838,32 +2838,46 @@ function createRoomModal() {
    LOAD ROOM TYPE OPTIONS
 ========================= */
 
-function populateRoomTypeOptions() {
+async function populateRoomTypeOptions() {
 
-  const select =
-    $('roomType');
+  const select = $('roomType');
 
   if (!select) return;
 
-
-  const current =
-    select.value;
-
-
   select.innerHTML = `
     <option value="">
-      Select room type
+      Loading room types...
     </option>
   `;
 
+  try {
 
-  RT.forEach(
-    roomType => {
+    const { data, error } = await db
+      .from('room_types')
+      .select('id,name,slug,price_per_night,is_active')
+      .eq('is_active', true)
+      .order('name');
+
+    if (error) {
+      throw error;
+    }
+
+    RT.length = 0;
+
+    if (Array.isArray(data)) {
+      RT.push(...data);
+    }
+
+    select.innerHTML = `
+      <option value="">
+        Select room type
+      </option>
+    `;
+
+    RT.forEach(roomType => {
 
       const option =
-        document.createElement(
-          'option'
-        );
+        document.createElement('option');
 
       option.value =
         roomType.id;
@@ -2872,16 +2886,23 @@ function populateRoomTypeOptions() {
         roomType.name ||
         'Unnamed Room Type';
 
-      select.appendChild(
-        option
-      );
+      select.appendChild(option);
 
-    }
-  );
+    });
 
+  } catch (error) {
 
-  if (current) {
-    select.value = current;
+    console.error(
+      'Room type dropdown error:',
+      error
+    );
+
+    select.innerHTML = `
+      <option value="">
+        Unable to load room types
+      </option>
+    `;
+
   }
 
 }
@@ -2891,44 +2912,37 @@ function populateRoomTypeOptions() {
    OPEN ROOM MODAL
 ========================= */
 
-function openRoomModal(room = null) {
+async function openRoomModal(room = null) {
 
   createRoomModal();
 
-  populateRoomTypeOptions();
-
   editingRoomId =
     room?.id || null;
-
 
   $('roomModalTitle').textContent =
     room
       ? 'Edit Room'
       : 'Add Room';
 
-
   $('roomNumber').value =
     room?.room_number || '';
-
 
   $('roomFloor').value =
     room?.floor || '';
 
-
-  $('roomType').value =
-    room?.room_type_id || '';
-
-
   $('roomStatus').value =
     room?.status || 'available';
-
 
   $('roomFormError').textContent =
     '';
 
-
   $('roomModal')
     .classList.add('show');
+
+  await populateRoomTypeOptions();
+
+  $('roomType').value =
+    room?.room_type_id || '';
 
 }
 
