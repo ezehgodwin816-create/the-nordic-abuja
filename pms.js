@@ -541,7 +541,7 @@ if (logoutButton) {
   );
 }
 
-/* =========================
+/* /* =========================
 MOBILE MENU
 ========================= */
 
@@ -553,15 +553,34 @@ const sideBar =
 
 if (menuButton && sideBar) {
 
+  /*
+   * The menu button already has its own
+   * inline toggle in pms.html.
+   *
+   * We DO NOT toggle the sidebar again here.
+   * Doing so would open it and immediately
+   * close it on the same tap.
+   */
+
   menuButton.addEventListener(
     'click',
-    event => {
-      event.preventDefault();
-      event.stopPropagation();
+    () => {
 
-      sideBar.classList.toggle('open');
+      const isOpen =
+        sideBar.classList.contains('open');
+
+      menuButton.setAttribute(
+        'aria-expanded',
+        isOpen ? 'true' : 'false'
+      );
+
     }
   );
+
+  /*
+   * Close the sidebar when the user taps
+   * outside it on mobile.
+   */
 
   document.addEventListener(
     'click',
@@ -577,8 +596,18 @@ if (menuButton && sideBar) {
         !clickedInsideSidebar &&
         !clickedMenu
       ) {
-        sideBar.classList.remove('open');
+
+        sideBar.classList.remove(
+          'open'
+        );
+
+        menuButton.setAttribute(
+          'aria-expanded',
+          'false'
+        );
+
       }
+
     }
   );
 
