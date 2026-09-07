@@ -1,30 +1,20 @@
-/* =========================================================
-   THE NORDIC ABUJA PMS
-   Original Supabase Project
-========================================================= */
-
 const URL_ =
-  'https://rzjvhfnizwckzbdawrb.supabase.co';
+'https://rzjvhfnizwckzbdawrbn.supabase.co';
 
 const KEY =
-  'sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob';
+'sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob';
 
 const db = supabase.createClient(
-  URL_,
-  KEY,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
-  }
+URL_,
+KEY,
+{
+auth: {
+persistSession: true,
+autoRefreshToken: true,
+detectSessionInUrl: true
+}
+}
 );
-
-
-/* =========================================================
-   DATA
-========================================================= */
 
 let B = [];
 let R = [];
@@ -35,157 +25,309 @@ let MT = [];
 let P = [];
 let F = [];
 
+/* =========================
+BASIC HELPERS
+========================= */
 
-/* =========================================================
-   HELPERS
-========================================================= */
+const $ = id => document.getElementById(id);
 
-const $ = x =>
-  document.getElementById(x);
-
-
-const esc = x =>
-  String(x ?? '').replace(
-    /[&<>"']/g,
-    m => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    }[m])
-  );
-
-
-const money = x =>
-  '₦' +
-  Number(x || 0).toLocaleString(
-    'en-NG',
-    {
-      minimumFractionDigits: 2
-    }
-  );
-
-
-async function q(x) {
-
-  const {
-    data,
-    error
-  } = await x;
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
+function show(id) {
+const el = $(id);
+if (el) el.classList.remove('hidden');
 }
 
-
-function loginError(message) {
-
-  const el = $('loginError');
-
-  if (el) {
-    el.textContent = message || '';
-  }
-
+function hide(id) {
+const el = $(id);
+if (el) el.classList.add('hidden');
 }
 
-
-function resetError(message) {
-
-  const el = $('resetError');
-
-  if (el) {
-    el.textContent = message || '';
-  }
-
+function text(id, value) {
+const el = $(id);
+if (el) el.textContent = value ?? '';
 }
 
+function escapeHtml(value) {
+return String(value ?? '')
+.replace(/&/g, '&')
+.replace(/</g, '<')
+.replace(/>/g, '>')
+.replace(/"/g, '"')
+.replace(/'/g, ''');
+}
 
-/* =========================================================
-   SCREEN CONTROL
-========================================================= */
+function money(value) {
+const n = Number(value || 0);
+
+return new Intl.NumberFormat(
+'en-NG',
+{
+style: 'currency',
+currency: 'NGN',
+maximumFractionDigits: 2
+}
+).format(n);
+}
+
+function dateValue(value) {
+if (!value) return '-';
+
+const d = new Date(value);
+
+if (Number.isNaN(d.getTime())) {
+return value;
+}
+
+return d.toLocaleDateString(
+'en-GB',
+{
+day: '2-digit',
+month: 'short',
+year: 'numeric'
+}
+);
+}
+
+function statusClass(status) {
+return String(status || '')
+.toLowerCase()
+.replace(/\s+/g, '-');
+}
+
+/* =========================
+LOGIN / AUTH UI
+========================= */
 
 function showLogin() {
+hide('app');
+hide('reset');
+show('login');
 
-  $('login').classList.remove('hidden');
-
-  $('reset').classList.add('hidden');
-
-  $('app').classList.add('hidden');
-
-  loginError('');
-
-  resetError('');
-
+const email = $('email');
+if (email) email.focus();
 }
 
+function showApp() {
+hide('login');
+hide('reset');
+show('app');
+
+if (typeof loadDashboard === 'function') {
+loadDashboard();
+}
+}
 
 function showReset() {
+hide('login');
+hide('app');
+show('reset');
 
-  $('login').classList.add('hidden');
+const password = $('newPassword');
+if (password) password.focus();
+}
 
-  $('app').classList.add('hidden');
+function setLoginError(message) {
+const el = $('loginError');
 
-  $('reset').classList.remove('hidden');
+if (el) {
+el.textContent = message || '';
+}
+}
 
-  resetError('');
+function setResetError(message) {
+const el = $('resetError');
+
+if (el) {
+el.textContent = message || '';
+}
+}
+
+/* =========================
+DETECT PASSWORD RECOVERY
+========================= */
+
+function isRecoveryUrl() {
+const hash =
+window.location.hash || '';
+
+const search =
+window.location.search || '';
+
+return (
+hash.includes('type=recovery') ||
+search.includes('type=recovery')
+);
+}
+
+/* =========================
+LOGIN
+========================= */
+
+async function login(email, password) {
+setLoginError('');
+
+const { data, error } =
+await db.auth.signInWithPassword({
+email,
+password
+});
+
+if (error) {
+setLoginError(
+error.message ||
+'Invalid login credentials.'
+);
+
+return false;
 
 }
 
+if (!data || !data.user) {
+setLoginError(
+'Login completed but no user session was returned.'
+);
 
-function showApp(user) {
-
-  $('login').classList.add('hidden');
-
-  $('reset').classList.add('hidden');
-
-  $('app').classList.remove('hidden');
-
-  $('who').textContent =
-    user?.email || '';
+return false;
 
 }
 
+const { data: adminData, error: adminError } =
+await db.rpc('is_admin_user');
 
-/* =========================================================
-   PASSWORD RECOVERY
-========================================================= */
+if (adminError) {
+setLoginError(
+'Unable to verify administrator access: ' +
+adminError.message
+);
 
-async function requestPasswordReset() {
+await db.auth.signOut();
+
+return false;
+
+}
+
+if (adminData !== true) {
+setLoginError(
+'This account does not have administrator access.'
+);
+
+await db.auth.signOut();
+
+return false;
+
+}
+
+showApp();
+
+return true;
+}
+
+/* =========================
+LOGIN FORM
+========================= */
+
+const loginForm = $('loginForm');
+
+if (loginForm) {
+loginForm.addEventListener(
+'submit',
+async event => {
+event.preventDefault();
 
   const email =
-    $('email').value.trim();
+    $('email')?.value.trim();
 
-  if (!email) {
+  const password =
+    $('password')?.value || '';
 
-    loginError(
-      'Enter your admin email first.'
+  if (!email || !password) {
+    setLoginError(
+      'Please enter your email and password.'
     );
-
-    $('email').focus();
 
     return;
   }
 
+  const button =
+    loginForm.querySelector(
+      'button[type="submit"]'
+    );
 
-  loginError(
-    'Sending password recovery email…'
-  );
+  if (button) {
+    button.disabled = true;
+    button.dataset.originalText =
+      button.textContent;
 
+    button.textContent =
+      'Signing in...';
+  }
 
   try {
+    await login(
+      email,
+      password
+    );
+  } catch (error) {
+    setLoginError(
+      error?.message ||
+      'Unable to sign in.'
+    );
+  } finally {
+    if (button) {
+      button.disabled = false;
 
+      button.textContent =
+        button.dataset.originalText ||
+        'Sign In';
+    }
+  }
+}
+
+);
+}
+
+/* =========================
+FORGOT PASSWORD
+========================= */
+
+const forgotPassword =
+$('forgotPassword');
+
+if (forgotPassword) {
+forgotPassword.addEventListener(
+'click',
+async event => {
+event.preventDefault();
+
+  setLoginError('');
+
+  const email =
+    $('email')?.value.trim();
+
+  if (!email) {
+    setLoginError(
+      'Enter your email address first, then tap Forgot Password.'
+    );
+
+    if ($('email')) {
+      $('email').focus();
+    }
+
+    return;
+  }
+
+  const originalText =
+    forgotPassword.textContent;
+
+  forgotPassword.disabled = true;
+  forgotPassword.textContent =
+    'Sending...';
+
+  try {
     const redirectTo =
       window.location.origin +
       window.location.pathname;
 
-
-    const {
-      error
-    } =
+    const { error } =
       await db.auth.resetPasswordForEmail(
         email,
         {
@@ -193,1983 +335,1022 @@ async function requestPasswordReset() {
         }
       );
 
-
     if (error) {
-      throw error;
+      setLoginError(
+        'Failed to send password recovery: ' +
+        error.message
+      );
+
+      return;
     }
 
-
-    loginError(
-      'Recovery email sent. Check your email and open the newest reset link.'
+    setLoginError(
+      'Password reset email sent. Check your email and open the new recovery link.'
     );
-
 
   } catch (error) {
-
-    console.error(
-      'Password recovery error:',
-      error
+    setLoginError(
+      'Failed to send password recovery: ' +
+      (
+        error?.message ||
+        'Network error.'
+      )
     );
-
-    loginError(
-      error?.message ||
-      'Unable to send password recovery email.'
-    );
-
+  } finally {
+    forgotPassword.disabled = false;
+    forgotPassword.textContent =
+      originalText;
   }
-
 }
 
+);
+}
 
-/* =========================================================
-   PASSWORD RESET FORM
-========================================================= */
+/* =========================
+BACK TO LOGIN
+========================= */
 
-async function updatePassword() {
+const backToLogin =
+$('backToLogin');
+
+if (backToLogin) {
+backToLogin.addEventListener(
+'click',
+event => {
+event.preventDefault();
+
+  setResetError('');
+
+  showLogin();
+}
+
+);
+}
+
+/* =========================
+PASSWORD UPDATE
+========================= */
+
+const resetForm =
+$('resetForm');
+
+if (resetForm) {
+resetForm.addEventListener(
+'submit',
+async event => {
+event.preventDefault();
+
+  setResetError('');
 
   const password =
-    $('newPassword').value;
+    $('newPassword')?.value || '';
 
-  const confirmation =
-    $('confirmPassword').value;
+  const confirmPassword =
+    $('confirmPassword')?.value || '';
 
-
-  if (password.length < 8) {
-
-    resetError(
-      'Password must be at least 8 characters.'
+  if (!password) {
+    setResetError(
+      'Enter your new password.'
     );
 
     return;
   }
 
-
-  if (password !== confirmation) {
-
-    resetError(
-      'The passwords do not match.'
+  if (password.length < 6) {
+    setResetError(
+      'Password must be at least 6 characters.'
     );
 
     return;
   }
 
+  if (password !== confirmPassword) {
+    setResetError(
+      'Passwords do not match.'
+    );
 
-  resetError(
-    'Updating password…'
-  );
+    return;
+  }
 
+  const button =
+    resetForm.querySelector(
+      'button[type="submit"]'
+    );
+
+  if (button) {
+    button.disabled = true;
+
+    button.dataset.originalText =
+      button.textContent;
+
+    button.textContent =
+      'Updating...';
+  }
 
   try {
-
-    const {
-      data,
-      error
-    } =
+    const { data, error } =
       await db.auth.updateUser({
         password
       });
 
-
     if (error) {
-      throw error;
-    }
-
-
-    if (!data?.user) {
-
-      throw new Error(
-        'Password update session was not found. Please open the newest recovery email again.'
+      setResetError(
+        error.message ||
+        'Unable to update password.'
       );
 
+      return;
     }
 
+    if (!data || !data.user) {
+      setResetError(
+        'Password update completed, but the account session could not be confirmed.'
+      );
 
-    resetError(
-      'Password updated successfully.'
+      return;
+    }
+
+    setResetError('');
+
+    alert(
+      'Password updated successfully. You can now sign in with your new password.'
     );
 
+    await db.auth.signOut();
 
-    setTimeout(
-      async () => {
+    resetForm.reset();
 
-        await db.auth.signOut();
-
-        $('newPassword').value = '';
-
-        $('confirmPassword').value = '';
-
-        showLogin();
-
-        loginError(
-          'Password updated. You can now sign in with your new password.'
-        );
-
-      },
-      1200
-    );
-
+    showLogin();
 
   } catch (error) {
-
-    console.error(
-      'Password update error:',
-      error
-    );
-
-    resetError(
+    setResetError(
       error?.message ||
       'Unable to update password.'
     );
+  } finally {
+    if (button) {
+      button.disabled = false;
 
+      button.textContent =
+        button.dataset.originalText ||
+        'Update Password';
+    }
   }
-
 }
 
-
-/* =========================================================
-   LOAD PMS DATA
-========================================================= */
-
-async function load() {
-
-  [
-    B,
-    R,
-    RT,
-    G,
-    HK,
-    MT,
-    P,
-    F
-  ] = await Promise.all([
-
-    q(
-      db
-        .from('bookings')
-        .select('*')
-        .order(
-          'created_at',
-          {
-            ascending: false
-          }
-        )
-    ),
-
-    q(
-      db
-        .from('rooms')
-        .select(
-          '*,room_types(name)'
-        )
-        .order('room_number')
-    ),
-
-    q(
-      db
-        .from('room_types')
-        .select('*')
-        .order('name')
-    ),
-
-    q(
-      db
-        .from('guest_profiles')
-        .select('*')
-        .order(
-          'created_at',
-          {
-            ascending: false
-          }
-        )
-    ),
-
-    q(
-      db
-        .from('housekeeping_tasks')
-        .select(
-          '*,rooms(room_number)'
-        )
-        .order(
-          'created_at',
-          {
-            ascending: false
-          }
-        )
-    ),
-
-    q(
-      db
-        .from('maintenance_tasks')
-        .select(
-          '*,rooms(room_number)'
-        )
-        .order(
-          'created_at',
-          {
-            ascending: false
-          }
-        )
-    ),
-
-    q(
-      db
-        .from('payments')
-        .select('*')
-        .order(
-          'created_at',
-          {
-            ascending: false
-          }
-        )
-    ),
-
-    q(
-      db
-        .from('folios')
-        .select('*')
-        .order(
-          'created_at',
-          {
-            ascending: false
-          }
-        )
-    )
-
-  ]);
-
+);
 }
 
+/* =========================
+LOGOUT
+========================= */
 
-/* =========================================================
-   PAGE HEADER
-========================================================= */
+async function logout() {
+await db.auth.signOut();
 
-const head = (
-  title,
-  subtitle
-) =>
-  `<div class="head">
-    <h1>${esc(title)}</h1>
-    <div class="muted">
-      ${esc(subtitle)}
-    </div>
-  </div>`;
+B = [];
+R = [];
+RT = [];
+G = [];
+HK = [];
+MT = [];
+P = [];
+F = [];
 
+showLogin();
+}
 
-/* =========================================================
-   DASHBOARD
-========================================================= */
+const logoutButton =
+$('logout');
 
-async function dashboard() {
-
-  let s = {};
+if (logoutButton) {
+logoutButton.addEventListener(
+'click',
+async event => {
+event.preventDefault();
 
   try {
-
-    s =
-      await q(
-        db.rpc(
-          'pms_dashboard_stats'
-        )
-      );
-
+    await logout();
   } catch (error) {
-
     console.error(
-      'Dashboard stats error:',
+      'Logout error:',
       error
     );
-
   }
-
-
-  $('main').innerHTML =
-
-    head(
-      'Hotel Operations',
-      'Live property overview'
-    ) +
-
-    `<div class="grid">
-
-      ${
-        [
-          [
-            'Rooms',
-            s.rooms_total
-          ],
-
-          [
-            'Available',
-            s.rooms_available
-          ],
-
-          [
-            'Occupied',
-            s.rooms_occupied
-          ],
-
-          [
-            'Maintenance',
-            s.rooms_maintenance
-          ],
-
-          [
-            'Pending',
-            s.bookings_pending
-          ],
-
-          [
-            'Confirmed',
-            s.bookings_confirmed
-          ],
-
-          [
-            'Paid revenue',
-            money(s.revenue_paid)
-          ],
-
-          [
-            'Open maintenance',
-            s.open_maintenance
-          ]
-
-        ]
-        .map(
-          x =>
-            `<div class="card">
-
-              <div class="muted">
-                ${esc(x[0])}
-              </div>
-
-              <div class="stat">
-                ${x[1] ?? 0}
-              </div>
-
-            </div>`
-        )
-        .join('')
-      }
-
-    </div>`;
-
 }
 
-
-/* =========================================================
-   FRONT DESK
-========================================================= */
-
-function frontdesk() {
-
-  $('main').innerHTML =
-
-    head(
-      'Front Desk',
-      'Arrivals, in-house guests and departures'
-    ) +
-
-    table(
-      [
-        'Booking',
-        'Guest',
-        'Stay',
-        'Status',
-        'Actions'
-      ],
-
-      B.map(
-        b => [
-
-          esc(
-            b.booking_reference
-          ),
-
-          esc(
-            b.guest_first_name +
-            ' ' +
-            b.guest_last_name
-          ),
-
-          `${esc(b.check_in)}
-           → ${esc(b.check_out)}`,
-
-          esc(b.status),
-
-          `<button
-            class="secondary"
-            onclick="cin('${b.id}')"
-          >
-            Check in
-          </button>
-
-          <button
-            class="secondary"
-            onclick="cout('${b.id}')"
-          >
-            Check out
-          </button>`
-
-        ]
-      )
-    );
-
+);
 }
 
+/* =========================
+ADMIN CHECK
+========================= */
 
-/* =========================================================
-   CHECK IN
-========================================================= */
+async function verifyAdmin() {
+const {
+data,
+error
+} = await db.rpc(
+'is_admin_user'
+);
 
-async function cin(id) {
+if (error) {
+throw error;
+}
 
-  const b =
-    B.find(
-      x => x.id === id
-    );
+return data === true;
+}
 
+/* =========================
+DASHBOARD
+========================= */
 
-  await q(
-    db
-      .from('bookings')
-      .update({
-        status: 'confirmed'
-      })
-      .eq('id', id)
+async function loadDashboard() {
+try {
+const {
+data,
+error
+} = await db.rpc(
+'pms_dashboard_stats'
+);
+
+if (error) {
+  console.error(
+    'Dashboard error:',
+    error
   );
 
+  return;
+}
 
-  if (b?.room_id) {
+const stats =
+  data || {};
 
-    await q(
-      db
-        .from('rooms')
-        .update({
-          status: 'occupied'
-        })
-        .eq(
-          'id',
-          b.room_id
-        )
-    );
+text(
+  'roomsTotal',
+  stats.rooms_total ?? 0
+);
 
-  }
+text(
+  'roomsAvailable',
+  stats.rooms_available ?? 0
+);
 
+text(
+  'roomsOccupied',
+  stats.rooms_occupied ?? 0
+);
 
-  await load();
+text(
+  'roomsMaintenance',
+  stats.rooms_maintenance ?? 0
+);
 
-  render('frontdesk');
+text(
+  'bookingsPending',
+  stats.bookings_pending ?? 0
+);
+
+text(
+  'bookingsConfirmed',
+  stats.bookings_confirmed ?? 0
+);
+
+text(
+  'revenuePaid',
+  money(stats.revenue_paid ?? 0)
+);
+
+text(
+  'openMaintenance',
+  stats.open_maintenance ?? 0
+);
+
+} catch (error) {
+console.error(
+'Dashboard loading failed:',
+error
+);
+}
+}
+
+/* =========================
+LOAD BOOKINGS
+========================= */
+
+async function loadBookings() {
+const {
+data,
+error
+} = await db
+.from('bookings')
+.select('*')
+.order(
+'created_at',
+{
+ascending: false
+}
+);
+
+if (error) {
+console.error(
+'Bookings error:',
+error
+);
+
+return;
 
 }
 
+B = data || [];
 
-/* =========================================================
-   CHECK OUT
-========================================================= */
+renderBookings();
+}
 
-async function cout(id) {
+function renderBookings() {
+const table =
+$('bookingsTable');
 
-  const b =
-    B.find(
-      x => x.id === id
-    );
+if (!table) return;
 
+if (!B.length) {
+table.innerHTML =
+'<tr><td colspan="100%">No bookings found.</td></tr>';
 
-  await q(
-    db
-      .from('bookings')
-      .update({
-        status: 'completed'
-      })
-      .eq('id', id)
-  );
-
-
-  if (b?.room_id) {
-
-    await q(
-      db
-        .from('rooms')
-        .update({
-          status: 'available'
-        })
-        .eq(
-          'id',
-          b.room_id
-        )
-    );
-
-  }
-
-
-  await load();
-
-  render('frontdesk');
+return;
 
 }
 
+table.innerHTML =
+B.map(
+booking => "<tr> <td>${escapeHtml(booking.id)}</td> <td>${escapeHtml(booking.guest_name || booking.full_name || '-')}</td> <td>${escapeHtml(booking.email || '-')}</td> <td>${escapeHtml(booking.room_id || booking.room_number || '-')}</td> <td>${dateValue(booking.check_in)}</td> <td>${dateValue(booking.check_out)}</td> <td>${escapeHtml(booking.status || '-')}</td> </tr>"
+).join('');
+}
 
-/* =========================================================
-   CALENDAR
-========================================================= */
+/* =========================
+LOAD ROOMS
+========================= */
 
-function calendar() {
+async function loadRooms() {
+const {
+data,
+error
+} = await db
+.from('rooms')
+.select('*')
+.order(
+'room_number',
+{
+ascending: true
+}
+);
 
-  const ds =
-    [...Array(7)].map(
-      (_, i) => {
+if (error) {
+console.error(
+'Rooms error:',
+error
+);
 
-        const d =
-          new Date();
-
-        d.setDate(
-          d.getDate() + i
-        );
-
-        return d
-          .toISOString()
-          .slice(
-            0,
-            10
-          );
-
-      }
-    );
-
-
-  let cells =
-
-    `<div class="tablewrap card">
-
-      <table class="table">
-
-        <tr>
-
-          <th>
-            Room
-          </th>
-
-          ${
-            ds
-              .map(
-                d =>
-                  `<th>${d}</th>`
-              )
-              .join('')
-          }
-
-        </tr>`;
-
-
-  R.forEach(
-    r => {
-
-      cells +=
-
-        `<tr>
-
-          <td>
-
-            <b>
-              ${esc(
-                r.room_number
-              )}
-            </b>
-
-            <br>
-
-            ${esc(
-              r.room_types?.name ||
-              ''
-            )}
-
-          </td>
-
-          ${
-            ds
-              .map(
-                d =>
-
-                  `<td>
-
-                    ${
-                      B
-                        .filter(
-                          b =>
-                            b.room_id === r.id &&
-                            d >= b.check_in &&
-                            d < b.check_out
-                        )
-                        .map(
-                          b =>
-                            `<span class="badge">
-                              ${esc(
-                                b.booking_reference
-                              )}
-                            </span>`
-                        )
-                        .join(' ') ||
-                      '—'
-                    }
-
-                  </td>`
-              )
-              .join('')
-          }
-
-        </tr>`;
-
-    }
-  );
-
-
-  cells +=
-
-    `</table>
-    </div>`;
-
-
-  $('main').innerHTML =
-
-    head(
-      'Reservation Calendar',
-      'Room rack for the next 7 days'
-    ) +
-
-    cells;
+return;
 
 }
 
+R = data || [];
 
-/* =========================================================
-   GUESTS / CRM
-========================================================= */
+renderRooms();
+}
 
-function guests() {
+function renderRooms() {
+const table =
+$('roomsTable');
 
-  $('main').innerHTML =
+if (!table) return;
 
-    head(
-      'Guests & CRM',
-      'Guest profiles and VIP information'
-    ) +
+if (!R.length) {
+table.innerHTML =
+'<tr><td colspan="100%">No rooms found.</td></tr>';
 
-    `<div class="card">
-
-      <button
-        class="primary"
-        onclick="addGuest()"
-      >
-        Add guest
-      </button>
-
-    </div>` +
-
-    table(
-      [
-        'Name',
-        'Email',
-        'Phone',
-        'Country',
-        'VIP'
-      ],
-
-      G.map(
-        g => [
-
-          esc(
-            g.first_name +
-            ' ' +
-            (g.last_name || '')
-          ),
-
-          esc(g.email),
-
-          esc(g.phone),
-
-          esc(g.country),
-
-          g.vip
-            ? '⭐'
-            : '—'
-
-        ]
-      )
-    );
+return;
 
 }
 
+table.innerHTML =
+R.map(
+room => "<tr> <td>${escapeHtml(room.room_number || room.number || '-')}</td> <td>${escapeHtml(room.room_type_id || room.room_type || '-')}</td> <td>${escapeHtml(room.status || '-')}</td> <td>${escapeHtml(room.floor || '-')}</td> </tr>"
+).join('');
+}
 
-async function addGuest() {
+/* =========================
+LOAD ROOM TYPES
+========================= */
 
-  const firstName =
-    prompt(
-      'First name'
-    );
+async function loadRoomTypes() {
+const {
+data,
+error
+} = await db
+.from('room_types')
+.select('*')
+.order(
+'name',
+{
+ascending: true
+}
+);
 
+if (error) {
+console.error(
+'Room types error:',
+error
+);
 
-  if (!firstName) {
-    return;
-  }
-
-
-  await q(
-    db
-      .from('guest_profiles')
-      .insert({
-        first_name:
-          firstName,
-
-        last_name:
-          prompt(
-            'Last name'
-          ) || null,
-
-        email:
-          prompt(
-            'Email'
-          ) || null,
-
-        phone:
-          prompt(
-            'Phone'
-          ) || null,
-
-        vip:
-          false
-      })
-  );
-
-
-  await load();
-
-  render('guests');
+return;
 
 }
 
+RT = data || [];
 
-/* =========================================================
-   HOUSEKEEPING
-========================================================= */
+renderRoomTypes();
+}
 
-function housekeeping() {
+function renderRoomTypes() {
+const table =
+$('roomTypesTable');
 
-  $('main').innerHTML =
+if (!table) return;
 
-    head(
-      'Housekeeping',
-      'Cleaning and inspection tasks'
-    ) +
+if (!RT.length) {
+table.innerHTML =
+'<tr><td colspan="100%">No room types found.</td></tr>';
 
-    `<div class="card">
-
-      <button
-        class="primary"
-        onclick="addHK()"
-      >
-        Create task
-      </button>
-
-    </div>` +
-
-    table(
-      [
-        'Room',
-        'Task',
-        'Priority',
-        'Status'
-      ],
-
-      HK.map(
-        x => [
-
-          esc(
-            x.rooms?.room_number ||
-            ''
-          ),
-
-          esc(
-            x.task_type
-          ),
-
-          esc(
-            x.priority
-          ),
-
-          esc(
-            x.status
-          )
-
-        ]
-      )
-    );
+return;
 
 }
 
+table.innerHTML =
+RT.map(
+roomType => "<tr> <td>${escapeHtml(roomType.name || '-')}</td> <td>${escapeHtml(roomType.description || '-')}</td> <td>${money(roomType.base_rate || roomType.price || 0)}</td> </tr>"
+).join('');
+}
 
-async function addHK() {
+/* =========================
+LOAD GUESTS
+========================= */
 
-  const roomId =
-    prompt(
-      'Room UUID'
-    );
+async function loadGuests() {
+const {
+data,
+error
+} = await db
+.from('guest_profiles')
+.select('*')
+.order(
+'created_at',
+{
+ascending: false
+}
+);
 
+if (error) {
+console.error(
+'Guests error:',
+error
+);
 
-  if (!roomId) {
-    return;
-  }
-
-
-  await q(
-    db
-      .from(
-        'housekeeping_tasks'
-      )
-      .insert({
-        room_id:
-          roomId,
-
-        task_type:
-          'cleaning'
-      })
-  );
-
-
-  await load();
-
-  render(
-    'housekeeping'
-  );
+return;
 
 }
 
+G = data || [];
 
-/* =========================================================
-   MAINTENANCE
-========================================================= */
+renderGuests();
+}
 
-function maintenance() {
+function renderGuests() {
+const table =
+$('guestsTable');
 
-  $('main').innerHTML =
+if (!table) return;
 
-    head(
-      'Maintenance',
-      'Repairs and room out-of-service tracking'
-    ) +
+if (!G.length) {
+table.innerHTML =
+'<tr><td colspan="100%">No guests found.</td></tr>';
 
-    `<div class="card">
-
-      <button
-        class="primary"
-        onclick="addMT()"
-      >
-        New ticket
-      </button>
-
-    </div>` +
-
-    table(
-      [
-        'Title',
-        'Room',
-        'Priority',
-        'Status',
-        'Cost'
-      ],
-
-      MT.map(
-        x => [
-
-          esc(x.title),
-
-          esc(
-            x.rooms?.room_number ||
-            ''
-          ),
-
-          esc(x.priority),
-
-          esc(x.status),
-
-          money(x.cost)
-
-        ]
-      )
-    );
+return;
 
 }
 
+table.innerHTML =
+G.map(
+guest => "<tr> <td>${escapeHtml(guest.full_name || guest.name || '-')}</td> <td>${escapeHtml(guest.email || '-')}</td> <td>${escapeHtml(guest.phone || '-')}</td> <td>${dateValue(guest.created_at)}</td> </tr>"
+).join('');
+}
 
-async function addMT() {
+/* =========================
+LOAD HOUSEKEEPING
+========================= */
 
-  const title =
-    prompt(
-      'Issue title'
-    );
+async function loadHousekeeping() {
+const {
+data,
+error
+} = await db
+.from('housekeeping_tasks')
+.select('*')
+.order(
+'created_at',
+{
+ascending: false
+}
+);
 
+if (error) {
+console.error(
+'Housekeeping error:',
+error
+);
 
-  if (!title) {
-    return;
-  }
-
-
-  await q(
-    db
-      .from(
-        'maintenance_tasks'
-      )
-      .insert({
-        title,
-
-        description:
-          prompt(
-            'Description'
-          ) || null
-      })
-  );
-
-
-  await load();
-
-  render(
-    'maintenance'
-  );
+return;
 
 }
 
+HK = data || [];
 
-/* =========================================================
-   FOLIOS
-========================================================= */
+renderHousekeeping();
+}
 
-function folios() {
+function renderHousekeeping() {
+const table =
+$('housekeepingTable');
 
-  $('main').innerHTML =
+if (!table) return;
 
-    head(
-      'Folios & Billing',
-      'Guest accounts and balances'
-    ) +
+if (!HK.length) {
+table.innerHTML =
+'<tr><td colspan="100%">No housekeeping tasks found.</td></tr>';
 
-    table(
-      [
-        'Booking',
-        'Status',
-        'Total',
-        'Paid',
-        'Balance'
-      ],
-
-      F.map(
-        x => [
-
-          esc(
-            B.find(
-              b =>
-                b.id ===
-                x.booking_id
-            )
-            ?.booking_reference ||
-            ''
-          ),
-
-          esc(x.status),
-
-          money(x.total),
-
-          money(x.paid),
-
-          money(x.balance)
-
-        ]
-      )
-    );
+return;
 
 }
 
+table.innerHTML =
+HK.map(
+task => "<tr> <td>${escapeHtml(task.room_id || '-')}</td> <td>${escapeHtml(task.task_type || task.type || '-')}</td> <td>${escapeHtml(task.status || '-')}</td> <td>${escapeHtml(task.assigned_to || '-')}</td> <td>${dateValue(task.created_at)}</td> </tr>"
+).join('');
+}
 
-/* =========================================================
-   PAYMENTS
-========================================================= */
+/* =========================
+LOAD MAINTENANCE
+========================= */
 
-function payments() {
+async function loadMaintenance() {
+const {
+data,
+error
+} = await db
+.from('maintenance_tasks')
+.select('*')
+.order(
+'created_at',
+{
+ascending: false
+}
+);
 
-  $('main').innerHTML =
+if (error) {
+console.error(
+'Maintenance error:',
+error
+);
 
-    head(
-      'Payments',
-      'Payment ledger and reconciliation'
-    ) +
-
-    table(
-      [
-        'Date',
-        'Booking',
-        'Amount',
-        'Method',
-        'Status',
-        'Reference'
-      ],
-
-      P.map(
-        x => [
-
-          new Date(
-            x.created_at
-          ).toLocaleString(),
-
-          esc(
-            B.find(
-              b =>
-                b.id ===
-                x.booking_id
-            )
-            ?.booking_reference ||
-            ''
-          ),
-
-          money(x.amount),
-
-          esc(x.method),
-
-          esc(x.status),
-
-          esc(
-            x.provider_reference ||
-            ''
-          )
-
-        ]
-      )
-    );
+return;
 
 }
 
+MT = data || [];
 
-/* =========================================================
-   RATES
-========================================================= */
+renderMaintenance();
+}
 
-async function rates() {
+function renderMaintenance() {
+const table =
+$('maintenanceTable');
 
-  const a =
-    await q(
-      db
-        .from('rate_rules')
-        .select(
-          '*,room_types(name)'
-        )
-        .order(
-          'start_date',
-          {
-            ascending: false
-          }
-        )
-    );
+if (!table) return;
 
+if (!MT.length) {
+table.innerHTML =
+'<tr><td colspan="100%">No maintenance tasks found.</td></tr>';
 
-  $('main').innerHTML =
-
-    head(
-      'Rates & Promotions',
-      'Seasonal rates and minimum stays'
-    ) +
-
-    table(
-      [
-        'Room',
-        'Rule',
-        'Dates',
-        'Rate',
-        'Min nights',
-        'Active'
-      ],
-
-      a.map(
-        x => [
-
-          esc(
-            x.room_types?.name
-          ),
-
-          esc(x.name),
-
-          `${x.start_date}
-           → ${x.end_date}`,
-
-          money(
-            x.price_per_night
-          ),
-
-          x.minimum_nights,
-
-          x.is_active
-            ? 'Yes'
-            : 'No'
-
-        ]
-      )
-    );
+return;
 
 }
 
+table.innerHTML =
+MT.map(
+task => "<tr> <td>${escapeHtml(task.room_id || '-')}</td> <td>${escapeHtml(task.title || task.task_type || '-')}</td> <td>${escapeHtml(task.status || '-')}</td> <td>${escapeHtml(task.priority || '-')}</td> <td>${dateValue(task.created_at)}</td> </tr>"
+).join('');
+}
 
-/* =========================================================
-   EXTRAS
-========================================================= */
+/* =========================
+LOAD PAYMENTS
+========================= */
 
-async function extras() {
+async function loadPayments() {
+const {
+data,
+error
+} = await db
+.from('payments')
+.select('*')
+.order(
+'created_at',
+{
+ascending: false
+}
+);
 
-  const a =
-    await q(
-      db
-        .from(
-          'booking_extras_catalog'
-        )
-        .select('*')
-        .order('name')
-    );
+if (error) {
+console.error(
+'Payments error:',
+error
+);
 
-
-  $('main').innerHTML =
-
-    head(
-      'Extras & Add-ons',
-      'Breakfast, transfers, laundry and services'
-    ) +
-
-    table(
-      [
-        'Name',
-        'Price',
-        'Pricing',
-        'Active'
-      ],
-
-      a.map(
-        x => [
-
-          esc(x.name),
-
-          money(x.price),
-
-          esc(
-            x.pricing_type
-          ),
-
-          x.is_active
-            ? 'Yes'
-            : 'No'
-
-        ]
-      )
-    );
+return;
 
 }
 
+P = data || [];
 
-/* =========================================================
-   REPORTS
-========================================================= */
+renderPayments();
+}
 
-function reports() {
+function renderPayments() {
+const table =
+$('paymentsTable');
 
-  const total =
-    B.length;
+if (!table) return;
 
-  const confirmed =
-    B.filter(
-      x =>
-        x.status ===
-        'confirmed'
-    ).length;
+if (!P.length) {
+table.innerHTML =
+'<tr><td colspan="100%">No payments found.</td></tr>';
 
-
-  $('main').innerHTML =
-
-    head(
-      'Reports & Analytics',
-      'Operational KPIs and exports'
-    ) +
-
-    `<div class="grid">
-
-      <div class="card">
-
-        <div class="muted">
-          Bookings
-        </div>
-
-        <div class="stat">
-          ${total}
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="muted">
-          Confirmed
-        </div>
-
-        <div class="stat">
-          ${confirmed}
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="muted">
-          Confirmation rate
-        </div>
-
-        <div class="stat">
-
-          ${
-            total
-              ? Math.round(
-                  confirmed /
-                  total *
-                  100
-                )
-              : 0
-          }%
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="card">
-
-      <button
-        class="primary"
-        onclick="csv()"
-      >
-        Export bookings CSV
-      </button>
-
-    </div>`;
+return;
 
 }
 
+table.innerHTML =
+P.map(
+payment => "<tr> <td>${escapeHtml(payment.id)}</td> <td>${money(payment.amount)}</td> <td>${escapeHtml(payment.method || payment.payment_method || '-')}</td> <td>${escapeHtml(payment.status || '-')}</td> <td>${dateValue(payment.created_at)}</td> </tr>"
+).join('');
+}
 
-/* =========================================================
-   CSV EXPORT
-========================================================= */
+/* =========================
+LOAD FOLIOS
+========================= */
 
-function csv() {
+async function loadFolios() {
+const {
+data,
+error
+} = await db
+.from('folios')
+.select('*')
+.order(
+'created_at',
+{
+ascending: false
+}
+);
 
-  const keys = [
+if (error) {
+console.error(
+'Folios error:',
+error
+);
 
-    'booking_reference',
-    'guest_first_name',
-    'guest_last_name',
-    'guest_email',
-    'guest_phone',
-    'check_in',
-    'check_out',
-    'nights',
-    'room_price',
-    'total_amount',
-    'status',
-    'payment_status'
-
-  ];
-
-
-  const out = [
-
-    keys.join(','),
-
-    ...B.map(
-      b =>
-
-        keys
-          .map(
-            k =>
-              `"${String(
-                b[k] ?? ''
-              ).replaceAll(
-                '"',
-                '""'
-              )}"`
-          )
-          .join(',')
-    )
-
-  ].join('\n');
-
-
-  const a =
-    document.createElement(
-      'a'
-    );
-
-
-  a.href =
-    URL.createObjectURL(
-      new Blob(
-        [out],
-        {
-          type:
-            'text/csv'
-        }
-      )
-    );
-
-
-  a.download =
-    'nordic-bookings.csv';
-
-
-  a.click();
+return;
 
 }
 
+F = data || [];
 
-/* =========================================================
-   STAFF
-========================================================= */
+renderFolios();
+}
 
-async function staff() {
+function renderFolios() {
+const table =
+$('foliosTable');
 
-  const a =
-    await q(
-      db
-        .from(
-          'staff_profiles'
-        )
-        .select('*')
-    );
+if (!table) return;
 
+if (!F.length) {
+table.innerHTML =
+'<tr><td colspan="100%">No folios found.</td></tr>';
 
-  $('main').innerHTML =
-
-    head(
-      'Staff & Permissions',
-      'Role foundation'
-    ) +
-
-    table(
-      [
-        'User',
-        'Name',
-        'Role',
-        'Active'
-      ],
-
-      a.map(
-        x => [
-
-          esc(x.id),
-
-          esc(
-            x.full_name
-          ),
-
-          esc(x.role),
-
-          x.is_active
-            ? 'Yes'
-            : 'No'
-
-        ]
-      )
-    );
+return;
 
 }
 
+table.innerHTML =
+F.map(
+folio => "<tr> <td>${escapeHtml(folio.id)}</td> <td>${escapeHtml(folio.booking_id || '-')}</td> <td>${money(folio.total || folio.amount || 0)}</td> <td>${escapeHtml(folio.status || '-')}</td> <td>${dateValue(folio.created_at)}</td> </tr>"
+).join('');
+}
 
-/* =========================================================
-   AUDIT LOG
-========================================================= */
+/* =========================
+LOAD STAFF
+========================= */
 
-async function audit() {
+async function loadStaff() {
+const {
+data,
+error
+} = await db
+.from('staff_profiles')
+.select('*')
+.order(
+'created_at',
+{
+ascending: false
+}
+);
 
-  const a =
-    await q(
-      db
-        .from(
-          'audit_logs'
-        )
-        .select('*')
-        .order(
-          'created_at',
-          {
-            ascending:
-              false
-          }
-        )
-        .limit(100)
-    );
+if (error) {
+console.error(
+'Staff error:',
+error
+);
 
-
-  $('main').innerHTML =
-
-    head(
-      'Audit Log',
-      'Administrative activity trail'
-    ) +
-
-    table(
-      [
-        'Date',
-        'Action',
-        'Entity',
-        'Details'
-      ],
-
-      a.map(
-        x => [
-
-          new Date(
-            x.created_at
-          ).toLocaleString(),
-
-          esc(x.action),
-
-          esc(
-            x.entity_type
-          ),
-
-          esc(
-            JSON.stringify(
-              x.details
-            )
-          )
-
-        ]
-      )
-    );
+return;
 
 }
 
+renderStaff(data || []);
+}
 
-/* =========================================================
-   TABLE
-========================================================= */
+function renderStaff(staff) {
+const table =
+$('staffTable');
 
-function table(
-  headers,
-  rows
-) {
+if (!table) return;
 
-  return `
+if (!staff.length) {
+table.innerHTML =
+'<tr><td colspan="100%">No staff found.</td></tr>';
 
-    <div class="card tablewrap">
-
-      <table class="table">
-
-        <thead>
-
-          <tr>
-
-            ${
-              headers
-                .map(
-                  x =>
-                    `<th>${esc(x)}</th>`
-                )
-                .join('')
-            }
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          ${
-            rows
-              .map(
-                row =>
-                  `<tr>
-                    ${
-                      row
-                        .map(
-                          cell =>
-                            `<td>${cell}</td>`
-                        )
-                        .join('')
-                    }
-                  </tr>`
-              )
-              .join('')
-
-            ||
-
-            `<tr>
-
-              <td
-                colspan="${headers.length}"
-              >
-                No records.
-              </td>
-
-            </tr>`
-          }
-
-        </tbody>
-
-      </table>
-
-    </div>`;
+return;
 
 }
 
-
-/* =========================================================
-   RENDER
-========================================================= */
-
-function render(view) {
-
-  const pages = {
-
-    dashboard,
-
-    frontdesk,
-
-    calendar,
-
-    guests,
-
-    housekeeping,
-
-    maintenance,
-
-    folios,
-
-    payments,
-
-    rates,
-
-    extras,
-
-    reports,
-
-    staff,
-
-    audit
-
-  };
-
-
-  (
-    pages[view] ||
-    dashboard
-  )();
-
+table.innerHTML =
+staff.map(
+member => "<tr> <td>${escapeHtml(member.full_name || member.name || '-')}</td> <td>${escapeHtml(member.role || '-')}</td> <td>${escapeHtml(member.email || '-')}</td> <td>${escapeHtml(member.phone || '-')}</td> <td>${escapeHtml(member.status || '-')}</td> </tr>"
+).join('');
 }
 
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-$('loginForm').onsubmit =
-  async event => {
-
-    event.preventDefault();
-
-    loginError(
-      'Signing in…'
-    );
-
-
-    try {
-
-      const {
-        error
-      } =
-        await db.auth.signInWithPassword({
-
-          email:
-            $('email')
-              .value
-              .trim(),
-
-          password:
-            $('password')
-              .value
-
-        });
-
-
-      if (error) {
-        throw error;
-      }
-
-
-      const {
-        data: userData,
-        error: userError
-      } =
-        await db.auth.getUser();
-
-
-      if (userError) {
-        throw userError;
-      }
-
-
-      const user =
-        userData?.user;
-
-
-      if (!user) {
-
-        throw new Error(
-          'Unable to identify the signed-in user.'
-        );
-
-      }
-
-
-      const {
-        data: admin,
-        error: adminError
-      } =
-        await db.rpc(
-          'is_admin_user'
-        );
-
-
-      if (adminError) {
-        throw adminError;
-      }
-
-
-      if (!admin) {
-
-        throw new Error(
-          'This account is not authorized as an administrator.'
-        );
-
-      }
-
-
-      showApp(user);
-
-      await load();
-
-      render(
-        'dashboard'
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        'Login error:',
-        error
-      );
-
-      loginError(
-        error?.message ||
-        'Unable to sign in.'
-      );
-
-      await db.auth.signOut();
-
-    }
-
-  };
-
-
-/* =========================================================
-   FORGOT PASSWORD BUTTON
-========================================================= */
-
-$('forgotPassword').onclick =
-  requestPasswordReset;
-
-
-/* =========================================================
-   RESET PASSWORD FORM
-========================================================= */
-
-$('resetForm').onsubmit =
-  async event => {
-
-    event.preventDefault();
-
-    await updatePassword();
-
-  };
-
-
-/* =========================================================
-   BACK TO LOGIN
-========================================================= */
-
-$('backToLogin').onclick =
-  async () => {
-
-    await db.auth.signOut();
-
-    $('newPassword').value = '';
-
-    $('confirmPassword').value = '';
-
-    showLogin();
-
-  };
-
-
-/* =========================================================
-   LOGOUT
-========================================================= */
-
-$('logout').onclick =
-  async () => {
-
-    await db.auth.signOut();
-
-    location.reload();
-
-  };
-
-
-/* =========================================================
-   MOBILE MENU
-========================================================= */
-
-$('menu').onclick =
-  () => {
-
-    $('side')
-      .classList
-      .toggle('open');
-
-  };
-
-
-/* =========================================================
-   NAVIGATION BUTTONS
-========================================================= */
+/* =========================
+LOAD ALL DATA
+========================= */
+
+async function loadAll() {
+await Promise.allSettled([
+loadDashboard(),
+loadBookings(),
+loadRooms(),
+loadRoomTypes(),
+loadGuests(),
+loadHousekeeping(),
+loadMaintenance(),
+loadPayments(),
+loadFolios(),
+loadStaff()
+]);
+}
+
+/* =========================
+NAVIGATION
+========================= */
 
 document
-  .querySelectorAll(
-    '#side button'
-  )
-  .forEach(
-    button => {
+.querySelectorAll('[data-section]')
+.forEach(button => {
 
-      button.onclick =
-        () =>
-          render(
-            button.dataset.v
-          );
+button.addEventListener(
+  'click',
+  async () => {
 
-    }
-  );
+    const section =
+      button.dataset.section;
 
+    document
+      .querySelectorAll('[data-section]')
+      .forEach(item => {
+        item.classList.remove(
+          'active'
+        );
+      });
 
-/* =========================================================
-   AUTH STATE CHANGE
-========================================================= */
-
-db.auth.onAuthStateChange(
-  (event, session) => {
-
-    console.log(
-      'Supabase auth event:',
-      event
+    button.classList.add(
+      'active'
     );
 
+    document
+      .querySelectorAll('.pms-section')
+      .forEach(panel => {
+        panel.classList.add(
+          'hidden'
+        );
+      });
 
-    if (
-      event ===
-      'PASSWORD_RECOVERY'
-    ) {
+    const target =
+      $(section);
 
-      showReset();
-
-      return;
+    if (target) {
+      target.classList.remove(
+        'hidden'
+      );
     }
 
-
-    if (
-      event ===
-      'SIGNED_OUT'
-    ) {
-
-      if (
-        $('reset')
-          .classList
-          .contains(
-            'hidden'
-          )
-      ) {
-
-        showLogin();
-
-      }
-
+    if (section === 'dashboard') {
+      await loadDashboard();
     }
 
+    if (section === 'bookings') {
+      await loadBookings();
+    }
+
+    if (section === 'rooms') {
+      await loadRooms();
+    }
+
+    if (section === 'guests') {
+      await loadGuests();
+    }
+
+    if (section === 'housekeeping') {
+      await loadHousekeeping();
+    }
+
+    if (section === 'maintenance') {
+      await loadMaintenance();
+    }
+
+    if (section === 'payments') {
+      await loadPayments();
+    }
+
+    if (section === 'folios') {
+      await loadFolios();
+    }
+
+    if (section === 'staff') {
+      await loadStaff();
+    }
   }
 );
 
+});
 
-/* =========================================================
-   INITIAL SESSION CHECK
-========================================================= */
+/* =========================
+AUTH STATE LISTENER
+========================= */
 
-async function initialise() {
+db.auth.onAuthStateChange(
+async (event, session) => {
+
+console.log(
+  'Auth event:',
+  event
+);
+
+if (
+  event ===
+  'PASSWORD_RECOVERY'
+) {
+  showReset();
+  return;
+}
+
+if (
+  event === 'SIGNED_OUT'
+) {
+  showLogin();
+  return;
+}
+
+if (
+  event === 'SIGNED_IN' &&
+  session
+) {
+
+  if (isRecoveryUrl()) {
+    showReset();
+    return;
+  }
 
   try {
+    const isAdmin =
+      await verifyAdmin();
 
-    /*
-      Supabase automatically processes
-      the recovery URL because
-      detectSessionInUrl is enabled.
-    */
-
-    const {
-      data,
-      error
-    } =
-      await db.auth.getSession();
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    const session =
-      data?.session;
-
-
-    /*
-      If this is a recovery URL,
-      wait for Supabase's
-      PASSWORD_RECOVERY event.
-    */
-
-    const hash =
-      window.location.hash || '';
-
-
-    const search =
-      window.location.search || '';
-
-
-    const isRecovery =
-      hash.includes(
-        'type=recovery'
-      ) ||
-      search.includes(
-        'type=recovery'
+    if (isAdmin) {
+      showApp();
+    } else {
+      setLoginError(
+        'This account does not have administrator access.'
       );
-
-
-    if (isRecovery) {
-
-      showReset();
-
-      return;
-    }
-
-
-    if (!session) {
-
-      showLogin();
-
-      return;
-
-    }
-
-
-    const {
-      data: userData,
-      error: userError
-    } =
-      await db.auth.getUser();
-
-
-    if (userError) {
-      throw userError;
-    }
-
-
-    const user =
-      userData?.user;
-
-
-    if (!user) {
 
       await db.auth.signOut();
-
-      showLogin();
-
-      return;
-
     }
-
-
-    const {
-      data: admin,
-      error: adminError
-    } =
-      await db.rpc(
-        'is_admin_user'
-      );
-
-
-    if (adminError) {
-      throw adminError;
-    }
-
-
-    if (!admin) {
-
-      await db.auth.signOut();
-
-      showLogin();
-
-      loginError(
-        'This account is not authorized as an administrator.'
-      );
-
-      return;
-
-    }
-
-
-    showApp(user);
-
-    await load();
-
-    render(
-      'dashboard'
-    );
-
 
   } catch (error) {
-
     console.error(
-      'PMS initialization error:',
+      'Admin verification error:',
       error
+    );
+
+    setLoginError(
+      'Unable to verify administrator access.'
     );
 
     await db.auth.signOut();
-
-    showLogin();
-
   }
-
 }
 
+}
+);
 
-/* =========================================================
-   START PMS
-========================================================= */
+/* =========================
+INITIALISE
+========================= */
+
+async function initialise() {
+
+try {
+
+/*
+  If Supabase has redirected us here
+  for password recovery, show the
+  password reset screen.
+*/
+
+if (isRecoveryUrl()) {
+  showReset();
+  return;
+}
+
+const {
+  data,
+  error
+} = await db.auth.getSession();
+
+if (error) {
+  console.error(
+    'Session error:',
+    error
+  );
+
+  showLogin();
+  return;
+}
+
+const session =
+  data?.session;
+
+if (!session) {
+  showLogin();
+  return;
+}
+
+const isAdmin =
+  await verifyAdmin();
+
+if (!isAdmin) {
+  await db.auth.signOut();
+
+  setLoginError(
+    'This account does not have administrator access.'
+  );
+
+  return;
+}
+
+showApp();
+
+} catch (error) {
+
+console.error(
+  'Initialisation error:',
+  error
+);
+
+showLogin();
+
+}
+}
+
+/* =========================
+START PMS
+========================= */
 
 initialise();
