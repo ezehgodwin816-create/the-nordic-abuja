@@ -1,263 +1,336 @@
-const URL_='https://rzjvhfnizwckzbdawrb.supabase.co',
-KEY='sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob',
-db=supabase.createClient(URL_,KEY);
+/* =========================================================
+   THE NORDIC ABUJA PMS
+   Original Supabase Project
+========================================================= */
 
-let B=[],R=[],RT=[],G=[],HK=[],MT=[],P=[],F=[];
+const URL_ =
+  'https://rzjvhfnizwckzbdawrb.supabase.co';
 
-const $=x=>document.getElementById(x);
+const KEY =
+  'sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob';
 
-const esc=x=>String(x??'').replace(/[&<>"']/g,m=>({
-  '&':'&amp;',
-  '<':'&lt;',
-  '>':'&gt;',
-  '"':'&quot;',
-  "'":'&#39;'
-}[m]));
+const db = supabase.createClient(
+  URL_,
+  KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }
+);
 
-const money=x=>'₦'+Number(x||0).toLocaleString('en-NG',{
-  minimumFractionDigits:2
-});
 
-async function q(x){
-  let{data,error}=await x;
-  if(error)throw error;
+/* =========================================================
+   DATA
+========================================================= */
+
+let B = [];
+let R = [];
+let RT = [];
+let G = [];
+let HK = [];
+let MT = [];
+let P = [];
+let F = [];
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = x =>
+  document.getElementById(x);
+
+
+const esc = x =>
+  String(x ?? '').replace(
+    /[&<>"']/g,
+    m => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[m])
+  );
+
+
+const money = x =>
+  '₦' +
+  Number(x || 0).toLocaleString(
+    'en-NG',
+    {
+      minimumFractionDigits: 2
+    }
+  );
+
+
+async function q(x) {
+
+  const {
+    data,
+    error
+  } = await x;
+
+  if (error) {
+    throw error;
+  }
+
   return data;
 }
 
-function err(x){
-  $('loginError').textContent=x||'';
+
+function loginError(message) {
+
+  const el = $('loginError');
+
+  if (el) {
+    el.textContent = message || '';
+  }
+
 }
 
-function resetErr(x){
-  $('resetError').textContent=x||'';
+
+function resetError(message) {
+
+  const el = $('resetError');
+
+  if (el) {
+    el.textContent = message || '';
+  }
+
 }
 
 
 /* =========================================================
-   PASSWORD RECOVERY UI
+   SCREEN CONTROL
 ========================================================= */
 
-function showLogin(){
-  $('reset').classList.add('hidden');
-  $('app').classList.add('hidden');
+function showLogin() {
+
   $('login').classList.remove('hidden');
 
-  $('loginError').textContent='';
-  $('resetError').textContent='';
+  $('reset').classList.add('hidden');
+
+  $('app').classList.add('hidden');
+
+  loginError('');
+
+  resetError('');
+
 }
 
-function showReset(){
+
+function showReset() {
+
   $('login').classList.add('hidden');
+
   $('app').classList.add('hidden');
+
   $('reset').classList.remove('hidden');
 
-  $('resetError').textContent='';
+  resetError('');
+
 }
 
-async function requestPasswordReset(){
 
-  const email=$('email').value.trim();
+function showApp(user) {
 
-  if(!email){
-    err('Enter your admin email first.');
-    $('email').focus();
-    return;
-  }
+  $('login').classList.add('hidden');
 
-  err('Sending password recovery email…');
+  $('reset').classList.add('hidden');
 
-  try{
+  $('app').classList.remove('hidden');
 
-    const redirectTo=window.location.origin+window.location.pathname;
+  $('who').textContent =
+    user?.email || '';
 
-    const{error}=await db.auth.resetPasswordForEmail(email,{
-      redirectTo
-    });
-
-    if(error)throw error;
-
-    err('Recovery email sent. Check your email and open the newest reset link.');
-
-  }catch(x){
-
-    err(x.message||'Unable to send password recovery email.');
-
-  }
 }
 
 
 /* =========================================================
-   LOGIN
+   PASSWORD RECOVERY
 ========================================================= */
 
-$('loginForm').onsubmit=async e=>{
+async function requestPasswordReset() {
 
-  e.preventDefault();
+  const email =
+    $('email').value.trim();
 
-  err('Signing in…');
+  if (!email) {
 
-  try{
+    loginError(
+      'Enter your admin email first.'
+    );
 
-    let{error}=await db.auth.signInWithPassword({
-      email:$('email').value.trim(),
-      password:$('password').value
-    });
+    $('email').focus();
 
-    if(error)throw error;
+    return;
+  }
 
-    let{data:u}=await db.auth.getUser();
 
-    let{data:a,error:ae}=await db.rpc('is_admin_user');
+  loginError(
+    'Sending password recovery email…'
+  );
 
-    if(ae)throw ae;
 
-    if(!a){
-      throw Error(
-        'This account is not authorized as an administrator.'
+  try {
+
+    const redirectTo =
+      window.location.origin +
+      window.location.pathname;
+
+
+    const {
+      error
+    } =
+      await db.auth.resetPasswordForEmail(
+        email,
+        {
+          redirectTo
+        }
       );
+
+
+    if (error) {
+      throw error;
     }
 
-    $('login').classList.add('hidden');
-    $('reset').classList.add('hidden');
-    $('app').classList.remove('hidden');
 
-    $('who').textContent=u.user.email;
-
-    await load();
-
-    render('dashboard');
-
-  }catch(x){
-
-    err(x.message);
-
-    await db.auth.signOut();
-
-  }
-
-};
+    loginError(
+      'Recovery email sent. Check your email and open the newest reset link.'
+    );
 
 
-/* =========================================================
-   FORGOT PASSWORD
-========================================================= */
+  } catch (error) {
 
-$('forgotPassword').onclick=async()=>{
+    console.error(
+      'Password recovery error:',
+      error
+    );
 
-  await requestPasswordReset();
-
-};
-
-
-/* =========================================================
-   PASSWORD UPDATE
-========================================================= */
-
-$('resetForm').onsubmit=async e=>{
-
-  e.preventDefault();
-
-  resetErr('Updating password…');
-
-  const password=$('newPassword').value;
-  const confirm=$('confirmPassword').value;
-
-  if(password.length<8){
-
-    resetErr('Password must be at least 8 characters.');
-
-    return;
-  }
-
-  if(password!==confirm){
-
-    resetErr('The passwords do not match.');
-
-    return;
-  }
-
-  try{
-
-    const{error}=await db.auth.updateUser({
-      password
-    });
-
-    if(error)throw error;
-
-    resetErr('Password updated successfully. Returning to login…');
-
-    setTimeout(async()=>{
-
-      await db.auth.signOut();
-
-      $('newPassword').value='';
-      $('confirmPassword').value='';
-
-      showLogin();
-
-      $('loginError').textContent=
-        'Password updated. You can now sign in with your new password.';
-
-    },1200);
-
-  }catch(x){
-
-    resetErr(
-      x.message||'Unable to update password.'
+    loginError(
+      error?.message ||
+      'Unable to send password recovery email.'
     );
 
   }
 
-};
+}
 
 
 /* =========================================================
-   BACK TO LOGIN
+   PASSWORD RESET FORM
 ========================================================= */
 
-$('backToLogin').onclick=async()=>{
+async function updatePassword() {
 
-  await db.auth.signOut();
+  const password =
+    $('newPassword').value;
 
-  $('newPassword').value='';
-  $('confirmPassword').value='';
-
-  showLogin();
-
-};
+  const confirmation =
+    $('confirmPassword').value;
 
 
-/* =========================================================
-   AUTH STATE
-========================================================= */
+  if (password.length < 8) {
 
-db.auth.onAuthStateChange(async(event,session)=>{
-
-  if(event==='PASSWORD_RECOVERY'){
-
-    showReset();
+    resetError(
+      'Password must be at least 8 characters.'
+    );
 
     return;
   }
 
-  if(event==='SIGNED_OUT'){
 
-    if(!$('reset').classList.contains('hidden')){
+  if (password !== confirmation) {
 
-      return;
+    resetError(
+      'The passwords do not match.'
+    );
+
+    return;
+  }
+
+
+  resetError(
+    'Updating password…'
+  );
+
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await db.auth.updateUser({
+        password
+      });
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    if (!data?.user) {
+
+      throw new Error(
+        'Password update session was not found. Please open the newest recovery email again.'
+      );
 
     }
 
+
+    resetError(
+      'Password updated successfully.'
+    );
+
+
+    setTimeout(
+      async () => {
+
+        await db.auth.signOut();
+
+        $('newPassword').value = '';
+
+        $('confirmPassword').value = '';
+
+        showLogin();
+
+        loginError(
+          'Password updated. You can now sign in with your new password.'
+        );
+
+      },
+      1200
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'Password update error:',
+      error
+    );
+
+    resetError(
+      error?.message ||
+      'Unable to update password.'
+    );
+
   }
 
-});
+}
 
 
 /* =========================================================
    LOAD PMS DATA
 ========================================================= */
 
-async function load(){
+async function load() {
 
   [
     B,
@@ -268,54 +341,98 @@ async function load(){
     MT,
     P,
     F
-  ]=await Promise.all([
+  ] = await Promise.all([
 
     q(
-      db.from('bookings')
+      db
+        .from('bookings')
         .select('*')
-        .order('created_at',{ascending:false})
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        )
     ),
 
     q(
-      db.from('rooms')
-        .select('*,room_types(name)')
+      db
+        .from('rooms')
+        .select(
+          '*,room_types(name)'
+        )
         .order('room_number')
     ),
 
     q(
-      db.from('room_types')
+      db
+        .from('room_types')
         .select('*')
         .order('name')
     ),
 
     q(
-      db.from('guest_profiles')
+      db
+        .from('guest_profiles')
         .select('*')
-        .order('created_at',{ascending:false})
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        )
     ),
 
     q(
-      db.from('housekeeping_tasks')
-        .select('*,rooms(room_number)')
-        .order('created_at',{ascending:false})
+      db
+        .from('housekeeping_tasks')
+        .select(
+          '*,rooms(room_number)'
+        )
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        )
     ),
 
     q(
-      db.from('maintenance_tasks')
-        .select('*,rooms(room_number)')
-        .order('created_at',{ascending:false})
+      db
+        .from('maintenance_tasks')
+        .select(
+          '*,rooms(room_number)'
+        )
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        )
     ),
 
     q(
-      db.from('payments')
+      db
+        .from('payments')
         .select('*')
-        .order('created_at',{ascending:false})
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        )
     ),
 
     q(
-      db.from('folios')
+      db
+        .from('folios')
         .select('*')
-        .order('created_at',{ascending:false})
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        )
     )
 
   ]);
@@ -324,57 +441,118 @@ async function load(){
 
 
 /* =========================================================
-   HEADER
+   PAGE HEADER
 ========================================================= */
 
-const head=(a,b)=>
-`<div class="head">
-  <h1>${a}</h1>
-  <div class="muted">${b}</div>
-</div>`;
+const head = (
+  title,
+  subtitle
+) =>
+  `<div class="head">
+    <h1>${esc(title)}</h1>
+    <div class="muted">
+      ${esc(subtitle)}
+    </div>
+  </div>`;
 
 
 /* =========================================================
    DASHBOARD
 ========================================================= */
 
-async function dashboard(){
+async function dashboard() {
 
-  let s={};
+  let s = {};
 
-  try{
+  try {
 
-    s=await q(
-      db.rpc('pms_dashboard_stats')
+    s =
+      await q(
+        db.rpc(
+          'pms_dashboard_stats'
+        )
+      );
+
+  } catch (error) {
+
+    console.error(
+      'Dashboard stats error:',
+      error
     );
 
-  }catch(e){}
+  }
 
-  $('main').innerHTML=
+
+  $('main').innerHTML =
+
     head(
       'Hotel Operations',
       'Live property overview'
-    )+
+    ) +
 
-    `<div class="grid">${
-      [
-        ['Rooms',s.rooms_total],
-        ['Available',s.rooms_available],
-        ['Occupied',s.rooms_occupied],
-        ['Maintenance',s.rooms_maintenance],
-        ['Pending',s.bookings_pending],
-        ['Confirmed',s.bookings_confirmed],
-        ['Paid revenue',money(s.revenue_paid)],
-        ['Open maintenance',s.open_maintenance]
-      ]
-      .map(x=>
-        `<div class="card">
-          <div class="muted">${x[0]}</div>
-          <div class="stat">${x[1]??0}</div>
-        </div>`
-      )
-      .join('')
-    }</div>`;
+    `<div class="grid">
+
+      ${
+        [
+          [
+            'Rooms',
+            s.rooms_total
+          ],
+
+          [
+            'Available',
+            s.rooms_available
+          ],
+
+          [
+            'Occupied',
+            s.rooms_occupied
+          ],
+
+          [
+            'Maintenance',
+            s.rooms_maintenance
+          ],
+
+          [
+            'Pending',
+            s.bookings_pending
+          ],
+
+          [
+            'Confirmed',
+            s.bookings_confirmed
+          ],
+
+          [
+            'Paid revenue',
+            money(s.revenue_paid)
+          ],
+
+          [
+            'Open maintenance',
+            s.open_maintenance
+          ]
+
+        ]
+        .map(
+          x =>
+            `<div class="card">
+
+              <div class="muted">
+                ${esc(x[0])}
+              </div>
+
+              <div class="stat">
+                ${x[1] ?? 0}
+              </div>
+
+            </div>`
+        )
+        .join('')
+      }
+
+    </div>`;
 
 }
 
@@ -383,13 +561,14 @@ async function dashboard(){
    FRONT DESK
 ========================================================= */
 
-function frontdesk(){
+function frontdesk() {
 
-  $('main').innerHTML=
+  $('main').innerHTML =
+
     head(
       'Front Desk',
       'Arrivals, in-house guests and departures'
-    )+
+    ) +
 
     table(
       [
@@ -400,61 +579,83 @@ function frontdesk(){
         'Actions'
       ],
 
-      B.map(b=>[
-        esc(b.booking_reference),
+      B.map(
+        b => [
 
-        esc(
-          b.guest_first_name+
-          ' '+
-          b.guest_last_name
-        ),
+          esc(
+            b.booking_reference
+          ),
 
-        `${b.check_in} → ${b.check_out}`,
+          esc(
+            b.guest_first_name +
+            ' ' +
+            b.guest_last_name
+          ),
 
-        esc(b.status),
+          `${esc(b.check_in)}
+           → ${esc(b.check_out)}`,
 
-        `<button
-          class="secondary"
-          onclick="cin('${b.id}')"
-        >
-          Check in
-        </button>
+          esc(b.status),
 
-        <button
-          class="secondary"
-          onclick="cout('${b.id}')"
-        >
-          Check out
-        </button>`
-      ])
+          `<button
+            class="secondary"
+            onclick="cin('${b.id}')"
+          >
+            Check in
+          </button>
+
+          <button
+            class="secondary"
+            onclick="cout('${b.id}')"
+          >
+            Check out
+          </button>`
+
+        ]
+      )
     );
 
 }
 
 
-async function cin(id){
+/* =========================================================
+   CHECK IN
+========================================================= */
 
-  let b=B.find(x=>x.id===id);
+async function cin(id) {
+
+  const b =
+    B.find(
+      x => x.id === id
+    );
+
 
   await q(
-    db.from('bookings')
+    db
+      .from('bookings')
       .update({
-        status:'confirmed'
+        status: 'confirmed'
       })
-      .eq('id',id)
+      .eq('id', id)
   );
 
-  if(b?.room_id){
+
+  if (b?.room_id) {
 
     await q(
-      db.from('rooms')
+      db
+        .from('rooms')
         .update({
-          status:'occupied'
+          status: 'occupied'
         })
-        .eq('id',b.room_id)
+        .eq(
+          'id',
+          b.room_id
+        )
     );
 
   }
+
 
   await load();
 
@@ -463,29 +664,44 @@ async function cin(id){
 }
 
 
-async function cout(id){
+/* =========================================================
+   CHECK OUT
+========================================================= */
 
-  let b=B.find(x=>x.id===id);
+async function cout(id) {
+
+  const b =
+    B.find(
+      x => x.id === id
+    );
+
 
   await q(
-    db.from('bookings')
+    db
+      .from('bookings')
       .update({
-        status:'completed'
+        status: 'completed'
       })
-      .eq('id',id)
+      .eq('id', id)
   );
 
-  if(b?.room_id){
+
+  if (b?.room_id) {
 
     await q(
-      db.from('rooms')
+      db
+        .from('rooms')
         .update({
-          status:'available'
+          status: 'available'
         })
-        .eq('id',b.room_id)
+        .eq(
+          'id',
+          b.room_id
+        )
     );
 
   }
+
 
   await load();
 
@@ -498,88 +714,157 @@ async function cout(id){
    CALENDAR
 ========================================================= */
 
-function calendar(){
+function calendar() {
 
-  let ds=[...Array(7)].map((_,i)=>{
+  const ds =
+    [...Array(7)].map(
+      (_, i) => {
 
-    let d=new Date;
+        const d =
+          new Date();
 
-    d.setDate(
-      d.getDate()+i
+        d.setDate(
+          d.getDate() + i
+        );
+
+        return d
+          .toISOString()
+          .slice(
+            0,
+            10
+          );
+
+      }
     );
 
-    return d.toISOString().slice(0,10);
 
-  });
+  let cells =
 
-  let cells=
-    '<div class="tablewrap card">'+
-    '<table class="table">'+
-    '<tr><th>Room</th>'+
-    ds.map(d=>`<th>${d}</th>`).join('')+
-    '</tr>';
+    `<div class="tablewrap card">
 
-  R.forEach(r=>{
+      <table class="table">
 
-    cells+=
-      `<tr>
-        <td>
-          <b>${esc(r.room_number)}</b><br>
-          ${esc(r.room_types?.name||'')}
-        </td>`+
+        <tr>
 
-      ds.map(d=>
-        `<td>${
-          B.filter(
-            b=>
-              b.room_id===r.id&&
-              d>=b.check_in&&
-              d<b.check_out
-          )
-          .map(b=>
-            `<span class="badge">
-              ${esc(b.booking_reference)}
-            </span>`
-          )
-          .join(' ')||'—'
-        }</td>`
-      ).join('')+
+          <th>
+            Room
+          </th>
 
-      '</tr>';
+          ${
+            ds
+              .map(
+                d =>
+                  `<th>${d}</th>`
+              )
+              .join('')
+          }
 
-  });
+        </tr>`;
 
-  $('main').innerHTML=
+
+  R.forEach(
+    r => {
+
+      cells +=
+
+        `<tr>
+
+          <td>
+
+            <b>
+              ${esc(
+                r.room_number
+              )}
+            </b>
+
+            <br>
+
+            ${esc(
+              r.room_types?.name ||
+              ''
+            )}
+
+          </td>
+
+          ${
+            ds
+              .map(
+                d =>
+
+                  `<td>
+
+                    ${
+                      B
+                        .filter(
+                          b =>
+                            b.room_id === r.id &&
+                            d >= b.check_in &&
+                            d < b.check_out
+                        )
+                        .map(
+                          b =>
+                            `<span class="badge">
+                              ${esc(
+                                b.booking_reference
+                              )}
+                            </span>`
+                        )
+                        .join(' ') ||
+                      '—'
+                    }
+
+                  </td>`
+              )
+              .join('')
+          }
+
+        </tr>`;
+
+    }
+  );
+
+
+  cells +=
+
+    `</table>
+    </div>`;
+
+
+  $('main').innerHTML =
+
     head(
       'Reservation Calendar',
       'Room rack for the next 7 days'
-    )+
-    cells+
-    '</table></div>';
+    ) +
+
+    cells;
 
 }
 
 
 /* =========================================================
-   GUESTS
+   GUESTS / CRM
 ========================================================= */
 
-function guests(){
+function guests() {
 
-  $('main').innerHTML=
+  $('main').innerHTML =
+
     head(
       'Guests & CRM',
       'Guest profiles and VIP information'
-    )+
+    ) +
 
     `<div class="card">
+
       <button
         class="primary"
         onclick="addGuest()"
       >
         Add guest
       </button>
-    </div>`+
+
+    </div>` +
 
     table(
       [
@@ -590,42 +875,72 @@ function guests(){
         'VIP'
       ],
 
-      G.map(g=>[
-        esc(
-          g.first_name+
-          ' '+
-          (g.last_name||'')
-        ),
+      G.map(
+        g => [
 
-        esc(g.email),
+          esc(
+            g.first_name +
+            ' ' +
+            (g.last_name || '')
+          ),
 
-        esc(g.phone),
+          esc(g.email),
 
-        esc(g.country),
+          esc(g.phone),
 
-        g.vip?'⭐':'—'
-      ])
+          esc(g.country),
+
+          g.vip
+            ? '⭐'
+            : '—'
+
+        ]
+      )
     );
 
 }
 
 
-async function addGuest(){
+async function addGuest() {
 
-  let f=prompt('First name');
+  const firstName =
+    prompt(
+      'First name'
+    );
 
-  if(!f)return;
+
+  if (!firstName) {
+    return;
+  }
+
 
   await q(
-    db.from('guest_profiles')
+    db
+      .from('guest_profiles')
       .insert({
-        first_name:f,
-        last_name:prompt('Last name')||null,
-        email:prompt('Email')||null,
-        phone:prompt('Phone')||null,
-        vip:false
+        first_name:
+          firstName,
+
+        last_name:
+          prompt(
+            'Last name'
+          ) || null,
+
+        email:
+          prompt(
+            'Email'
+          ) || null,
+
+        phone:
+          prompt(
+            'Phone'
+          ) || null,
+
+        vip:
+          false
       })
   );
+
 
   await load();
 
@@ -638,22 +953,25 @@ async function addGuest(){
    HOUSEKEEPING
 ========================================================= */
 
-function housekeeping(){
+function housekeeping() {
 
-  $('main').innerHTML=
+  $('main').innerHTML =
+
     head(
       'Housekeeping',
       'Cleaning and inspection tasks'
-    )+
+    ) +
 
     `<div class="card">
+
       <button
         class="primary"
         onclick="addHK()"
       >
         Create task
       </button>
-    </div>`+
+
+    </div>` +
 
     table(
       [
@@ -663,34 +981,66 @@ function housekeeping(){
         'Status'
       ],
 
-      HK.map(x=>[
-        esc(x.rooms?.room_number||''),
-        esc(x.task_type),
-        esc(x.priority),
-        esc(x.status)
-      ])
+      HK.map(
+        x => [
+
+          esc(
+            x.rooms?.room_number ||
+            ''
+          ),
+
+          esc(
+            x.task_type
+          ),
+
+          esc(
+            x.priority
+          ),
+
+          esc(
+            x.status
+          )
+
+        ]
+      )
     );
 
 }
 
 
-async function addHK(){
+async function addHK() {
 
-  let id=prompt('Room UUID');
+  const roomId =
+    prompt(
+      'Room UUID'
+    );
 
-  if(!id)return;
+
+  if (!roomId) {
+    return;
+  }
+
 
   await q(
-    db.from('housekeeping_tasks')
+    db
+      .from(
+        'housekeeping_tasks'
+      )
       .insert({
-        room_id:id,
-        task_type:'cleaning'
+        room_id:
+          roomId,
+
+        task_type:
+          'cleaning'
       })
   );
 
+
   await load();
 
-  render('housekeeping');
+  render(
+    'housekeeping'
+  );
 
 }
 
@@ -699,22 +1049,25 @@ async function addHK(){
    MAINTENANCE
 ========================================================= */
 
-function maintenance(){
+function maintenance() {
 
-  $('main').innerHTML=
+  $('main').innerHTML =
+
     head(
       'Maintenance',
       'Repairs and room out-of-service tracking'
-    )+
+    ) +
 
     `<div class="card">
+
       <button
         class="primary"
         onclick="addMT()"
       >
         New ticket
       </button>
-    </div>`+
+
+    </div>` +
 
     table(
       [
@@ -725,35 +1078,63 @@ function maintenance(){
         'Cost'
       ],
 
-      MT.map(x=>[
-        esc(x.title),
-        esc(x.rooms?.room_number||''),
-        esc(x.priority),
-        esc(x.status),
-        money(x.cost)
-      ])
+      MT.map(
+        x => [
+
+          esc(x.title),
+
+          esc(
+            x.rooms?.room_number ||
+            ''
+          ),
+
+          esc(x.priority),
+
+          esc(x.status),
+
+          money(x.cost)
+
+        ]
+      )
     );
 
 }
 
 
-async function addMT(){
+async function addMT() {
 
-  let t=prompt('Issue title');
+  const title =
+    prompt(
+      'Issue title'
+    );
 
-  if(!t)return;
+
+  if (!title) {
+    return;
+  }
+
 
   await q(
-    db.from('maintenance_tasks')
+    db
+      .from(
+        'maintenance_tasks'
+      )
       .insert({
-        title:t,
-        description:prompt('Description')||null
+        title,
+
+        description:
+          prompt(
+            'Description'
+          ) || null
       })
   );
 
+
   await load();
 
-  render('maintenance');
+  render(
+    'maintenance'
+  );
 
 }
 
@@ -762,13 +1143,14 @@ async function addMT(){
    FOLIOS
 ========================================================= */
 
-function folios(){
+function folios() {
 
-  $('main').innerHTML=
+  $('main').innerHTML =
+
     head(
       'Folios & Billing',
       'Guest accounts and balances'
-    )+
+    ) +
 
     table(
       [
@@ -779,21 +1161,29 @@ function folios(){
         'Balance'
       ],
 
-      F.map(x=>[
-        esc(
-          B.find(
-            b=>b.id===x.booking_id
-          )?.booking_reference||''
-        ),
+      F.map(
+        x => [
 
-        esc(x.status),
+          esc(
+            B.find(
+              b =>
+                b.id ===
+                x.booking_id
+            )
+            ?.booking_reference ||
+            ''
+          ),
 
-        money(x.total),
+          esc(x.status),
 
-        money(x.paid),
+          money(x.total),
 
-        money(x.balance)
-      ])
+          money(x.paid),
+
+          money(x.balance)
+
+        ]
+      )
     );
 
 }
@@ -803,13 +1193,14 @@ function folios(){
    PAYMENTS
 ========================================================= */
 
-function payments(){
+function payments() {
 
-  $('main').innerHTML=
+  $('main').innerHTML =
+
     head(
       'Payments',
       'Payment ledger and reconciliation'
-    )+
+    ) +
 
     table(
       [
@@ -821,25 +1212,36 @@ function payments(){
         'Reference'
       ],
 
-      P.map(x=>[
-        new Date(
-          x.created_at
-        ).toLocaleString(),
+      P.map(
+        x => [
 
-        esc(
-          B.find(
-            b=>b.id===x.booking_id
-          )?.booking_reference||''
-        ),
+          new Date(
+            x.created_at
+          ).toLocaleString(),
 
-        money(x.amount),
+          esc(
+            B.find(
+              b =>
+                b.id ===
+                x.booking_id
+            )
+            ?.booking_reference ||
+            ''
+          ),
 
-        esc(x.method),
+          money(x.amount),
 
-        esc(x.status),
+          esc(x.method),
 
-        esc(x.provider_reference||'')
-      ])
+          esc(x.status),
+
+          esc(
+            x.provider_reference ||
+            ''
+          )
+
+        ]
+      )
     );
 
 }
@@ -849,22 +1251,30 @@ function payments(){
    RATES
 ========================================================= */
 
-async function rates(){
+async function rates() {
 
-  let a=await q(
-    db.from('rate_rules')
-      .select('*,room_types(name)')
-      .order(
-        'start_date',
-        {ascending:false}
-      )
-  );
+  const a =
+    await q(
+      db
+        .from('rate_rules')
+        .select(
+          '*,room_types(name)'
+        )
+        .order(
+          'start_date',
+          {
+            ascending: false
+          }
+        )
+    );
 
-  $('main').innerHTML=
+
+  $('main').innerHTML =
+
     head(
       'Rates & Promotions',
       'Seasonal rates and minimum stays'
-    )+
+    ) +
 
     table(
       [
@@ -876,14 +1286,30 @@ async function rates(){
         'Active'
       ],
 
-      a.map(x=>[
-        esc(x.room_types?.name),
-        esc(x.name),
-        `${x.start_date} → ${x.end_date}`,
-        money(x.price_per_night),
-        x.minimum_nights,
-        x.is_active?'Yes':'No'
-      ])
+      a.map(
+        x => [
+
+          esc(
+            x.room_types?.name
+          ),
+
+          esc(x.name),
+
+          `${x.start_date}
+           → ${x.end_date}`,
+
+          money(
+            x.price_per_night
+          ),
+
+          x.minimum_nights,
+
+          x.is_active
+            ? 'Yes'
+            : 'No'
+
+        ]
+      )
     );
 
 }
@@ -893,19 +1319,25 @@ async function rates(){
    EXTRAS
 ========================================================= */
 
-async function extras(){
+async function extras() {
 
-  let a=await q(
-    db.from('booking_extras_catalog')
-      .select('*')
-      .order('name')
-  );
+  const a =
+    await q(
+      db
+        .from(
+          'booking_extras_catalog'
+        )
+        .select('*')
+        .order('name')
+    );
 
-  $('main').innerHTML=
+
+  $('main').innerHTML =
+
     head(
       'Extras & Add-ons',
       'Breakfast, transfers, laundry and services'
-    )+
+    ) +
 
     table(
       [
@@ -915,12 +1347,23 @@ async function extras(){
         'Active'
       ],
 
-      a.map(x=>[
-        esc(x.name),
-        money(x.price),
-        esc(x.pricing_type),
-        x.is_active?'Yes':'No'
-      ])
+      a.map(
+        x => [
+
+          esc(x.name),
+
+          money(x.price),
+
+          esc(
+            x.pricing_type
+          ),
+
+          x.is_active
+            ? 'Yes'
+            : 'No'
+
+        ]
+      )
     );
 
 }
@@ -930,56 +1373,98 @@ async function extras(){
    REPORTS
 ========================================================= */
 
-function reports(){
+function reports() {
 
-  let total=B.length;
+  const total =
+    B.length;
 
-  let c=B.filter(
-    x=>x.status==='confirmed'
-  ).length;
+  const confirmed =
+    B.filter(
+      x =>
+        x.status ===
+        'confirmed'
+    ).length;
 
-  $('main').innerHTML=
+
+  $('main').innerHTML =
+
     head(
       'Reports & Analytics',
       'Operational KPIs and exports'
-    )+
+    ) +
 
     `<div class="grid">
 
       <div class="card">
-        <div class="muted">Bookings</div>
-        <div class="stat">${total}</div>
-      </div>
 
-      <div class="card">
-        <div class="muted">Confirmed</div>
-        <div class="stat">${c}</div>
-      </div>
-
-      <div class="card">
-        <div class="muted">Confirmation rate</div>
-        <div class="stat">
-          ${total?Math.round(c/total*100):0}%
+        <div class="muted">
+          Bookings
         </div>
+
+        <div class="stat">
+          ${total}
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="muted">
+          Confirmed
+        </div>
+
+        <div class="stat">
+          ${confirmed}
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="muted">
+          Confirmation rate
+        </div>
+
+        <div class="stat">
+
+          ${
+            total
+              ? Math.round(
+                  confirmed /
+                  total *
+                  100
+                )
+              : 0
+          }%
+
+        </div>
+
       </div>
 
     </div>
 
     <div class="card">
+
       <button
         class="primary"
         onclick="csv()"
       >
         Export bookings CSV
       </button>
+
     </div>`;
 
 }
 
 
-function csv(){
+/* =========================================================
+   CSV EXPORT
+========================================================= */
 
-  let keys=[
+function csv() {
+
+  const keys = [
+
     'booking_reference',
     'guest_first_name',
     'guest_last_name',
@@ -992,34 +1477,54 @@ function csv(){
     'total_amount',
     'status',
     'payment_status'
+
   ];
 
-  let out=[
+
+  const out = [
+
     keys.join(','),
 
     ...B.map(
-      b=>
-        keys.map(
-          k=>
-            `"${String(
-              b[k]??''
-            ).replaceAll('"','""')}"`
-        ).join(',')
+      b =>
+
+        keys
+          .map(
+            k =>
+              `"${String(
+                b[k] ?? ''
+              ).replaceAll(
+                '"',
+                '""'
+              )}"`
+          )
+          .join(',')
     )
 
   ].join('\n');
 
-  let a=document.createElement('a');
 
-  a.href=
+  const a =
+    document.createElement(
+      'a'
+    );
+
+
+  a.href =
     URL.createObjectURL(
       new Blob(
         [out],
-        {type:'text/csv'}
+        {
+          type:
+            'text/csv'
+        }
       )
     );
 
-  a.download='nordic-bookings.csv';
+
+  a.download =
+    'nordic-bookings.csv';
+
 
   a.click();
 
@@ -1030,18 +1535,24 @@ function csv(){
    STAFF
 ========================================================= */
 
-async function staff(){
+async function staff() {
 
-  let a=await q(
-    db.from('staff_profiles')
-      .select('*')
-  );
+  const a =
+    await q(
+      db
+        .from(
+          'staff_profiles'
+        )
+        .select('*')
+    );
 
-  $('main').innerHTML=
+
+  $('main').innerHTML =
+
     head(
       'Staff & Permissions',
       'Role foundation'
-    )+
+    ) +
 
     table(
       [
@@ -1051,38 +1562,58 @@ async function staff(){
         'Active'
       ],
 
-      a.map(x=>[
-        esc(x.id),
-        esc(x.full_name),
-        esc(x.role),
-        x.is_active?'Yes':'No'
-      ])
+      a.map(
+        x => [
+
+          esc(x.id),
+
+          esc(
+            x.full_name
+          ),
+
+          esc(x.role),
+
+          x.is_active
+            ? 'Yes'
+            : 'No'
+
+        ]
+      )
     );
 
 }
 
 
 /* =========================================================
-   AUDIT
+   AUDIT LOG
 ========================================================= */
 
-async function audit(){
+async function audit() {
 
-  let a=await q(
-    db.from('audit_logs')
-      .select('*')
-      .order(
-        'created_at',
-        {ascending:false}
-      )
-      .limit(100)
-  );
+  const a =
+    await q(
+      db
+        .from(
+          'audit_logs'
+        )
+        .select('*')
+        .order(
+          'created_at',
+          {
+            ascending:
+              false
+          }
+        )
+        .limit(100)
+    );
 
-  $('main').innerHTML=
+
+  $('main').innerHTML =
+
     head(
       'Audit Log',
       'Administrative activity trail'
-    )+
+    ) +
 
     table(
       [
@@ -1092,56 +1623,93 @@ async function audit(){
         'Details'
       ],
 
-      a.map(x=>[
-        new Date(
-          x.created_at
-        ).toLocaleString(),
+      a.map(
+        x => [
 
-        esc(x.action),
+          new Date(
+            x.created_at
+          ).toLocaleString(),
 
-        esc(x.entity_type),
+          esc(x.action),
 
-        esc(
-          JSON.stringify(x.details)
-        )
-      ])
+          esc(
+            x.entity_type
+          ),
+
+          esc(
+            JSON.stringify(
+              x.details
+            )
+          )
+
+        ]
+      )
     );
 
 }
 
 
 /* =========================================================
-   TABLE HELPER
+   TABLE
 ========================================================= */
 
-function table(h,r){
+function table(
+  headers,
+  rows
+) {
 
   return `
+
     <div class="card tablewrap">
 
       <table class="table">
 
         <thead>
+
           <tr>
-            ${h.map(x=>`<th>${x}</th>`).join('')}
+
+            ${
+              headers
+                .map(
+                  x =>
+                    `<th>${esc(x)}</th>`
+                )
+                .join('')
+            }
+
           </tr>
+
         </thead>
 
         <tbody>
 
           ${
-            r.map(x=>
-              `<tr>
-                ${x.map(y=>`<td>${y}</td>`).join('')}
-              </tr>`
-            ).join('')
+            rows
+              .map(
+                row =>
+                  `<tr>
+                    ${
+                      row
+                        .map(
+                          cell =>
+                            `<td>${cell}</td>`
+                        )
+                        .join('')
+                    }
+                  </tr>`
+              )
+              .join('')
 
             ||
 
             `<tr>
-              <td colspan="${h.length}">
+
+              <td
+                colspan="${headers.length}"
+              >
                 No records.
               </td>
+
             </tr>`
           }
 
@@ -1150,121 +1718,458 @@ function table(h,r){
       </table>
 
     </div>`;
+
 }
 
 
 /* =========================================================
-   NAVIGATION
+   RENDER
 ========================================================= */
 
-function render(v){
+function render(view) {
 
-  let m={
+  const pages = {
+
     dashboard,
+
     frontdesk,
+
     calendar,
+
     guests,
+
     housekeeping,
+
     maintenance,
+
     folios,
+
     payments,
+
     rates,
+
     extras,
+
     reports,
+
     staff,
+
     audit
+
   };
 
-  (m[v]||dashboard)();
+
+  (
+    pages[view] ||
+    dashboard
+  )();
 
 }
 
 
 /* =========================================================
-   LOGOUT / MENU
+   LOGIN
 ========================================================= */
 
-$('logout').onclick=async()=>{
+$('loginForm').onsubmit =
+  async event => {
 
-  await db.auth.signOut();
+    event.preventDefault();
 
-  location.reload();
-
-};
-
-
-$('menu').onclick=()=>
-  $('side').classList.toggle('open');
+    loginError(
+      'Signing in…'
+    );
 
 
-document
-  .querySelectorAll('#side button')
-  .forEach(
-    b=>
-      b.onclick=()=>
-        render(b.dataset.v)
-  );
+    try {
+
+      const {
+        error
+      } =
+        await db.auth.signInWithPassword({
+
+          email:
+            $('email')
+              .value
+              .trim(),
+
+          password:
+            $('password')
+              .value
+
+        });
 
 
-/* =========================================================
-   EXISTING SESSION
-========================================================= */
+      if (error) {
+        throw error;
+      }
 
-db.auth.getSession().then(
-  async({data})=>{
 
-    if(!data.session)return;
+      const {
+        data: userData,
+        error: userError
+      } =
+        await db.auth.getUser();
 
-    /*
-      If this session is the special password-recovery
-      session, let the PASSWORD_RECOVERY event handle it.
-    */
 
-    if(
-      window.location.hash.includes(
-        'type=recovery'
-      )
-    ){
+      if (userError) {
+        throw userError;
+      }
 
-      showReset();
 
-      return;
+      const user =
+        userData?.user;
 
-    }
 
-    try{
+      if (!user) {
 
-      let{data:u}=await db.auth.getUser();
-
-      let{
-        data:a,
-        error:ae
-      }=await db.rpc('is_admin_user');
-
-      if(ae)throw ae;
-
-      if(u?.user&&a){
-
-        $('login').classList.add('hidden');
-
-        $('reset').classList.add('hidden');
-
-        $('app').classList.remove('hidden');
-
-        $('who').textContent=
-          u.user.email;
-
-        await load();
-
-        render('dashboard');
+        throw new Error(
+          'Unable to identify the signed-in user.'
+        );
 
       }
 
-    }catch(e){
+
+      const {
+        data: admin,
+        error: adminError
+      } =
+        await db.rpc(
+          'is_admin_user'
+        );
+
+
+      if (adminError) {
+        throw adminError;
+      }
+
+
+      if (!admin) {
+
+        throw new Error(
+          'This account is not authorized as an administrator.'
+        );
+
+      }
+
+
+      showApp(user);
+
+      await load();
+
+      render(
+        'dashboard'
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        'Login error:',
+        error
+      );
+
+      loginError(
+        error?.message ||
+        'Unable to sign in.'
+      );
 
       await db.auth.signOut();
 
     }
 
+  };
+
+
+/* =========================================================
+   FORGOT PASSWORD BUTTON
+========================================================= */
+
+$('forgotPassword').onclick =
+  requestPasswordReset;
+
+
+/* =========================================================
+   RESET PASSWORD FORM
+========================================================= */
+
+$('resetForm').onsubmit =
+  async event => {
+
+    event.preventDefault();
+
+    await updatePassword();
+
+  };
+
+
+/* =========================================================
+   BACK TO LOGIN
+========================================================= */
+
+$('backToLogin').onclick =
+  async () => {
+
+    await db.auth.signOut();
+
+    $('newPassword').value = '';
+
+    $('confirmPassword').value = '';
+
+    showLogin();
+
+  };
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+$('logout').onclick =
+  async () => {
+
+    await db.auth.signOut();
+
+    location.reload();
+
+  };
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+$('menu').onclick =
+  () => {
+
+    $('side')
+      .classList
+      .toggle('open');
+
+  };
+
+
+/* =========================================================
+   NAVIGATION BUTTONS
+========================================================= */
+
+document
+  .querySelectorAll(
+    '#side button'
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        () =>
+          render(
+            button.dataset.v
+          );
+
+    }
+  );
+
+
+/* =========================================================
+   AUTH STATE CHANGE
+========================================================= */
+
+db.auth.onAuthStateChange(
+  (event, session) => {
+
+    console.log(
+      'Supabase auth event:',
+      event
+    );
+
+
+    if (
+      event ===
+      'PASSWORD_RECOVERY'
+    ) {
+
+      showReset();
+
+      return;
+    }
+
+
+    if (
+      event ===
+      'SIGNED_OUT'
+    ) {
+
+      if (
+        $('reset')
+          .classList
+          .contains(
+            'hidden'
+          )
+      ) {
+
+        showLogin();
+
+      }
+
+    }
+
   }
 );
+
+
+/* =========================================================
+   INITIAL SESSION CHECK
+========================================================= */
+
+async function initialise() {
+
+  try {
+
+    /*
+      Supabase automatically processes
+      the recovery URL because
+      detectSessionInUrl is enabled.
+    */
+
+    const {
+      data,
+      error
+    } =
+      await db.auth.getSession();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    const session =
+      data?.session;
+
+
+    /*
+      If this is a recovery URL,
+      wait for Supabase's
+      PASSWORD_RECOVERY event.
+    */
+
+    const hash =
+      window.location.hash || '';
+
+
+    const search =
+      window.location.search || '';
+
+
+    const isRecovery =
+      hash.includes(
+        'type=recovery'
+      ) ||
+      search.includes(
+        'type=recovery'
+      );
+
+
+    if (isRecovery) {
+
+      showReset();
+
+      return;
+    }
+
+
+    if (!session) {
+
+      showLogin();
+
+      return;
+
+    }
+
+
+    const {
+      data: userData,
+      error: userError
+    } =
+      await db.auth.getUser();
+
+
+    if (userError) {
+      throw userError;
+    }
+
+
+    const user =
+      userData?.user;
+
+
+    if (!user) {
+
+      await db.auth.signOut();
+
+      showLogin();
+
+      return;
+
+    }
+
+
+    const {
+      data: admin,
+      error: adminError
+    } =
+      await db.rpc(
+        'is_admin_user'
+      );
+
+
+    if (adminError) {
+      throw adminError;
+    }
+
+
+    if (!admin) {
+
+      await db.auth.signOut();
+
+      showLogin();
+
+      loginError(
+        'This account is not authorized as an administrator.'
+      );
+
+      return;
+
+    }
+
+
+    showApp(user);
+
+    await load();
+
+    render(
+      'dashboard'
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'PMS initialization error:',
+      error
+    );
+
+    await db.auth.signOut();
+
+    showLogin();
+
+  }
+
+}
+
+
+/* =========================================================
+   START PMS
+========================================================= */
+
+initialise();
