@@ -1,5729 +1,1127 @@
-const URL_ =
-'https://rzjvhfnizwckzbdawrbn.supabase.co';
+/* The Nordic Abuja — Property Management System
+   Improved full frontend against Supabase
+*/
+const URL_ = 'https://rzjvhfnizwckzbdawrb.supabase.co';
+const KEY  = 'sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob';
+const db   = supabase.createClient(URL_, KEY);
 
-const KEY =
-'sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob';
+let B = [], R = [], RT = [], G = [], HK = [], MT = [], P = [], F = [];
+let currentView = 'dashboard';
+let loading = false;
 
-const db = supabase.createClient(URL_, KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
+const $ = (x) => document.getElementById(x);
+const esc = (x) => String(x ?? '').replace(/[&<>"']/g, m => ({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[m]));
+const money = (x) => '₦' + Number(x || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 });
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '—';
+const fmtDT   = (d) => d ? new Date(d).toLocaleString('en-GB') : '—';
+
+async function q(promise) {
+  const { data, error } = await promise;
+  if (error) throw error;
+  return data;
+}
+
+function toast(msg, type = '') {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type;
+  el.classList.remove('hidden');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.add('hidden'), 3200);
+}
+
+function setLoading(on) {
+  loading = on;
+  document.body.style.cursor = on ? 'wait' : '';
+}
+
+/* ---------- Modal helpers ---------- */
+function openModal(title, bodyHtml, footerHtml = '') {
+  $('modalTitle').textContent = title;
+  $('modalBody').innerHTML = bodyHtml;
+  $('modalFooter').innerHTML = footerHtml;
+  $('modal').classList.remove('hidden');
+}
+function closeModal() {
+  $('modal').classList.add('hidden');
+  $('modalBody').innerHTML = '';
+  $('modalFooter').innerHTML = '';
+}
+document.addEventListener('click', (e) => {
+  if (e.target.matches('[data-close]')) closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
 });
 
-let B = [];
-let R = [];
-let RT = [];
-let G = [];
-let HK = [];
-let MT = [];
-let P = [];
-let F = [];
+/* ---------- Auth ---------- */
+function err(x) { $('loginError').textContent = x || ''; }
 
-/* =========================
-BASIC HELPERS
-========================= */
-
-const $ = id => document.getElementById(id);
-
-function show(id) {
-  const el = $(id);
-  if (el) el.classList.remove('hidden');
-}
-
-function hide(id) {
-  const el = $(id);
-  if (el) el.classList.add('hidden');
-}
-
-function text(id, value) {
-  const el = $(id);
-  if (el) el.textContent = value ?? '';
-}
-
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function money(value) {
-  const n = Number(value || 0);
-
-  return new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency: 'NGN',
-    maximumFractionDigits: 2
-  }).format(n);
-}
-
-function dateValue(value) {
-  if (!value) return '-';
-
-  const d = new Date(value);
-
-  if (Number.isNaN(d.getTime())) {
-    return value;
-  }
-
-  return d.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  });
-}
-
-/* =========================
-LOGIN / AUTH UI
-========================= */
-
-function showLogin() {
-  hide('app');
-  hide('reset');
-  show('login');
-
-  const email = $('email');
-  if (email) email.focus();
-}
-
-function showApp() {
-  hide('login');
-  hide('reset');
-  show('app');
-
-  loadDashboard();
-}
-
-function showReset() {
-  hide('login');
-  hide('app');
-  show('reset');
-
-  const password = $('newPassword');
-  if (password) password.focus();
-}
-
-function setLoginError(message) {
-  const el = $('loginError');
-
-  if (el) {
-    el.textContent = message || '';
-  }
-}
-
-function setResetError(message) {
-  const el = $('resetError');
-
-  if (el) {
-    el.textContent = message || '';
-  }
-}
-
-/* =========================
-PASSWORD RECOVERY URL
-========================= */
-
-function isRecoveryUrl() {
-  const hash = window.location.hash || '';
-  const search = window.location.search || '';
-
-  return (
-    hash.includes('type=recovery') ||
-    search.includes('type=recovery')
-  );
-}
-
-/* =========================
-ADMIN CHECK
-========================= */
-
-async function verifyAdmin() {
-  const { data, error } =
-    await db.rpc('is_admin_user');
-
-  if (error) {
-    throw error;
-  }
-
-  return data === true;
-}
-
-/* =========================
-LOGIN
-========================= */
-
-async function login(email, password) {
-  setLoginError('');
-
-  const { data, error } =
-    await db.auth.signInWithPassword({
-      email,
-      password
+$('loginForm').onsubmit = async (e) => {
+  e.preventDefault();
+  err('Signing in…');
+  try {
+    const { error } = await db.auth.signInWithPassword({
+      email: $('email').value.trim(),
+      password: $('password').value
     });
-
-  if (error) {
-    setLoginError(
-      error.message || 'Invalid login credentials.'
-    );
-
-    return false;
-  }
-
-  if (!data || !data.user) {
-    setLoginError(
-      'Login completed but no user session was returned.'
-    );
-
-    return false;
-  }
-
-  try {
-    const isAdmin = await verifyAdmin();
-
-    if (!isAdmin) {
-      setLoginError(
-        'This account does not have administrator access.'
-      );
-
-      await db.auth.signOut();
-
-      return false;
-    }
-
-  } catch (adminError) {
-    setLoginError(
-      'Unable to verify administrator access: ' +
-      adminError.message
-    );
-
-    await db.auth.signOut();
-
-    return false;
-  }
-
-  showApp();
-
-  return true;
-}
-
-/* =========================
-LOGIN FORM
-========================= */
-
-const loginForm = $('loginForm');
-
-if (loginForm) {
-  loginForm.addEventListener('submit', async event => {
-    event.preventDefault();
-
-    const email =
-      $('email')?.value.trim();
-
-    const password =
-      $('password')?.value || '';
-
-    if (!email || !password) {
-      setLoginError(
-        'Please enter your email and password.'
-      );
-
-      return;
-    }
-
-    const button =
-      loginForm.querySelector(
-        'button[type="submit"]'
-      );
-
-    const originalText =
-      button?.textContent;
-
-    if (button) {
-      button.disabled = true;
-      button.textContent = 'Signing in...';
-    }
-
-    try {
-      await login(email, password);
-
-    } catch (error) {
-      console.error('Login error:', error);
-
-      setLoginError(
-        error?.message ||
-        'Unable to sign in.'
-      );
-
-    } finally {
-      if (button) {
-        button.disabled = false;
-        button.textContent =
-          originalText || 'Sign In';
-      }
-    }
-  });
-}
-
-/* =========================
-FORGOT PASSWORD
-========================= */
-
-const forgotPassword =
-  $('forgotPassword');
-
-if (forgotPassword) {
-  forgotPassword.addEventListener(
-    'click',
-    async event => {
-      event.preventDefault();
-
-      setLoginError('');
-
-      const email =
-        $('email')?.value.trim();
-
-      if (!email) {
-        setLoginError(
-          'Enter your email address first, then tap Forgot Password.'
-        );
-
-        if ($('email')) {
-          $('email').focus();
-        }
-
-        return;
-      }
-
-      const originalText =
-        forgotPassword.textContent;
-
-      forgotPassword.disabled = true;
-      forgotPassword.textContent =
-        'Sending...';
-
-      try {
-        const redirectTo =
-          window.location.origin +
-          window.location.pathname;
-
-        console.log(
-          'Password recovery redirect:',
-          redirectTo
-        );
-
-        const { error } =
-          await db.auth.resetPasswordForEmail(
-            email,
-            {
-              redirectTo
-            }
-          );
-
-        if (error) {
-          console.error(
-            'Password recovery error:',
-            error
-          );
-
-          setLoginError(
-            'Failed to send password recovery: ' +
-            error.message
-          );
-
-          return;
-        }
-
-        setLoginError(
-          'Password reset email sent. Check your email and open the new recovery link.'
-        );
-
-      } catch (error) {
-        console.error(
-          'Password recovery request failed:',
-          error
-        );
-
-        setLoginError(
-          'Failed to send password recovery: ' +
-          (
-            error?.message ||
-            'Network error.'
-          )
-        );
-
-      } finally {
-        forgotPassword.disabled = false;
-        forgotPassword.textContent =
-          originalText;
-      }
-    }
-  );
-}
-
-/* =========================
-BACK TO LOGIN
-========================= */
-
-const backToLogin =
-  $('backToLogin');
-
-if (backToLogin) {
-  backToLogin.addEventListener(
-    'click',
-    event => {
-      event.preventDefault();
-
-      setResetError('');
-
-      showLogin();
-    }
-  );
-}
-
-/* =========================
-RESET PASSWORD
-========================= */
-
-const resetForm =
-  $('resetForm');
-
-if (resetForm) {
-  resetForm.addEventListener(
-    'submit',
-    async event => {
-      event.preventDefault();
-
-      setResetError('');
-
-      const password =
-        $('newPassword')?.value || '';
-
-      const confirmPassword =
-        $('confirmPassword')?.value || '';
-
-      if (!password) {
-        setResetError(
-          'Enter your new password.'
-        );
-
-        return;
-      }
-
-      if (password.length < 6) {
-        setResetError(
-          'Password must be at least 6 characters.'
-        );
-
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        setResetError(
-          'Passwords do not match.'
-        );
-
-        return;
-      }
-
-      const button =
-        resetForm.querySelector(
-          'button[type="submit"]'
-        );
-
-      const originalText =
-        button?.textContent;
-
-      if (button) {
-        button.disabled = true;
-        button.textContent =
-          'Updating...';
-      }
-
-      try {
-        const { data, error } =
-          await db.auth.updateUser({
-            password
-          });
-
-        if (error) {
-          setResetError(
-            error.message ||
-            'Unable to update password.'
-          );
-
-          return;
-        }
-
-        if (!data || !data.user) {
-          setResetError(
-            'Password update completed, but the account session could not be confirmed.'
-          );
-
-          return;
-        }
-
-        setResetError('');
-
-        alert(
-          'Password updated successfully. You can now sign in with your new password.'
-        );
-
-        await db.auth.signOut();
-
-        resetForm.reset();
-
-        showLogin();
-
-      } catch (error) {
-        console.error(
-          'Password update error:',
-          error
-        );
-
-        setResetError(
-          error?.message ||
-          'Unable to update password.'
-        );
-
-      } finally {
-        if (button) {
-          button.disabled = false;
-          button.textContent =
-            originalText ||
-            'Update Password';
-        }
-      }
-    }
-  );
-}
-
-/* =========================
-LOGOUT
-========================= */
-
-async function logout() {
-  await db.auth.signOut();
-
-  B = [];
-  R = [];
-  RT = [];
-  G = [];
-  HK = [];
-  MT = [];
-  P = [];
-  F = [];
-
-  showLogin();
-}
-
-const logoutButton =
-  $('logout');
-
-if (logoutButton) {
-  logoutButton.addEventListener(
-    'click',
-    async event => {
-      event.preventDefault();
-
-      try {
-        await logout();
-      } catch (error) {
-        console.error(
-          'Logout error:',
-          error
-        );
-      }
-    }
-  );
-}
-
-/* /* =========================
-MOBILE MENU
-========================= */
-
-const menuButton =
-  $('menu');
-
-const sideBar =
-  $('side');
-
-if (menuButton && sideBar) {
-
-  /*
-   * The menu button already has its own
-   * inline toggle in pms.html.
-   *
-   * We DO NOT toggle the sidebar again here.
-   * Doing so would open it and immediately
-   * close it on the same tap.
-   */
-
-  menuButton.addEventListener(
-    'click',
-    () => {
-
-      const isOpen =
-        sideBar.classList.contains('open');
-
-      menuButton.setAttribute(
-        'aria-expanded',
-        isOpen ? 'true' : 'false'
-      );
-
-    }
-  );
-
-  /*
-   * Close the sidebar when the user taps
-   * outside it on mobile.
-   */
-
-  document.addEventListener(
-    'click',
-    event => {
-
-      const clickedInsideSidebar =
-        sideBar.contains(event.target);
-
-      const clickedMenu =
-        menuButton.contains(event.target);
-
-      if (
-        !clickedInsideSidebar &&
-        !clickedMenu
-      ) {
-
-        sideBar.classList.remove(
-          'open'
-        );
-
-        menuButton.setAttribute(
-          'aria-expanded',
-          'false'
-        );
-
-      }
-
-    }
-  );
-
-}
-
-/* =========================
-DASHBOARD
-========================= */
-
-async function loadDashboard() {
-  try {
-    const { data, error } =
-      await db.rpc(
-        'pms_dashboard_stats'
-      );
-
-    if (error) {
-      console.error(
-        'Dashboard error:',
-        error
-      );
-
-      return;
-    }
-
-    const stats = data || {};
-
-    text(
-      'roomsTotal',
-      stats.rooms_total ?? 0
-    );
-
-    text(
-      'roomsAvailable',
-      stats.rooms_available ?? 0
-    );
-
-    text(
-      'roomsOccupied',
-      stats.rooms_occupied ?? 0
-    );
-
-    text(
-      'roomsMaintenance',
-      stats.rooms_maintenance ?? 0
-    );
-
-    text(
-      'bookingsPending',
-      stats.bookings_pending ?? 0
-    );
-
-    text(
-      'bookingsConfirmed',
-      stats.bookings_confirmed ?? 0
-    );
-
-    text(
-      'revenuePaid',
-      money(stats.revenue_paid ?? 0)
-    );
-
-    text(
-      'openMaintenance',
-      stats.open_maintenance ?? 0
-    );
-
-  } catch (error) {
-    console.error(
-      'Dashboard loading failed:',
-      error
-    );
-  }
-}
-
-/* =========================
-BOOKINGS
-========================= */
-
-async function loadBookings() {
-  const { data, error } =
-    await db
-      .from('bookings')
-      .select('*')
-      .order(
-        'created_at',
-        { ascending: false }
-      );
-
-  if (error) {
-    console.error(
-      'Bookings error:',
-      error
-    );
-
-    return;
-  }
-
-  B = data || [];
-
-  renderBookings();
-}
-
-function renderBookings() {
-  const table =
-    $('bookingsTable');
-
-  if (!table) return;
-
-  if (!B.length) {
-    table.innerHTML =
-      '<tr><td colspan="100%">No bookings found.</td></tr>';
-
-    return;
-  }
-
-  table.innerHTML =
-    B.map(
-      booking => `
-        <tr>
-          <td>${escapeHtml(booking.id)}</td>
-          <td>${escapeHtml(
-            booking.guest_name ||
-            booking.full_name ||
-            '-'
-          )}</td>
-          <td>${escapeHtml(
-            booking.email || '-'
-          )}</td>
-          <td>${escapeHtml(
-            booking.room_id ||
-            booking.room_number ||
-            '-'
-          )}</td>
-          <td>${dateValue(
-            booking.check_in
-          )}</td>
-          <td>${dateValue(
-            booking.check_out
-          )}</td>
-          <td>${escapeHtml(
-            booking.status || '-'
-          )}</td>
-        </tr>
-      `
-    ).join('');
-}
-
-/* =========================
-ROOMS
-========================= */
-
-async function loadRooms() {
-  const { data, error } =
-    await db
-      .from('rooms')
-      .select('*')
-      .order(
-        'room_number',
-        { ascending: true }
-      );
-
-  if (error) {
-    console.error(
-      'Rooms error:',
-      error
-    );
-
-    return;
-  }
-
-  R = data || [];
-
-  renderRooms();
-}
-
-function renderRooms() {
-  const table =
-    $('roomsTable');
-
-  if (!table) return;
-
-  if (!R.length) {
-    table.innerHTML =
-      '<tr><td colspan="100%">No rooms found.</td></tr>';
-
-    return;
-  }
-
-  table.innerHTML =
-    R.map(
-      room => `
-        <tr>
-          <td>${escapeHtml(
-            room.room_number ||
-            room.number ||
-            '-'
-          )}</td>
-          <td>${escapeHtml(
-            room.room_type_id ||
-            room.room_type ||
-            '-'
-          )}</td>
-          <td>${escapeHtml(
-            room.status || '-'
-          )}</td>
-          <td>${escapeHtml(
-            room.floor || '-'
-          )}</td>
-        </tr>
-      `
-    ).join('');
-}
-
-/* =========================
-ROOM TYPES
-========================= */
-
-async function loadRoomTypes() {
-  const { data, error } =
-    await db
-      .from('room_types')
-      .select('*')
-      .order(
-        'name',
-        { ascending: true }
-      );
-
-  if (error) {
-    console.error(
-      'Room types error:',
-      error
-    );
-
-    return;
-  }
-
-  RT = data || [];
-
-  renderRoomTypes();
-}
-
-function renderRoomTypes() {
-  const table =
-    $('roomTypesTable');
-
-  if (!table) return;
-
-  if (!RT.length) {
-    table.innerHTML =
-      '<tr><td colspan="100%">No room types found.</td></tr>';
-
-    return;
-  }
-
-  table.innerHTML =
-    RT.map(
-      roomType => `
-        <tr>
-          <td>${escapeHtml(
-            roomType.name || '-'
-          )}</td>
-          <td>${escapeHtml(
-            roomType.description || '-'
-          )}</td>
-          <td>${money(
-            roomType.base_rate ||
-            roomType.price ||
-            0
-          )}</td>
-        </tr>
-      `
-    ).join('');
-}
-
-/* =========================
-GUESTS
-========================= */
-
-async function loadGuests() {
-  const { data, error } =
-    await db
-      .from('guest_profiles')
-      .select('*')
-      .order(
-        'created_at',
-        { ascending: false }
-      );
-
-  if (error) {
-    console.error(
-      'Guests error:',
-      error
-    );
-
-    return;
-  }
-
-  G = data || [];
-
-  renderGuests();
-}
-
-function renderGuests() {
-  const table =
-    $('guestsTable');
-
-  if (!table) return;
-
-  if (!G.length) {
-    table.innerHTML =
-      '<tr><td colspan="100%">No guests found.</td></tr>';
-
-    return;
-  }
-
-  table.innerHTML =
-    G.map(
-      guest => `
-        <tr>
-          <td>${escapeHtml(
-            guest.full_name ||
-            guest.name ||
-            '-'
-          )}</td>
-          <td>${escapeHtml(
-            guest.email || '-'
-          )}</td>
-          <td>${escapeHtml(
-            guest.phone || '-'
-          )}</td>
-          <td>${dateValue(
-            guest.created_at
-          )}</td>
-        </tr>
-      `
-    ).join('');
-}
-
-/* =========================
-HOUSEKEEPING
-========================= */
-
-async function loadHousekeeping() {
-  const { data, error } =
-    await db
-      .from('housekeeping_tasks')
-      .select('*')
-      .order(
-        'created_at',
-        { ascending: false }
-      );
-
-  if (error) {
-    console.error(
-      'Housekeeping error:',
-      error
-    );
-
-    return;
-  }
-
-  HK = data || [];
-
-  renderHousekeeping();
-}
-
-function renderHousekeeping() {
-  const table =
-    $('housekeepingTable');
-
-  if (!table) return;
-
-  if (!HK.length) {
-    table.innerHTML =
-      '<tr><td colspan="100%">No housekeeping tasks found.</td></tr>';
-
-    return;
-  }
-
-  table.innerHTML =
-    HK.map(
-      task => `
-        <tr>
-          <td>${escapeHtml(
-            task.room_id || '-'
-          )}</td>
-          <td>${escapeHtml(
-            task.task_type ||
-            task.type ||
-            '-'
-          )}</td>
-          <td>${escapeHtml(
-            task.status || '-'
-          )}</td>
-          <td>${escapeHtml(
-            task.assigned_to || '-'
-          )}</td>
-          <td>${dateValue(
-            task.created_at
-          )}</td>
-        </tr>
-      `
-    ).join('');
-}
-
-/* =========================
-MAINTENANCE
-========================= */
-
-async function loadMaintenance() {
-  const { data, error } =
-    await db
-      .from('maintenance_tasks')
-      .select('*')
-      .order(
-        'created_at',
-        { ascending: false }
-      );
-
-  if (error) {
-    console.error(
-      'Maintenance error:',
-      error
-    );
-
-    return;
-  }
-
-  MT = data || [];
-
-  renderMaintenance();
-}
-
-function renderMaintenance() {
-  const table =
-    $('maintenanceTable');
-
-  if (!table) return;
-
-  if (!MT.length) {
-    table.innerHTML =
-      '<tr><td colspan="100%">No maintenance tasks found.</td></tr>';
-
-    return;
-  }
-
-  table.innerHTML =
-    MT.map(
-      task => `
-        <tr>
-          <td>${escapeHtml(
-            task.room_id || '-'
-          )}</td>
-          <td>${escapeHtml(
-            task.title ||
-            task.task_type ||
-            '-'
-          )}</td>
-          <td>${escapeHtml(
-            task.status || '-'
-          )}</td>
-          <td>${escapeHtml(
-            task.priority || '-'
-          )}</td>
-          <td>${dateValue(
-            task.created_at
-          )}</td>
-        </tr>
-      `
-    ).join('');
-}
-
-/* =========================
-PAYMENTS
-========================= */
-
-async function loadPayments() {
-  const { data, error } =
-    await db
-      .from('payments')
-      .select('*')
-      .order(
-        'created_at',
-        { ascending: false }
-      );
-
-  if (error) {
-    console.error(
-      'Payments error:',
-      error
-    );
-
-    return;
-  }
-
-  P = data || [];
-
-  renderPayments();
-}
-
-function renderPayments() {
-  const table =
-    $('paymentsTable');
-
-  if (!table) return;
-
-  if (!P.length) {
-    table.innerHTML =
-      '<tr><td colspan="100%">No payments found.</td></tr>';
-
-    return;
-  }
-
-  table.innerHTML =
-    P.map(
-      payment => `
-        <tr>
-          <td>${escapeHtml(
-            payment.id
-          )}</td>
-          <td>${money(
-            payment.amount
-          )}</td>
-          <td>${escapeHtml(
-            payment.method ||
-            payment.payment_method ||
-            '-'
-          )}</td>
-          <td>${escapeHtml(
-            payment.status || '-'
-          )}</td>
-          <td>${dateValue(
-            payment.created_at
-          )}</td>
-        </tr>
-      `
-    ).join('');
-}
-
-/* =========================
-FOLIOS
-========================= */
-
-async function loadFolios() {
-  const { data, error } =
-    await db
-      .from('folios')
-      .select('*')
-      .order(
-        'created_at',
-        { ascending: false }
-      );
-
-  if (error) {
-    console.error(
-      'Folios error:',
-      error
-    );
-
-    return;
-  }
-
-  F = data || [];
-
-  renderFolios();
-}
-
-function renderFolios() {
-  const table =
-    $('foliosTable');
-
-  if (!table) return;
-
-  if (!F.length) {
-    table.innerHTML =
-      '<tr><td colspan="100%">No folios found.</td></tr>';
-
-    return;
-  }
-
-  table.innerHTML =
-    F.map(
-      folio => `
-        <tr>
-          <td>${escapeHtml(
-            folio.id
-          )}</td>
-          <td>${escapeHtml(
-            folio.booking_id || '-'
-          )}</td>
-          <td>${money(
-            folio.total ||
-            folio.amount ||
-            0
-          )}</td>
-          <td>${escapeHtml(
-            folio.status || '-'
-          )}</td>
-          <td>${dateValue(
-            folio.created_at
-          )}</td>
-        </tr>
-      `
-    ).join('');
-}
-
-/* =========================
-STAFF
-========================= */
-
-async function loadStaff() {
-  const { data, error } =
-    await db
-      .from('staff_profiles')
-      .select('*')
-      .order(
-        'created_at',
-        { ascending: false }
-      );
-
-  if (error) {
-    console.error(
-      'Staff error:',
-      error
-    );
-
-    return;
-  }
-
-  renderStaff(data || []);
-}
-
-function renderStaff(staff) {
-  const table =
-    $('staffTable');
-
-  if (!table) return;
-
-  if (!staff.length) {
-    table.innerHTML =
-      '<tr><td colspan="100%">No staff found.</td></tr>';
-
-    return;
-  }
-
-  table.innerHTML =
-    staff.map(
-      member => `
-        <tr>
-          <td>${escapeHtml(
-            member.full_name ||
-            member.name ||
-            '-'
-          )}</td>
-          <td>${escapeHtml(
-            member.role || '-'
-          )}</td>
-          <td>${escapeHtml(
-            member.email || '-'
-          )}</td>
-          <td>${escapeHtml(
-            member.phone || '-'
-          )}</td>
-          <td>${escapeHtml(
-            member.status || '-'
-          )}</td>
-        </tr>
-      `
-    ).join('');
-}
-
-/* =========================
-LOAD ALL
-========================= */
-
-async function loadAll() {
-  await Promise.allSettled([
-    loadDashboard(),
-    loadBookings(),
-    loadRooms(),
-    loadRoomTypes(),
-    loadGuests(),
-    loadHousekeeping(),
-    loadMaintenance(),
-    loadPayments(),
-    loadFolios(),
-    loadStaff()
-  ]);
-}
-
-/* =========================
-NAVIGATION
-========================= */
-
-document
-  .querySelectorAll('[data-section]')
-  .forEach(button => {
-
-    button.addEventListener(
-      'click',
-      async () => {
-
-        const section =
-          button.dataset.section;
-
-        document
-          .querySelectorAll('[data-section]')
-          .forEach(item => {
-            item.classList.remove(
-              'active'
-            );
-          });
-
-        button.classList.add(
-          'active'
-        );
-
-        document
-          .querySelectorAll('.pms-section')
-          .forEach(panel => {
-            panel.classList.add(
-              'hidden'
-            );
-          });
-
-        const target =
-          $(section);
-
-        if (target) {
-          target.classList.remove(
-            'hidden'
-          );
-        }
-
-        /*
-         * On mobile, close the sidebar
-         * after selecting a section.
-         */
-        if (sideBar) {
-          sideBar.classList.remove(
-            'open'
-          );
-        }
-
-        if (section === 'dashboard') {
-          await loadDashboard();
-        }
-
-        if (section === 'bookings') {
-          await loadBookings();
-        }
-
-        if (section === 'rooms') {
-          await loadRooms();
-        }
-
-        if (section === 'guests') {
-          await loadGuests();
-        }
-
-        if (section === 'housekeeping') {
-          await loadHousekeeping();
-        }
-
-        if (section === 'maintenance') {
-          await loadMaintenance();
-        }
-
-        if (section === 'payments') {
-          await loadPayments();
-        }
-
-        if (section === 'folios') {
-          await loadFolios();
-        }
-
-        if (section === 'staff') {
-          await loadStaff();
-        }
-
-        if (section === 'rates') {
-          await loadRoomTypes();
-        }
-      }
-    );
-  });
-
-/* =========================
-AUTH STATE LISTENER
-========================= */
-
-db.auth.onAuthStateChange(
-  async (event, session) => {
-
-    console.log(
-      'Auth event:',
-      event
-    );
-
-    if (
-      event ===
-      'PASSWORD_RECOVERY'
-    ) {
-      showReset();
-      return;
-    }
-
-    if (
-      event ===
-      'SIGNED_OUT'
-    ) {
-      showLogin();
-      return;
-    }
-
-    if (
-      event === 'SIGNED_IN' &&
-      session
-    ) {
-
-      if (isRecoveryUrl()) {
-        showReset();
-        return;
-      }
-
-      try {
-        const isAdmin =
-          await verifyAdmin();
-
-        if (isAdmin) {
-          showApp();
-        } else {
-          setLoginError(
-            'This account does not have administrator access.'
-          );
-
-          await db.auth.signOut();
-        }
-
-      } catch (error) {
-        console.error(
-          'Admin verification error:',
-          error
-        );
-
-        setLoginError(
-          'Unable to verify administrator access.'
-        );
-
-        await db.auth.signOut();
-      }
-    }
-  }
-);
-
-/* =========================
-INITIALISE
-========================= */
-
-async function initialise() {
-
-  try {
-
-    if (isRecoveryUrl()) {
-      showReset();
-      return;
-    }
-
-    const {
-      data,
-      error
-    } = await db.auth.getSession();
-
-    if (error) {
-      console.error(
-        'Session error:',
-        error
-      );
-
-      showLogin();
-      return;
-    }
-
-    const session =
-      data?.session;
-
-    if (!session) {
-      showLogin();
-      return;
-    }
-
-    const isAdmin =
-      await verifyAdmin();
-
-    if (!isAdmin) {
-
-      await db.auth.signOut();
-
-      setLoginError(
-        'This account does not have administrator access.'
-      );
-
-      return;
-    }
-
-    showApp();
-
-  } catch (error) {
-
-    console.error(
-      'Initialisation error:',
-      error
-    );
-
-    showLogin();
-
-  }
-}
-
-/* =========================
-START PMS
-========================= */
-
-initialise();
-/* =========================================================
-   GUESTS & CRM — EDIT / ADD / DELETE
-========================================================= */
-
-let editingGuestId = null;
-
-
-/* =========================
-   GUEST MODAL
-========================= */
-
-function createGuestModal() {
-
-  if ($('guestModal')) return;
-
-  const modal = document.createElement('div');
-
-  modal.id = 'guestModal';
-
-  modal.innerHTML = `
-    <div class="guest-modal-backdrop">
-
-      <div class="guest-modal-card">
-
-        <div class="guest-modal-head">
-
-          <div>
-            <h2 id="guestModalTitle">
-              Add Guest
-            </h2>
-
-            <div class="muted">
-              Guest profile information
-            </div>
-          </div>
-
-          <button
-            type="button"
-            class="secondary"
-            id="closeGuestModal"
-          >
-            ✕
-          </button>
-
-        </div>
-
-
-        <form id="guestForm">
-
-          <div class="guest-form-grid">
-
-            <div>
-              <label>First name</label>
-
-              <input
-                id="guestFirstName"
-                type="text"
-                required
-              >
-            </div>
-
-
-            <div>
-              <label>Last name</label>
-
-              <input
-                id="guestLastName"
-                type="text"
-              >
-            </div>
-
-
-            <div>
-              <label>Email</label>
-
-              <input
-                id="guestEmail"
-                type="email"
-              >
-            </div>
-
-
-            <div>
-              <label>Phone</label>
-
-              <input
-                id="guestPhone"
-                type="text"
-              >
-            </div>
-
-
-            <div>
-              <label>Address</label>
-
-              <input
-                id="guestAddress"
-                type="text"
-              >
-            </div>
-
-
-            <div>
-              <label>City</label>
-
-              <input
-                id="guestCity"
-                type="text"
-              >
-            </div>
-
-
-            <div>
-              <label>Country</label>
-
-              <input
-                id="guestCountry"
-                type="text"
-                value="Nigeria"
-              >
-            </div>
-
-
-            <div>
-              <label>Nationality</label>
-
-              <input
-                id="guestNationality"
-                type="text"
-              >
-            </div>
-
-
-            <div>
-              <label>ID type</label>
-
-              <select id="guestIdType">
-
-                <option value="">
-                  Select ID type
-                </option>
-
-                <option value="passport">
-                  Passport
-                </option>
-
-                <option value="national_id">
-                  National ID
-                </option>
-
-                <option value="drivers_license">
-                  Driver's License
-                </option>
-
-                <option value="voters_card">
-                  Voter's Card
-                </option>
-
-                <option value="other">
-                  Other
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div>
-              <label>ID number</label>
-
-              <input
-                id="guestIdNumber"
-                type="text"
-              >
-            </div>
-
-
-            <div class="guest-full">
-
-              <label>Notes</label>
-
-              <textarea
-                id="guestNotes"
-                rows="4"
-              ></textarea>
-
-            </div>
-
-
-            <div class="guest-full">
-
-              <label class="guest-check">
-
-                <input
-                  id="guestVip"
-                  type="checkbox"
-                >
-
-                <span>
-                  VIP guest
-                </span>
-
-              </label>
-
-            </div>
-
-          </div>
-
-
-          <div
-            id="guestFormError"
-            class="guest-form-error"
-          ></div>
-
-
-          <div class="guest-modal-actions">
-
-            <button
-              type="button"
-              class="secondary"
-              id="cancelGuest"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              class="primary"
-              id="saveGuest"
-            >
-              Save Guest
-            </button>
-
-          </div>
-
-        </form>
-
-      </div>
-
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-
-  $('closeGuestModal')
-    .addEventListener(
-      'click',
-      closeGuestModal
-    );
-
-
-  $('cancelGuest')
-    .addEventListener(
-      'click',
-      closeGuestModal
-    );
-
-
-  $('guestForm')
-    .addEventListener(
-      'submit',
-      saveGuest
-    );
-
-}
-
-
-/* =========================
-   OPEN MODAL
-========================= */
-
-function openGuestModal(guest = null) {
-
-  createGuestModal();
-
-  editingGuestId =
-    guest?.id || null;
-
-  $('guestModalTitle').textContent =
-    guest
-      ? 'Edit Guest'
-      : 'Add Guest';
-
-  $('guestFirstName').value =
-    guest?.first_name || '';
-
-  $('guestLastName').value =
-    guest?.last_name || '';
-
-  $('guestEmail').value =
-    guest?.email || '';
-
-  $('guestPhone').value =
-    guest?.phone || '';
-
-  $('guestAddress').value =
-    guest?.address || '';
-
-  $('guestCity').value =
-    guest?.city || '';
-
-  $('guestCountry').value =
-    guest?.country || 'Nigeria';
-
-  $('guestNationality').value =
-    guest?.nationality || '';
-
-  $('guestIdType').value =
-    guest?.id_type || '';
-
-  $('guestIdNumber').value =
-    guest?.id_number || '';
-
-  $('guestNotes').value =
-    guest?.notes || '';
-
-  $('guestVip').checked =
-    guest?.vip === true;
-
-  $('guestFormError').textContent =
-    '';
-
-  $('guestModal')
-    .classList.add('show');
-
-}
-
-
-/* =========================
-   CLOSE MODAL
-========================= */
-
-function closeGuestModal() {
-
-  const modal =
-    $('guestModal');
-
-  if (modal) {
-    modal.classList.remove('show');
-  }
-
-  editingGuestId = null;
-
-}
-
-
-/* =========================
-   SAVE GUEST
-========================= */
-
-async function saveGuest(event) {
-
-  event.preventDefault();
-
-  const errorBox =
-    $('guestFormError');
-
-  const saveButton =
-    $('saveGuest');
-
-  errorBox.textContent = '';
-
-  const firstName =
-    $('guestFirstName')
-      .value
-      .trim();
-
-  if (!firstName) {
-
-    errorBox.textContent =
-      'First name is required.';
-
-    return;
-  }
-
-
-  const payload = {
-
-    first_name:
-      firstName,
-
-    last_name:
-      $('guestLastName')
-        .value
-        .trim() || null,
-
-    email:
-      $('guestEmail')
-        .value
-        .trim() || null,
-
-    phone:
-      $('guestPhone')
-        .value
-        .trim() || null,
-
-    address:
-      $('guestAddress')
-        .value
-        .trim() || null,
-
-    city:
-      $('guestCity')
-        .value
-        .trim() || null,
-
-    country:
-      $('guestCountry')
-        .value
-        .trim() ||
-      'Nigeria',
-
-    nationality:
-      $('guestNationality')
-        .value
-        .trim() || null,
-
-    id_type:
-      $('guestIdType')
-        .value || null,
-
-    id_number:
-      $('guestIdNumber')
-        .value
-        .trim() || null,
-
-    notes:
-      $('guestNotes')
-        .value
-        .trim() || null,
-
-    vip:
-      $('guestVip').checked
-
-  };
-
-
-  const originalText =
-    saveButton.textContent;
-
-  saveButton.disabled = true;
-
-  saveButton.textContent =
-    editingGuestId
-      ? 'Saving...'
-      : 'Creating...';
-
-
-  try {
-
-    let result;
-
-
-    if (editingGuestId) {
-
-      result =
-        await db
-          .from('guest_profiles')
-          .update(payload)
-          .eq(
-            'id',
-            editingGuestId
-          )
-          .select()
-          .single();
-
-    } else {
-
-      result =
-        await db
-          .from('guest_profiles')
-          .insert(payload)
-          .select()
-          .single();
-
-    }
-
-
-    if (result.error) {
-      throw result.error;
-    }
-
-
-    try {
-
-      await db.rpc(
-        'pms_audit',
-        {
-          p_action:
-            editingGuestId
-              ? 'update_guest'
-              : 'create_guest',
-
-          p_entity_type:
-            'guest_profile',
-
-          p_entity_id:
-            result.data?.id ||
-            editingGuestId,
-
-          p_details:
-            {
-              first_name:
-                payload.first_name,
-
-              last_name:
-                payload.last_name,
-
-              vip:
-                payload.vip
-            }
-        }
-      );
-
-    } catch (auditError) {
-
-      console.warn(
-        'Guest audit log failed:',
-        auditError
-      );
-
-    }
-
-
-    closeGuestModal();
-
-    await loadGuests();
-
-    alert(
-      editingGuestId
-        ? 'Guest updated successfully.'
-        : 'Guest added successfully.'
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      'Guest save error:',
-      error
-    );
-
-    errorBox.textContent =
-      error?.message ||
-      'Unable to save guest.';
-
-
-  } finally {
-
-    saveButton.disabled =
-      false;
-
-    saveButton.textContent =
-      originalText;
-
-  }
-
-}
-
-
-/* =========================
-   DELETE GUEST
-========================= */
-
-async function deleteGuest(id) {
-
-  const guest =
-    G.find(
-      item =>
-        item.id === id
-    );
-
-  if (!guest) return;
-
-
-  const name =
-    [
-      guest.first_name,
-      guest.last_name
-    ]
-      .filter(Boolean)
-      .join(' ');
-
-
-  const confirmed =
-    confirm(
-      `Delete guest "${name || 'this guest'}"?\n\nThis action cannot be undone.`
-    );
-
-
-  if (!confirmed) {
-    return;
-  }
-
-
-  try {
-
-    const { error } =
-      await db
-        .from('guest_profiles')
-        .delete()
-        .eq(
-          'id',
-          id
-        );
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    try {
-
-      await db.rpc(
-        'pms_audit',
-        {
-          p_action:
-            'delete_guest',
-
-          p_entity_type:
-            'guest_profile',
-
-          p_entity_id:
-            id,
-
-          p_details:
-            {
-              first_name:
-                guest.first_name,
-
-              last_name:
-                guest.last_name
-            }
-        }
-      );
-
-    } catch (auditError) {
-
-      console.warn(
-        'Guest audit log failed:',
-        auditError
-      );
-
-    }
-
-
-    await loadGuests();
-
-    alert(
-      'Guest deleted successfully.'
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      'Guest delete error:',
-      error
-    );
-
-    alert(
-      'Unable to delete guest: ' +
-      (
-        error?.message ||
-        'Unknown error.'
-      )
-    );
-
-  }
-
-}
-
-
-/* =========================
-   REPLACE GUEST RENDERER
-========================= */
-
-function renderGuests() {
-
-  const table =
-    $('guestsTable');
-
-  if (!table) return;
-
-
-  if (!G.length) {
-
-    table.innerHTML = `
-      <tr>
-        <td colspan="100%">
-          No guests found.
-        </td>
-      </tr>
-    `;
-
-    return;
-  }
-
-
-  table.innerHTML =
-    G.map(
-      guest => {
-
-        const name =
-          [
-            guest.first_name,
-            guest.last_name
-          ]
-            .filter(Boolean)
-            .join(' ');
-
-
-        return `
-          <tr>
-
-            <td>
-              ${escapeHtml(
-                name || '-'
-              )}
-            </td>
-
-            <td>
-              ${escapeHtml(
-                guest.email || '-'
-              )}
-            </td>
-
-            <td>
-              ${escapeHtml(
-                guest.phone || '-'
-              )}
-            </td>
-
-            <td>
-              ${escapeHtml(
-                guest.country || '-'
-              )}
-            </td>
-
-            <td>
-              ${
-                guest.vip
-                  ? '⭐ VIP'
-                  : '—'
-              }
-            </td>
-
-            <td>
-
-              <button
-                type="button"
-                class="secondary guest-edit-button"
-                data-guest-id="${guest.id}"
-              >
-                Edit
-              </button>
-
-              <button
-                type="button"
-                class="secondary guest-delete-button"
-                data-guest-id="${guest.id}"
-              >
-                Delete
-              </button>
-
-            </td>
-
-          </tr>
-        `;
-
-      }
-    ).join('');
-
-
-  /*
-   * Add Actions header automatically.
-   */
-
-  const header =
-    table
-      .closest('table')
-      ?.querySelector('thead tr');
-
-
-  if (header) {
-
-    const alreadyExists =
-      header.querySelector(
-        '[data-guest-actions-header]'
-      );
-
-    if (!alreadyExists) {
-
-      const th =
-        document.createElement('th');
-
-      th.textContent =
-        'Actions';
-
-      th.dataset.guestActionsHeader =
-        'true';
-
-      header.appendChild(th);
-
-    }
-
-  }
-
-
-  table
-    .querySelectorAll(
-      '.guest-edit-button'
-    )
-    .forEach(button => {
-
-      button.addEventListener(
-        'click',
-        () => {
-
-          const guest =
-            G.find(
-              item =>
-                String(item.id) ===
-                String(
-                  button.dataset.guestId
-                )
-            );
-
-          if (guest) {
-            openGuestModal(guest);
-          }
-
-        }
-      );
-
-    });
-
-
-  table
-    .querySelectorAll(
-      '.guest-delete-button'
-    )
-    .forEach(button => {
-
-      button.addEventListener(
-        'click',
-        () => {
-
-          deleteGuest(
-            button.dataset.guestId
-          );
-
-        }
-      );
-
-    });
-
-}
-
-
-/* =========================
-   ADD GUEST BUTTON
-========================= */
-
-function addGuest() {
-
-  openGuestModal();
-
-}
-
-
-/* =========================
-   GUEST TOOLBAR
-========================= */
-
-function addGuestToolbar() {
-
-  const section =
-    $('guests');
-
-  if (!section) return;
-
-
-  const head =
-    section.querySelector(
-      '.head'
-    );
-
-  if (!head) return;
-
-
-  if (
-    section.querySelector(
-      '#addGuestButton'
-    )
-  ) {
-    return;
-  }
-
-
-  const button =
-    document.createElement(
-      'button'
-    );
-
-  button.id =
-    'addGuestButton';
-
-  button.type =
-    'button';
-
-  button.className =
-    'primary';
-
-  button.textContent =
-    '+ Add Guest';
-
-  button.style.marginTop =
-    '12px';
-
-  button.addEventListener(
-    'click',
-    addGuest
-  );
-
-
-  head.appendChild(button);
-
-}
-
-
-/* =========================
-   GUEST CSS
-========================= */
-
-(function addGuestStyles() {
-
-  if (
-    document.getElementById(
-      'guestCrudStyles'
-    )
-  ) {
-    return;
-  }
-
-
-  const style =
-    document.createElement(
-      'style'
-    );
-
-  style.id =
-    'guestCrudStyles';
-
-
-  style.textContent = `
-
-    #guestModal {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: none;
-    }
-
-    #guestModal.show {
-      display: block;
-    }
-
-    .guest-modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      overflow-y: auto;
-    }
-
-    .guest-modal-card {
-      width: min(760px, 96vw);
-      max-height: 92vh;
-      overflow-y: auto;
-      background: #fff;
-      border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 25px 80px rgba(0,0,0,.28);
-    }
-
-    .guest-modal-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .guest-modal-head h2 {
-      margin: 0 0 5px;
-      font-family: Georgia, serif;
-    }
-
-    .guest-form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .guest-form-grid > div {
-      min-width: 0;
-    }
-
-    .guest-full {
-      grid-column: 1 / -1;
-    }
-
-    .guest-form-grid label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: #4d5651;
-    }
-
-    .guest-form-grid input,
-    .guest-form-grid select,
-    .guest-form-grid textarea {
-      width: 100%;
-      padding: 11px 12px;
-      border: 1px solid #e2ded7;
-      border-radius: 8px;
-      background: #fff;
-      font: inherit;
-      color: #202723;
-    }
-
-    .guest-form-grid textarea {
-      resize: vertical;
-    }
-
-    .guest-check {
-      display: flex !important;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-
-    .guest-check input {
-      width: auto;
-    }
-
-    .guest-form-error {
-      color: #a33b34;
-      margin-top: 12px;
-      min-height: 20px;
-    }
-
-    .guest-modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #e2ded7;
-    }
-
-    .guest-edit-button,
-    .guest-delete-button {
-      margin: 2px;
-    }
-
-    @media (max-width: 600px) {
-
-      .guest-form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .guest-full {
-        grid-column: auto;
-      }
-
-      .guest-modal-card {
-        padding: 16px;
-      }
-
-      .guest-modal-actions {
-        flex-direction: column-reverse;
-      }
-
-      .guest-modal-actions button {
-        width: 100%;
-      }
-
-    }
-
-  `;
-
-
-  document.head.appendChild(style);
-
-})();
-
-
-/* =========================
-   GUEST SECTION HOOK
-========================= */
-
-document.addEventListener(
-  'DOMContentLoaded',
-  () => {
-
-    addGuestToolbar();
-
-  }
-);
-
-
-/*
- * If the PMS is already loaded when this
- * code runs, create the button immediately.
- */
-
-addGuestToolbar();
-/* =========================================================
-   ROOMS MANAGEMENT — ADD / EDIT / DELETE / STATUS
-========================================================= */
-
-let editingRoomId = null;
-
-
-/* =========================
-   ROOM MODAL
-========================= */
-
-function createRoomModal() {
-
-  if ($('roomModal')) return;
-
-  const modal = document.createElement('div');
-
-  modal.id = 'roomModal';
-
-  modal.innerHTML = `
-    <div class="room-modal-backdrop">
-
-      <div class="room-modal-card">
-
-        <div class="room-modal-head">
-
-          <div>
-            <h2 id="roomModalTitle">
-              Add Room
-            </h2>
-
-            <div class="muted">
-              Room information
-            </div>
-          </div>
-
-          <button
-            type="button"
-            class="secondary"
-            id="closeRoomModal"
-          >
-            ✕
-          </button>
-
-        </div>
-
-
-        <form id="roomForm">
-
-          <div class="room-form-grid">
-
-            <div>
-              <label>Room number</label>
-
-              <input
-                id="roomNumber"
-                type="text"
-                required
-                placeholder="e.g. 101"
-              >
-            </div>
-
-
-            <div>
-              <label>Floor</label>
-
-              <input
-                id="roomFloor"
-                type="text"
-                placeholder="e.g. Ground Floor"
-              >
-            </div>
-
-
-            <div>
-              <label>Room type</label>
-
-              <select
-                id="roomType"
-                required
-              >
-                <option value="">
-                  Select room type
-                </option>
-              </select>
-
-            </div>
-
-
-            <div>
-              <label>Status</label>
-
-              <select id="roomStatus">
-
-                <option value="available">
-                  Available
-                </option>
-
-                <option value="occupied">
-                  Occupied
-                </option>
-
-                <option value="maintenance">
-                  Maintenance
-                </option>
-
-                <option value="out_of_service">
-                  Out of Service
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
-
-
-          <div
-            id="roomFormError"
-            class="room-form-error"
-          ></div>
-
-
-          <div class="room-modal-actions">
-
-            <button
-              type="button"
-              class="secondary"
-              id="cancelRoom"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              class="primary"
-              id="saveRoom"
-            >
-              Save Room
-            </button>
-
-          </div>
-
-        </form>
-
-      </div>
-
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-
-  $('closeRoomModal')
-    .addEventListener(
-      'click',
-      closeRoomModal
-    );
-
-
-  $('cancelRoom')
-    .addEventListener(
-      'click',
-      closeRoomModal
-    );
-
-
-  $('roomForm')
-    .addEventListener(
-      'submit',
-      saveRoom
-    );
-
-}
-
-
-/* =========================
-   LOAD ROOM TYPE OPTIONS
-========================= */
-
-async function populateRoomTypeOptions() {
-
-  const select = $('roomType');
-
-  if (!select) return;
-
-  select.innerHTML = `
-    <option value="">
-      Loading room types...
-    </option>
-  `;
-
-  try {
-
-    const { data, error } = await db
-      .from('room_types')
-      .select('id,name,slug,price_per_night,is_active')
-      .eq('is_active', true)
-      .order('name');
-
-    if (error) {
-      throw error;
-    }
-
-    RT.length = 0;
-
-    if (Array.isArray(data)) {
-      RT.push(...data);
-    }
-
-    select.innerHTML = `
-      <option value="">
-        Select room type
-      </option>
-    `;
-
-    RT.forEach(roomType => {
-
-      const option =
-        document.createElement('option');
-
-      option.value =
-        roomType.id;
-
-      option.textContent =
-        roomType.name ||
-        'Unnamed Room Type';
-
-      select.appendChild(option);
-
-    });
-
-  } catch (error) {
-
-    console.error(
-      'Room type dropdown error:',
-      error
-    );
-
-    select.innerHTML = `
-      <option value="">
-        Unable to load room types
-      </option>
-    `;
-
-  }
-
-}
-
-
-/* =========================
-   OPEN ROOM MODAL
-========================= */
-
-async function openRoomModal(room = null) {
-
-  createRoomModal();
-
-  editingRoomId =
-    room?.id || null;
-
-  $('roomModalTitle').textContent =
-    room
-      ? 'Edit Room'
-      : 'Add Room';
-
-  $('roomNumber').value =
-    room?.room_number || '';
-
-  $('roomFloor').value =
-    room?.floor || '';
-
-  $('roomStatus').value =
-    room?.status || 'available';
-
-  $('roomFormError').textContent =
-    '';
-
-  $('roomModal')
-    .classList.add('show');
-
-  await populateRoomTypeOptions();
-
-  $('roomType').value =
-    room?.room_type_id || '';
-
-}
-
-
-/* =========================
-   CLOSE ROOM MODAL
-========================= */
-
-function closeRoomModal() {
-
-  const modal =
-    $('roomModal');
-
-  if (modal) {
-
-    modal.classList.remove(
-      'show'
-    );
-
-  }
-
-  editingRoomId = null;
-
-}
-
-
-/* =========================
-   SAVE ROOM
-========================= */
-
-async function saveRoom(event) {
-
-  event.preventDefault();
-
-
-  const errorBox =
-    $('roomFormError');
-
-  const saveButton =
-    $('saveRoom');
-
-
-  errorBox.textContent = '';
-
-
-  const roomNumber =
-    $('roomNumber')
-      .value
-      .trim();
-
-
-  const roomTypeId =
-    $('roomType')
-      .value;
-
-
-  const floor =
-    $('roomFloor')
-      .value
-      .trim();
-
-
-  const status =
-    $('roomStatus')
-      .value;
-
-
-  if (!roomNumber) {
-
-    errorBox.textContent =
-      'Room number is required.';
-
-    return;
-
-  }
-
-
-  if (!roomTypeId) {
-
-    errorBox.textContent =
-      'Please select a room type.';
-
-    return;
-
-  }
-
-
-  const payload = {
-
-    room_number:
-      roomNumber,
-
-    room_type_id:
-      roomTypeId,
-
-    floor:
-      floor || null,
-
-    status:
-      status
-
-  };
-
-
-  const originalText =
-    saveButton.textContent;
-
-
-  saveButton.disabled = true;
-
-  saveButton.textContent =
-    editingRoomId
-      ? 'Saving...'
-      : 'Creating...';
-
-
-  try {
-
-    let result;
-
-
-    if (editingRoomId) {
-
-      result =
-        await db
-          .from('rooms')
-          .update(payload)
-          .eq(
-            'id',
-            editingRoomId
-          )
-          .select()
-          .single();
-
-    } else {
-
-      result =
-        await db
-          .from('rooms')
-          .insert(payload)
-          .select()
-          .single();
-
-    }
-
-
-    if (result.error) {
-      throw result.error;
-    }
-
-
-    try {
-
-      await db.rpc(
-        'pms_audit',
-        {
-
-          p_action:
-            editingRoomId
-              ? 'update_room'
-              : 'create_room',
-
-          p_entity_type:
-            'room',
-
-          p_entity_id:
-            result.data?.id ||
-            editingRoomId,
-
-          p_details:
-            {
-              room_number:
-                payload.room_number,
-
-              room_type_id:
-                payload.room_type_id,
-
-              floor:
-                payload.floor,
-
-              status:
-                payload.status
-            }
-
-        }
-      );
-
-    } catch (auditError) {
-
-      console.warn(
-        'Room audit log failed:',
-        auditError
-      );
-
-    }
-
-
-    closeRoomModal();
-
-
-    await loadRooms();
-
-
-    alert(
-      editingRoomId
-        ? 'Room updated successfully.'
-        : 'Room added successfully.'
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      'Room save error:',
-      error
-    );
-
-
-    errorBox.textContent =
-      error?.message ||
-      'Unable to save room.';
-
-
-  } finally {
-
-    saveButton.disabled =
-      false;
-
-    saveButton.textContent =
-      originalText;
-
-  }
-
-}
-
-
-/* =========================
-   DELETE ROOM
-========================= */
-
-async function deleteRoom(id) {
-
-  const room =
-    R.find(
-      item =>
-        String(item.id) ===
-        String(id)
-    );
-
-
-  if (!room) return;
-
-
-  const confirmed =
-    confirm(
-      `Delete room "${room.room_number}"?\n\nThis action cannot be undone.`
-    );
-
-
-  if (!confirmed) {
-    return;
-  }
-
-
-  try {
-
-    const { error } =
-      await db
-        .from('rooms')
-        .delete()
-        .eq(
-          'id',
-          id
-        );
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    try {
-
-      await db.rpc(
-        'pms_audit',
-        {
-
-          p_action:
-            'delete_room',
-
-          p_entity_type:
-            'room',
-
-          p_entity_id:
-            id,
-
-          p_details:
-            {
-              room_number:
-                room.room_number,
-
-              room_type_id:
-                room.room_type_id
-            }
-
-        }
-      );
-
-    } catch (auditError) {
-
-      console.warn(
-        'Room audit log failed:',
-        auditError
-      );
-
-    }
-
-
-    await loadRooms();
-
-
-    alert(
-      'Room deleted successfully.'
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      'Room delete error:',
-      error
-    );
-
-
-    alert(
-      'Unable to delete room: ' +
-      (
-        error?.message ||
-        'Unknown error.'
-      )
-    );
-
-  }
-
-}
-
-
-/* =========================
-   ROOM RENDERER
-========================= */
-
-function renderRooms() {
-
-  const table =
-    $('roomsTable');
-
-  if (!table) return;
-
-
-  if (!R.length) {
-
-    table.innerHTML = `
-      <tr>
-        <td colspan="100%">
-          No rooms found.
-        </td>
-      </tr>
-    `;
-
-    return;
-
-  }
-
-
-  table.innerHTML =
-    R.map(
-      room => {
-
-        const roomType =
-          RT.find(
-            type =>
-              String(type.id) ===
-              String(
-                room.room_type_id
-              )
-          );
-
-
-        const roomTypeName =
-          roomType?.name ||
-          'Unknown';
-
-
-        const status =
-          String(
-            room.status ||
-            'available'
-          );
-
-
-        return `
-          <tr>
-
-            <td>
-              ${escapeHtml(
-                room.room_number ||
-                '-'
-              )}
-            </td>
-
-
-            <td>
-              ${escapeHtml(
-                roomTypeName
-              )}
-            </td>
-
-
-            <td>
-
-              <span class="badge">
-
-                ${escapeHtml(
-                  status
-                    .replaceAll(
-                      '_',
-                      ' '
-                    )
-                    .replace(
-                      /\b\w/g,
-                      char =>
-                        char.toUpperCase()
-                    )
-                )}
-
-              </span>
-
-            </td>
-
-
-            <td>
-              ${escapeHtml(
-                room.floor ||
-                '-'
-              )}
-            </td>
-
-
-            <td>
-
-              <button
-                type="button"
-                class="secondary room-edit-button"
-                data-room-id="${room.id}"
-              >
-                Edit
-              </button>
-
-
-              <button
-                type="button"
-                class="secondary room-delete-button"
-                data-room-id="${room.id}"
-              >
-                Delete
-              </button>
-
-            </td>
-
-          </tr>
-        `;
-
-      }
-    ).join('');
-
-
-  table
-    .querySelectorAll(
-      '.room-edit-button'
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          'click',
-          () => {
-
-            const room =
-              R.find(
-                item =>
-                  String(item.id) ===
-                  String(
-                    button.dataset.roomId
-                  )
-              );
-
-
-            if (room) {
-
-              openRoomModal(
-                room
-              );
-
-            }
-
-          }
-        );
-
-      }
-    );
-
-
-  table
-    .querySelectorAll(
-      '.room-delete-button'
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          'click',
-          () => {
-
-            deleteRoom(
-              button.dataset.roomId
-            );
-
-          }
-        );
-
-      }
-    );
-
-}
-
-
-/* =========================
-   ADD ROOM BUTTON
-========================= */
-
-function addRoom() {
-
-  openRoomModal();
-
-}
-
-
-/* =========================
-   ROOM TOOLBAR
-========================= */
-
-function addRoomToolbar() {
-
-  const section =
-    $('rooms');
-
-  if (!section) return;
-
-
-  const head =
-    section.querySelector(
-      '.head'
-    );
-
-  if (!head) return;
-
-
-  if (
-    section.querySelector(
-      '#addRoomButton'
-    )
-  ) {
-    return;
-  }
-
-
-  const button =
-    document.createElement(
-      'button'
-    );
-
-
-  button.id =
-    'addRoomButton';
-
-
-  button.type =
-    'button';
-
-
-  button.className =
-    'primary';
-
-
-  button.textContent =
-    '+ Add Room';
-
-
-  button.style.marginTop =
-    '12px';
-
-
-  button.addEventListener(
-    'click',
-    addRoom
-  );
-
-
-  head.appendChild(
-    button
-  );
-
-}
-
-
-/* =========================
-   ROOM CSS
-========================= */
-
-(function addRoomStyles() {
-
-  if (
-    document.getElementById(
-      'roomCrudStyles'
-    )
-  ) {
-    return;
-  }
-
-
-  const style =
-    document.createElement(
-      'style'
-    );
-
-
-  style.id =
-    'roomCrudStyles';
-
-
-  style.textContent = `
-
-    #roomModal {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: none;
-    }
-
-    #roomModal.show {
-      display: block;
-    }
-
-    .room-modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      overflow-y: auto;
-    }
-
-    .room-modal-card {
-      width: min(650px, 96vw);
-      max-height: 92vh;
-      overflow-y: auto;
-      background: #fff;
-      border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 25px 80px rgba(0,0,0,.28);
-    }
-
-    .room-modal-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .room-modal-head h2 {
-      margin: 0 0 5px;
-      font-family: Georgia, serif;
-    }
-
-    .room-form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .room-form-grid > div {
-      min-width: 0;
-    }
-
-    .room-form-grid label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: #4d5651;
-    }
-
-    .room-form-grid input,
-    .room-form-grid select {
-      width: 100%;
-      padding: 11px 12px;
-      border: 1px solid #e2ded7;
-      border-radius: 8px;
-      background: #fff;
-      font: inherit;
-      color: #202723;
-    }
-
-    .room-form-error {
-      color: #a33b34;
-      margin-top: 12px;
-      min-height: 20px;
-    }
-
-    .room-modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #e2ded7;
-    }
-
-    .room-edit-button,
-    .room-delete-button {
-      margin: 2px;
-    }
-
-    @media (max-width: 600px) {
-
-      .room-form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .room-modal-card {
-        padding: 16px;
-      }
-
-      .room-modal-actions {
-        flex-direction: column-reverse;
-      }
-
-      .room-modal-actions button {
-        width: 100%;
-      }
-
-    }
-
-  `;
-
-
-  document.head.appendChild(
-    style
-  );
-
-})();
-
-
-/* =========================
-   ROOM SECTION HOOK
-========================= */
-
-document.addEventListener(
-  'DOMContentLoaded',
-  () => {
-
-    addRoomToolbar();
-
-  }
-);
-
-
-addRoomToolbar();
-/* =========================================================
-   ROOM TYPES MANAGEMENT — ADD / EDIT / DELETE
-========================================================= */
-
-let editingRoomTypeId = null;
-
-
-/* =========================
-   ROOM TYPE MODAL
-========================= */
-
-function createRoomTypeModal() {
-
-  if ($('roomTypeModal')) return;
-
-  const modal = document.createElement('div');
-
-  modal.id = 'roomTypeModal';
-
-  modal.innerHTML = `
-    <div class="room-type-modal-backdrop">
-
-      <div class="room-type-modal-card">
-
-        <div class="room-type-modal-head">
-
-          <div>
-            <h2 id="roomTypeModalTitle">
-              Add Room Type
-            </h2>
-
-            <div class="muted">
-              Room type information
-            </div>
-          </div>
-
-          <button
-            type="button"
-            class="secondary"
-            id="closeRoomTypeModal"
-          >
-            ✕
-          </button>
-
-        </div>
-
-
-        <form id="roomTypeForm">
-
-          <div class="room-type-form-grid">
-
-            <div>
-              <label>Room type name</label>
-
-              <input
-                id="roomTypeName"
-                type="text"
-                required
-                placeholder="e.g. Deluxe Room"
-              >
-            </div>
-
-
-            <div>
-              <label>Slug</label>
-
-              <input
-                id="roomTypeSlug"
-                type="text"
-                required
-                placeholder="e.g. deluxe-room"
-              >
-            </div>
-
-
-            <div class="room-type-full">
-
-              <label>Description</label>
-
-              <textarea
-                id="roomTypeDescription"
-                rows="4"
-                placeholder="Full room type description"
-              ></textarea>
-
-            </div>
-
-
-            <div class="room-type-full">
-
-              <label>Short description</label>
-
-              <input
-                id="roomTypeShortDescription"
-                type="text"
-                placeholder="Short description"
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Price per night (₦)
-              </label>
-
-              <input
-                id="roomTypePrice"
-                type="number"
-                min="0"
-                step="0.01"
-                value="0"
-                required
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Maximum guests
-              </label>
-
-              <input
-                id="roomTypeMaxGuests"
-                type="number"
-                min="1"
-                step="1"
-                value="2"
-                required
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Bed type
-              </label>
-
-              <input
-                id="roomTypeBedType"
-                type="text"
-                placeholder="e.g. King Bed"
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Room size
-              </label>
-
-              <input
-                id="roomTypeRoomSize"
-                type="text"
-                placeholder="e.g. 45 m²"
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                View type
-              </label>
-
-              <input
-                id="roomTypeViewType"
-                type="text"
-                placeholder="e.g. City View"
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Image URL
-              </label>
-
-              <input
-                id="roomTypeImageUrl"
-                type="url"
-                placeholder="https://..."
-              >
-
-            </div>
-
-
-            <div class="room-type-full">
-
-              <label>
-                Amenities
-              </label>
-
-              <input
-                id="roomTypeAmenities"
-                type="text"
-                placeholder="Wi-Fi, TV, Air Conditioning, Mini Bar"
-              >
-
-              <div class="muted room-type-help">
-                Separate amenities with commas.
-              </div>
-
-            </div>
-
-
-            <div class="room-type-full">
-
-              <label class="room-type-check">
-
-                <input
-                  id="roomTypeActive"
-                  type="checkbox"
-                  checked
-                >
-
-                <span>
-                  Active room type
-                </span>
-
-              </label>
-
-            </div>
-
-          </div>
-
-
-          <div
-            id="roomTypeFormError"
-            class="room-type-form-error"
-          ></div>
-
-
-          <div class="room-type-modal-actions">
-
-            <button
-              type="button"
-              class="secondary"
-              id="cancelRoomType"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              class="primary"
-              id="saveRoomType"
-            >
-              Save Room Type
-            </button>
-
-          </div>
-
-        </form>
-
-      </div>
-
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-
-  $('closeRoomTypeModal')
-    .addEventListener(
-      'click',
-      closeRoomTypeModal
-    );
-
-
-  $('cancelRoomType')
-    .addEventListener(
-      'click',
-      closeRoomTypeModal
-    );
-
-
-  $('roomTypeForm')
-    .addEventListener(
-      'submit',
-      saveRoomType
-    );
-
-}
-
-
-/* =========================
-   CREATE SLUG
-========================= */
-
-function makeRoomTypeSlug(value) {
-
-  return String(value || '')
-    .trim()
-    .toLowerCase()
-    .replace(
-      /[^a-z0-9]+/g,
-      '-'
-    )
-    .replace(
-      /^-+|-+$/g,
-      ''
-    );
-
-}
-
-
-/* =========================
-   OPEN ROOM TYPE MODAL
-========================= */
-
-function openRoomTypeModal(
-  roomType = null
-) {
-
-  createRoomTypeModal();
-
-  editingRoomTypeId =
-    roomType?.id || null;
-
-
-  $('roomTypeModalTitle')
-    .textContent =
-      roomType
-        ? 'Edit Room Type'
-        : 'Add Room Type';
-
-
-  $('roomTypeName').value =
-    roomType?.name || '';
-
-
-  $('roomTypeSlug').value =
-    roomType?.slug || '';
-
-
-  $('roomTypeDescription').value =
-    roomType?.description || '';
-
-
-  $('roomTypeShortDescription').value =
-    roomType?.short_description || '';
-
-
-  $('roomTypePrice').value =
-    roomType?.price_per_night ?? 0;
-
-
-  $('roomTypeMaxGuests').value =
-    roomType?.max_guests ?? 2;
-
-
-  $('roomTypeBedType').value =
-    roomType?.bed_type || '';
-
-
-  $('roomTypeRoomSize').value =
-    roomType?.room_size || '';
-
-
-  $('roomTypeViewType').value =
-    roomType?.view_type || '';
-
-
-  $('roomTypeImageUrl').value =
-    roomType?.image_url || '';
-
-
-  let amenities = [];
-
-  if (
-    Array.isArray(
-      roomType?.amenities
-    )
-  ) {
-
-    amenities =
-      roomType.amenities;
-
-  }
-
-
-  $('roomTypeAmenities').value =
-    amenities.join(', ');
-
-
-  $('roomTypeActive').checked =
-    roomType?.is_active !== false;
-
-
-  $('roomTypeFormError').textContent =
-    '';
-
-
-  $('roomTypeModal')
-    .classList.add('show');
-
-}
-
-
-/* =========================
-   CLOSE ROOM TYPE MODAL
-========================= */
-
-function closeRoomTypeModal() {
-
-  const modal =
-    $('roomTypeModal');
-
-  if (modal) {
-
-    modal.classList.remove(
-      'show'
-    );
-
-  }
-
-  editingRoomTypeId = null;
-
-}
-
-
-/* =========================
-   SAVE ROOM TYPE
-========================= */
-
-async function saveRoomType(event) {
-
-  event.preventDefault();
-
-
-  const errorBox =
-    $('roomTypeFormError');
-
-  const saveButton =
-    $('saveRoomType');
-
-
-  errorBox.textContent =
-    '';
-
-
-  const name =
-    $('roomTypeName')
-      .value
-      .trim();
-
-
-  let slug =
-    $('roomTypeSlug')
-      .value
-      .trim();
-
-
-  if (!slug) {
-
-    slug =
-      makeRoomTypeSlug(
-        name
-      );
-
-  }
-
-
-  const price =
-    Number(
-      $('roomTypePrice').value
-    );
-
-
-  const maxGuests =
-    Number(
-      $('roomTypeMaxGuests').value
-    );
-
-
-  if (!name) {
-
-    errorBox.textContent =
-      'Room type name is required.';
-
-    return;
-
-  }
-
-
-  if (!slug) {
-
-    errorBox.textContent =
-      'A valid slug is required.';
-
-    return;
-
-  }
-
-
-  if (
-    !Number.isFinite(price) ||
-    price < 0
-  ) {
-
-    errorBox.textContent =
-      'Price must be zero or greater.';
-
-    return;
-
-  }
-
-
-  if (
-    !Number.isInteger(maxGuests) ||
-    maxGuests < 1
-  ) {
-
-    errorBox.textContent =
-      'Maximum guests must be at least 1.';
-
-    return;
-
-  }
-
-
-  const amenitiesText =
-    $('roomTypeAmenities')
-      .value
-      .trim();
-
-
-  const amenities =
-    amenitiesText
-      ? amenitiesText
-          .split(',')
-          .map(
-            item =>
-              item.trim()
-          )
-          .filter(Boolean)
-      : [];
-
-
-  const payload = {
-
-    name,
-
-    slug,
-
-    description:
-      $('roomTypeDescription')
-        .value
-        .trim() || null,
-
-    short_description:
-      $('roomTypeShortDescription')
-        .value
-        .trim() || null,
-
-    price_per_night:
-      price,
-
-    max_guests:
-      maxGuests,
-
-    bed_type:
-      $('roomTypeBedType')
-        .value
-        .trim() || null,
-
-    room_size:
-      $('roomTypeRoomSize')
-        .value
-        .trim() || null,
-
-    view_type:
-      $('roomTypeViewType')
-        .value
-        .trim() || null,
-
-    amenities,
-
-    image_url:
-      $('roomTypeImageUrl')
-        .value
-        .trim() || null,
-
-    is_active:
-      $('roomTypeActive').checked
-
-  };
-
-
-  const originalText =
-    saveButton.textContent;
-
-
-  saveButton.disabled =
-    true;
-
-
-  saveButton.textContent =
-    editingRoomTypeId
-      ? 'Saving...'
-      : 'Creating...';
-
-
-  try {
-
-    let result;
-
-
-    if (editingRoomTypeId) {
-
-      result =
-        await db
-          .from('room_types')
-          .update(payload)
-          .eq(
-            'id',
-            editingRoomTypeId
-          )
-          .select()
-          .single();
-
-    } else {
-
-      result =
-        await db
-          .from('room_types')
-          .insert(payload)
-          .select()
-          .single();
-
-    }
-
-
-    if (result.error) {
-      throw result.error;
-    }
-
-
-    try {
-
-      await db.rpc(
-        'pms_audit',
-        {
-
-          p_action:
-            editingRoomTypeId
-              ? 'update_room_type'
-              : 'create_room_type',
-
-          p_entity_type:
-            'room_type',
-
-          p_entity_id:
-            result.data?.id ||
-            editingRoomTypeId,
-
-          p_details:
-            {
-              name:
-                payload.name,
-
-              slug:
-                payload.slug,
-
-              price_per_night:
-                payload.price_per_night,
-
-              is_active:
-                payload.is_active
-            }
-
-        }
-      );
-
-    } catch (auditError) {
-
-      console.warn(
-        'Room type audit log failed:',
-        auditError
-      );
-
-    }
-
-
-    closeRoomTypeModal();
-
-
-    await loadRoomTypes();
-
-
-    /*
-     * Refresh the room-type dropdown
-     * if the Rooms modal already exists.
-     */
-
-    populateRoomTypeOptions();
-
-
-    alert(
-      editingRoomTypeId
-        ? 'Room type updated successfully.'
-        : 'Room type added successfully.'
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      'Room type save error:',
-      error
-    );
-
-
-    errorBox.textContent =
-      error?.message ||
-      'Unable to save room type.';
-
-
-  } finally {
-
-    saveButton.disabled =
-      false;
-
-    saveButton.textContent =
-      originalText;
-
-  }
-
-}
-
-
-/* =========================
-   DELETE ROOM TYPE
-========================= */
-
-async function deleteRoomType(id) {
-
-  const roomType =
-    RT.find(
-      item =>
-        String(item.id) ===
-        String(id)
-    );
-
-
-  if (!roomType) return;
-
-
-  /*
-   * Prevent accidental deletion if
-   * rooms are currently using this type.
-   */
-
-  const roomsUsingType =
-    R.filter(
-      room =>
-        String(
-          room.room_type_id
-        ) ===
-        String(id)
-    );
-
-
-  if (roomsUsingType.length) {
-
-    alert(
-      `This room type cannot be deleted because ${roomsUsingType.length} room${roomsUsingType.length === 1 ? '' : 's'} currently use it.\n\nEdit those rooms first, then delete the room type.`
-    );
-
-    return;
-
-  }
-
-
-  const confirmed =
-    confirm(
-      `Delete room type "${roomType.name}"?\n\nThis action cannot be undone.`
-    );
-
-
-  if (!confirmed) {
-    return;
-  }
-
-
-  try {
-
-    const { error } =
-      await db
-        .from('room_types')
-        .delete()
-        .eq(
-          'id',
-          id
-        );
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    try {
-
-      await db.rpc(
-        'pms_audit',
-        {
-
-          p_action:
-            'delete_room_type',
-
-          p_entity_type:
-            'room_type',
-
-          p_entity_id:
-            id,
-
-          p_details:
-            {
-              name:
-                roomType.name,
-
-              slug:
-                roomType.slug
-            }
-
-        }
-      );
-
-    } catch (auditError) {
-
-      console.warn(
-        'Room type audit log failed:',
-        auditError
-      );
-
-    }
-
-
-    await loadRoomTypes();
-
-
-    populateRoomTypeOptions();
-
-
-    alert(
-      'Room type deleted successfully.'
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      'Room type delete error:',
-      error
-    );
-
-
-    alert(
-      'Unable to delete room type: ' +
-      (
-        error?.message ||
-        'Unknown error.'
-      )
-    );
-
-  }
-
-}
-
-
-/* =========================
-   ROOM TYPE RENDERER
-========================= */
-
-function renderRoomTypes() {
-
-  const table =
-    $('roomTypesTable');
-
-  if (!table) return;
-
-
-  if (!RT.length) {
-
-    table.innerHTML = `
-      <tr>
-        <td colspan="100%">
-          No room types found.
-        </td>
-      </tr>
-    `;
-
-    return;
-
-  }
-
-
-  table.innerHTML =
-    RT.map(
-      roomType => {
-
-        return `
-          <tr>
-
-            <td>
-              ${escapeHtml(
-                roomType.name ||
-                '-'
-              )}
-            </td>
-
-            <td>
-              ${escapeHtml(
-                roomType.description ||
-                '-'
-              )}
-            </td>
-
-            <td>
-              ${money(
-                roomType.price_per_night
-              )}
-            </td>
-
-            <td>
-
-              <span class="badge">
-                ${
-                  roomType.is_active
-                    ? 'Active'
-                    : 'Inactive'
-                }
-              </span>
-
-            </td>
-
-            <td>
-
-              <button
-                type="button"
-                class="secondary room-type-edit-button"
-                data-room-type-id="${roomType.id}"
-              >
-                Edit
-              </button>
-
-              <button
-                type="button"
-                class="secondary room-type-delete-button"
-                data-room-type-id="${roomType.id}"
-              >
-                Delete
-              </button>
-
-            </td>
-
-          </tr>
-        `;
-
-      }
-    ).join('');
-
-
-  table
-    .querySelectorAll(
-      '.room-type-edit-button'
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          'click',
-          () => {
-
-            const roomType =
-              RT.find(
-                item =>
-                  String(item.id) ===
-                  String(
-                    button.dataset.roomTypeId
-                  )
-              );
-
-
-            if (roomType) {
-
-              openRoomTypeModal(
-                roomType
-              );
-
-            }
-
-          }
-        );
-
-      }
-    );
-
-
-  table
-    .querySelectorAll(
-      '.room-type-delete-button'
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          'click',
-          () => {
-
-            deleteRoomType(
-              button.dataset.roomTypeId
-            );
-
-          }
-        );
-
-      }
-    );
-
-}
-
-
-/* =========================
-   ADD ROOM TYPE BUTTON
-========================= */
-
-function addRoomType() {
-
-  openRoomTypeModal();
-
-}
-
-
-/* =========================
-   ROOM TYPE TOOLBAR
-========================= */
-
-function addRoomTypeToolbar() {
-
-  const section =
-    $('rates');
-
-  if (!section) return;
-
-
-  const head =
-    section.querySelector(
-      '.head'
-    );
-
-  if (!head) return;
-
-
-  if (
-    section.querySelector(
-      '#addRoomTypeButton'
-    )
-  ) {
-    return;
-  }
-
-
-  const button =
-    document.createElement(
-      'button'
-    );
-
-
-  button.id =
-    'addRoomTypeButton';
-
-
-  button.type =
-    'button';
-
-
-  button.className =
-    'primary';
-
-
-  button.textContent =
-    '+ Add Room Type';
-
-
-  button.style.marginTop =
-    '12px';
-
-
-  button.addEventListener(
-    'click',
-    addRoomType
-  );
-
-
-  head.appendChild(
-    button
-  );
-
-}
-
-
-/* =========================
-   ROOM TYPE CSS
-========================= */
-
-(function addRoomTypeStyles() {
-
-  if (
-    document.getElementById(
-      'roomTypeCrudStyles'
-    )
-  ) {
-    return;
-  }
-
-
-  const style =
-    document.createElement(
-      'style'
-    );
-
-
-  style.id =
-    'roomTypeCrudStyles';
-
-
-  style.textContent = `
-
-    #roomTypeModal {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: none;
-    }
-
-    #roomTypeModal.show {
-      display: block;
-    }
-
-    .room-type-modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      overflow-y: auto;
-    }
-
-    .room-type-modal-card {
-      width: min(760px, 96vw);
-      max-height: 92vh;
-      overflow-y: auto;
-      background: #fff;
-      border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 25px 80px rgba(0,0,0,.28);
-    }
-
-    .room-type-modal-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .room-type-modal-head h2 {
-      margin: 0 0 5px;
-      font-family: Georgia, serif;
-    }
-
-    .room-type-form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .room-type-full {
-      grid-column: 1 / -1;
-    }
-
-    .room-type-form-grid label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: #4d5651;
-    }
-
-    .room-type-form-grid input,
-    .room-type-form-grid textarea {
-      width: 100%;
-      padding: 11px 12px;
-      border: 1px solid #e2ded7;
-      border-radius: 8px;
-      background: #fff;
-      font: inherit;
-      color: #202723;
-    }
-
-    .room-type-form-grid textarea {
-      resize: vertical;
-    }
-
-    .room-type-help {
-      margin-top: 5px;
-      font-size: 11px;
-    }
-
-    .room-type-check {
-      display: flex !important;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-
-    .room-type-check input {
-      width: auto;
-    }
-
-    .room-type-form-error {
-      color: #a33b34;
-      margin-top: 12px;
-      min-height: 20px;
-    }
-
-    .room-type-modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #e2ded7;
-    }
-
-    .room-type-edit-button,
-    .room-type-delete-button {
-      margin: 2px;
-    }
-
-    @media (max-width: 600px) {
-
-      .room-type-form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .room-type-full {
-        grid-column: auto;
-      }
-
-      .room-type-modal-card {
-        padding: 16px;
-      }
-
-      .room-type-modal-actions {
-        flex-direction: column-reverse;
-      }
-
-      .room-type-modal-actions button {
-        width: 100%;
-      }
-
-    }
-
-  `;
-
-
-  document.head.appendChild(
-    style
-  );
-
-})();
-
-
-/* =========================
-   ROOM TYPE SECTION HOOK
-========================= */
-
-document.addEventListener(
-  'DOMContentLoaded',
-  () => {
-
-    addRoomTypeToolbar();
-
-  }
-);
-
-
-addRoomTypeToolbar();
-/* =========================================================
-   PHASE 1 — RESERVATIONS / FRONT DESK
-   Complete Create / Edit / Cancel + double-booking check
-========================================================= */
-
-let editingBookingId = null;
-let bookingSearchTerm = '';
-
-/* =========================
-   BOOKING MODAL
-========================= */
-
-function createBookingModal() {
-  if ($('bookingModal')) return;
-
-  const modal = document.createElement('div');
-  modal.id = 'bookingModal';
-
-  modal.innerHTML = `
-    <div class="booking-modal-backdrop">
-      <div class="booking-modal-card">
-        <div class="booking-modal-head">
-          <div>
-            <h2 id="bookingModalTitle">New Reservation</h2>
-            <div class="muted">Reservation details</div>
-          </div>
-          <button type="button" class="secondary" id="closeBookingModal">✕</button>
-        </div>
-
-        <form id="bookingForm">
-          <div class="booking-form-grid">
-
-            <div class="booking-full">
-              <label>Guest</label>
-              <select id="bookingGuest" required>
-                <option value="">Select guest</option>
-              </select>
-            </div>
-
-            <div>
-              <label>Room</label>
-              <select id="bookingRoom" required>
-                <option value="">Select room</option>
-              </select>
-            </div>
-
-            <div>
-              <label>Status</label>
-              <select id="bookingStatus">
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="checked_in">Checked In</option>
-                <option value="checked_out">Checked Out</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-
-            <div>
-              <label>Check-in</label>
-              <input id="bookingCheckIn" type="date" required>
-            </div>
-
-            <div>
-              <label>Check-out</label>
-              <input id="bookingCheckOut" type="date" required>
-            </div>
-
-            <div>
-              <label>Adults</label>
-              <input id="bookingAdults" type="number" min="1" value="1" required>
-            </div>
-
-            <div>
-              <label>Children</label>
-              <input id="bookingChildren" type="number" min="0" value="0">
-            </div>
-
-            <div class="booking-full">
-              <label>Notes</label>
-              <textarea id="bookingNotes" rows="3" placeholder="Internal notes"></textarea>
-            </div>
-
-            <div class="booking-full">
-              <label>Special requests</label>
-              <textarea id="bookingSpecialRequests" rows="2" placeholder="Guest special requests"></textarea>
-            </div>
-
-          </div>
-
-          <div id="bookingFormError" class="booking-form-error"></div>
-
-          <div class="booking-modal-actions">
-            <button type="button" class="secondary" id="cancelBooking">Cancel</button>
-            <button type="submit" class="primary" id="saveBooking">Save Reservation</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-  $('closeBookingModal').addEventListener('click', closeBookingModal);
-  $('cancelBooking').addEventListener('click', closeBookingModal);
-  $('bookingForm').addEventListener('submit', saveBooking);
-}
-
-/* =========================
-   POPULATE DROPDOWNS (fixed)
-========================= */
-
-async function populateBookingGuestOptions(selectedId = null) {
-  const select = $('bookingGuest');
-  if (!select) return;
-
-  select.innerHTML = `<option value="">Loading guests...</option>`;
-
-  try {
-    const { data, error } = await db
-      .from('guest_profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Guest dropdown error:', error);
-      select.innerHTML = `<option value="">Unable to load guests</option>`;
-      return;
-    }
-
-    G = data || [];
-
-    select.innerHTML = `<option value="">Select guest</option>`;
-
-    if (!G.length) {
-      select.innerHTML = `<option value="">No guests found – add a guest first</option>`;
-      return;
-    }
-
-    G.forEach(guest => {
-      const name = [guest.first_name, guest.last_name].filter(Boolean).join(' ') ||
-                   guest.full_name || guest.name || 'Unnamed Guest';
-
-      const option = document.createElement('option');
-      option.value = guest.id;
-      option.textContent = `${name}${guest.email ? ' — ' + guest.email : ''}`;
-      select.appendChild(option);
-    });
-
-    if (selectedId) {
-      select.value = selectedId;
-    }
-
-  } catch (err) {
-    console.error('Guest dropdown failed:', err);
-    select.innerHTML = `<option value="">Error loading guests</option>`;
-  }
-}
-
-async function populateBookingRoomOptions(selectedId = null) {
-  const select = $('bookingRoom');
-  if (!select) return;
-
-  select.innerHTML = `<option value="">Loading rooms...</option>`;
-
-  try {
-    const { data, error } = await db
-      .from('rooms')
-      .select('*')
-      .order('room_number', { ascending: true });
-
-    if (error) {
-      console.error('Room dropdown error:', error);
-      select.innerHTML = `<option value="">Unable to load rooms</option>`;
-      return;
-    }
-
-    R = data || [];
-
-    if (!RT.length) {
-      await loadRoomTypes();
-    }
-
-    select.innerHTML = `<option value="">Select room</option>`;
-
-    if (!R.length) {
-      select.innerHTML = `<option value="">No rooms found</option>`;
-      return;
-    }
-
-    R.forEach(room => {
-      const type = RT.find(t => String(t.id) === String(room.room_type_id));
-      const typeName = type?.name || '';
-      const status = (room.status || 'available').replaceAll('_', ' ');
-
-      const option = document.createElement('option');
-      option.value = room.id;
-      option.textContent = `${room.room_number || '—'} ${typeName ? '(' + typeName + ')' : ''} — ${status}`;
-      select.appendChild(option);
-    });
-
-    if (selectedId) {
-      select.value = selectedId;
-    }
-
-  } catch (err) {
-    console.error('Room dropdown failed:', err);
-    select.innerHTML = `<option value="">Error loading rooms</option>`;
-  }
-}
-
-/* =========================
-   OPEN / CLOSE MODAL
-========================= */
-
-async function openBookingModal(booking = null) {
-  createBookingModal();
-
-  editingBookingId = booking?.id || null;
-
-  $('bookingModalTitle').textContent = booking ? 'Edit Reservation' : 'New Reservation';
-
-  await Promise.all([
-    populateBookingGuestOptions(booking?.guest_id || null),
-    populateBookingRoomOptions(booking?.room_id || null)
-  ]);
-
-  $('bookingCheckIn').value = booking?.check_in ? String(booking.check_in).slice(0, 10) : '';
-  $('bookingCheckOut').value = booking?.check_out ? String(booking.check_out).slice(0, 10) : '';
-  $('bookingStatus').value = booking?.status || 'pending';
-  $('bookingAdults').value = booking?.adults ?? 1;
-  $('bookingChildren').value = booking?.children ?? 0;
-  $('bookingNotes').value = booking?.notes || '';
-  $('bookingSpecialRequests').value = booking?.special_requests || '';
-
-  $('bookingFormError').textContent = '';
-  $('bookingModal').classList.add('show');
-}
-
-function closeBookingModal() {
-  const modal = $('bookingModal');
-  if (modal) modal.classList.remove('show');
-  editingBookingId = null;
-}
-
-/* =========================
-   DOUBLE-BOOKING CHECK (client-side)
-========================= */
-
-function isRoomAvailableClient(roomId, checkIn, checkOut, excludeId = null) {
-  // TEMPORARY: always allow while we debug overlapping data
-  // We will restore proper checking once the first bookings work
-  console.log('Availability check temporarily disabled for testing');
-  return true;
-}
-
-/* =========================
-   SAVE BOOKING
-========================= */
-
-async function saveBooking(event) {
-  event.preventDefault();
-
-  const errorBox = $('bookingFormError');
-  const saveButton = $('saveBooking');
-  errorBox.textContent = '';
-
-  const guestId = $('bookingGuest').value;
-  const roomId = $('bookingRoom').value;
-  const checkIn = $('bookingCheckIn').value;
-  const checkOut = $('bookingCheckOut').value;
-  const status = $('bookingStatus').value;
-  const adults = Number($('bookingAdults').value) || 1;
-  const children = Number($('bookingChildren').value) || 0;
-  const notes = $('bookingNotes').value.trim() || null;
-  const specialRequests = $('bookingSpecialRequests').value.trim() || null;
-
-  if (!guestId) {
-    errorBox.textContent = 'Please select a guest.';
-    return;
-  }
-  if (!roomId) {
-    errorBox.textContent = 'Please select a room.';
-    return;
-  }
-  if (!checkIn || !checkOut) {
-    errorBox.textContent = 'Check-in and check-out dates are required.';
-    return;
-  }
-  if (new Date(checkOut) <= new Date(checkIn)) {
-    errorBox.textContent = 'Check-out must be after check-in.';
-    return;
-  }
-
-  if (status !== 'cancelled') {
-    const available = isRoomAvailableClient(roomId, checkIn, checkOut, editingBookingId);
-    if (!available) {
-      errorBox.textContent = 'This room is not available for the selected dates (overlapping reservation).';
-      return;
-    }
-  }
-
-  const guest = G.find(g => String(g.id) === String(guestId));
-  const room = R.find(r => String(r.id) === String(roomId));
-
-  const guestName = guest
-    ? [guest.first_name, guest.last_name].filter(Boolean).join(' ') || guest.full_name || guest.name || null
-    : null;
-
-  const payload = {
-    guest_id: guestId,
-    room_id: roomId,
-    check_in: checkIn,
-    check_out: checkOut,
-    status,
-    adults,
-    children,
-    notes,
-    special_requests: specialRequests,
-    guest_name: guestName,
-    email: guest?.email || null,
-    room_number: room?.room_number || null,
-    updated_at: new Date().toISOString()
-  };
-
-  const originalText = saveButton.textContent;
-  saveButton.disabled = true;
-  saveButton.textContent = editingBookingId ? 'Saving...' : 'Creating...';
-
-  try {
-    let result;
-
-    if (editingBookingId) {
-      result = await db
-        .from('bookings')
-        .update(payload)
-        .eq('id', editingBookingId)
-        .select()
-        .single();
-    } else {
-      result = await db
-        .from('bookings')
-        .insert(payload)
-        .select()
-        .single();
-    }
-
-    if (result.error) throw result.error;
-
-    try {
-      await db.rpc('pms_audit', {
-        p_action: editingBookingId ? 'update_booking' : 'create_booking',
-        p_entity_type: 'booking',
-        p_entity_id: result.data?.id || editingBookingId,
-        p_details: {
-          guest_id: payload.guest_id,
-          room_id: payload.room_id,
-          check_in: payload.check_in,
-          check_out: payload.check_out,
-          status: payload.status
-        }
-      });
-    } catch (auditError) {
-      console.warn('Booking audit failed:', auditError);
-    }
-
-    closeBookingModal();
-    await loadBookings();
-    await loadDashboard();
-
-    alert(editingBookingId ? 'Reservation updated successfully.' : 'Reservation created successfully.');
-  } catch (error) {
-    console.error('Booking save error:', error);
-    errorBox.textContent = error?.message || 'Unable to save reservation.';
-  } finally {
-    saveButton.disabled = false;
-    saveButton.textContent = originalText;
-  }
-}
-
-/* =========================
-   CANCEL BOOKING
-========================= */
-
-async function cancelBooking(id) {
-  const booking = B.find(b => String(b.id) === String(id));
-  if (!booking) return;
-
-  const name = booking.guest_name || booking.full_name || 'this reservation';
-
-  const confirmed = confirm(
-    `Cancel reservation for "${name}"?\n\nThis will mark the booking as cancelled.`
-  );
-  if (!confirmed) return;
-
-  try {
-    const { error } = await db
-      .from('bookings')
-      .update({
-        status: 'cancelled',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id);
-
     if (error) throw error;
 
-    try {
-      await db.rpc('pms_audit', {
-        p_action: 'cancel_booking',
-        p_entity_type: 'booking',
-        p_entity_id: id,
-        p_details: {
-          guest_name: booking.guest_name,
-          room_id: booking.room_id,
-          check_in: booking.check_in,
-          check_out: booking.check_out
-        }
-      });
-    } catch (auditError) {
-      console.warn('Cancel audit failed:', auditError);
-    }
+    const { data: u } = await db.auth.getUser();
+    const { data: a, error: ae } = await db.rpc('is_admin_user');
+    if (ae) throw ae;
+    if (!a) throw new Error('This account is not authorized as an administrator.');
 
-    await loadBookings();
-    await loadDashboard();
-    alert('Reservation cancelled.');
-  } catch (error) {
-    console.error('Cancel booking error:', error);
-    alert('Unable to cancel reservation: ' + (error?.message || 'Unknown error'));
+    $('login').classList.add('hidden');
+    $('app').classList.remove('hidden');
+    $('who').textContent = u.user.email;
+    await load();
+    render('dashboard');
+  } catch (x) {
+    err(x.message || String(x));
+    await db.auth.signOut();
   }
-}
+};
 
-/* =========================
-   REPLACE renderBookings
-========================= */
+$('logout').onclick = async () => {
+  await db.auth.signOut();
+  location.reload();
+};
 
-function renderBookings() {
-  const table = $('bookingsTable');
-  if (!table) return;
+$('menu').onclick = () => $('side').classList.toggle('open');
 
-  const header = table.closest('table')?.querySelector('thead tr');
-  if (header && !header.querySelector('[data-booking-actions-header]')) {
-    const th = document.createElement('th');
-    th.textContent = 'Actions';
-    th.dataset.bookingActionsHeader = 'true';
-    header.appendChild(th);
-  }
-
-  let list = B;
-
-  if (bookingSearchTerm) {
-    const term = bookingSearchTerm.toLowerCase();
-    list = B.filter(b => {
-      const guest = (b.guest_name || b.full_name || '').toLowerCase();
-      const email = (b.email || '').toLowerCase();
-      const room = (b.room_number || b.room_id || '').toString().toLowerCase();
-      const status = (b.status || '').toLowerCase();
-      return guest.includes(term) || email.includes(term) || room.includes(term) || status.includes(term);
-    });
-  }
-
-  if (!list.length) {
-    table.innerHTML = `<tr><td colspan="100%">No bookings found.</td></tr>`;
-    return;
-  }
-
-  table.innerHTML = list.map(booking => {
-    let guestDisplay = booking.guest_name || booking.full_name || '-';
-    if (booking.guest_id && G.length) {
-      const g = G.find(item => String(item.id) === String(booking.guest_id));
-      if (g) {
-        guestDisplay = [g.first_name, g.last_name].filter(Boolean).join(' ') || g.full_name || guestDisplay;
-      }
-    }
-
-    let roomDisplay = booking.room_number || booking.room_id || '-';
-    if (booking.room_id && R.length) {
-      const r = R.find(item => String(item.id) === String(booking.room_id));
-      if (r) roomDisplay = r.room_number || roomDisplay;
-    }
-
-    const statusLabel = String(booking.status || '-')
-      .replaceAll('_', ' ')
-      .replace(/\b\w/g, c => c.toUpperCase());
-
-    return `
-      <tr>
-        <td>${escapeHtml(String(booking.id).slice(0, 8))}…</td>
-        <td>${escapeHtml(guestDisplay)}</td>
-        <td>${escapeHtml(booking.email || '-')}</td>
-        <td>${escapeHtml(roomDisplay)}</td>
-        <td>${dateValue(booking.check_in)}</td>
-        <td>${dateValue(booking.check_out)}</td>
-        <td><span class="badge">${escapeHtml(statusLabel)}</span></td>
-        <td>
-          <button type="button" class="secondary booking-edit-button" data-booking-id="${booking.id}">
-            Edit
-          </button>
-          ${booking.status !== 'cancelled' ? `
-            <button type="button" class="secondary booking-cancel-button" data-booking-id="${booking.id}">
-              Cancel
-            </button>
-          ` : ''}
-        </td>
-      </tr>
-    `;
-  }).join('');
-
-  table.querySelectorAll('.booking-edit-button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const booking = B.find(b => String(b.id) === String(btn.dataset.bookingId));
-      if (booking) openBookingModal(booking);
-    });
-  });
-
-  table.querySelectorAll('.booking-cancel-button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      cancelBooking(btn.dataset.bookingId);
-    });
-  });
-}
-
-/* =========================
-   TOOLBAR + SEARCH
-========================= */
-
-function addBookingToolbar() {
-  const section = $('bookings');
-  if (!section) return;
-
-  const head = section.querySelector('.head');
-  if (!head) return;
-
-  if (section.querySelector('#addBookingButton')) return;
-
-  const searchWrap = document.createElement('div');
-  searchWrap.style.display = 'flex';
-  searchWrap.style.gap = '10px';
-  searchWrap.style.marginTop = '12px';
-  searchWrap.style.flexWrap = 'wrap';
-  searchWrap.style.alignItems = 'center';
-
-  const searchInput = document.createElement('input');
-  searchInput.type = 'search';
-  searchInput.placeholder = 'Search guest, email, room, status…';
-  searchInput.style.padding = '10px 12px';
-  searchInput.style.border = '1px solid #e2ded7';
-  searchInput.style.borderRadius = '8px';
-  searchInput.style.minWidth = '220px';
-  searchInput.id = 'bookingSearch';
-
-  searchInput.addEventListener('input', () => {
-    bookingSearchTerm = searchInput.value.trim();
-    renderBookings();
-  });
-
-  const addBtn = document.createElement('button');
-  addBtn.id = 'addBookingButton';
-  addBtn.type = 'button';
-  addBtn.className = 'primary';
-  addBtn.textContent = '+ New Reservation';
-  addBtn.addEventListener('click', () => openBookingModal());
-
-  searchWrap.appendChild(searchInput);
-  searchWrap.appendChild(addBtn);
-  head.appendChild(searchWrap);
-}
-
-/* =========================
-   STYLES
-========================= */
-
-(function addBookingStyles() {
-  if (document.getElementById('bookingCrudStyles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'bookingCrudStyles';
-  style.textContent = `
-    #bookingModal {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: none;
-    }
-    #bookingModal.show { display: block; }
-
-    .booking-modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      overflow-y: auto;
-    }
-
-    .booking-modal-card {
-      width: min(720px, 96vw);
-      max-height: 92vh;
-      overflow-y: auto;
-      background: #fff;
-      border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 25px 80px rgba(0,0,0,.28);
-    }
-
-    .booking-modal-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .booking-modal-head h2 {
-      margin: 0 0 5px;
-      font-family: Georgia, serif;
-    }
-
-    .booking-form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .booking-full { grid-column: 1 / -1; }
-
-    .booking-form-grid label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: #4d5651;
-    }
-
-    .booking-form-grid input,
-    .booking-form-grid select,
-    .booking-form-grid textarea {
-      width: 100%;
-      padding: 11px 12px;
-      border: 1px solid #e2ded7;
-      border-radius: 8px;
-      background: #fff;
-      font: inherit;
-      color: #202723;
-    }
-
-    .booking-form-grid textarea { resize: vertical; }
-
-    .booking-form-error {
-      color: #a33b34;
-      margin-top: 12px;
-      min-height: 20px;
-    }
-
-    .booking-modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #e2ded7;
-    }
-
-    .booking-edit-button,
-    .booking-cancel-button {
-      margin: 2px;
-    }
-
-    @media (max-width: 600px) {
-      .booking-form-grid { grid-template-columns: 1fr; }
-      .booking-full { grid-column: auto; }
-      .booking-modal-card { padding: 16px; }
-      .booking-modal-actions { flex-direction: column-reverse; }
-      .booking-modal-actions button { width: 100%; }
-    }
-  `;
-  document.head.appendChild(style);
-})();
-
-/* =========================
-   HOOKS
-========================= */
-
-document.addEventListener('DOMContentLoaded', () => {
-  addBookingToolbar();
+document.querySelectorAll('#side button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('#side button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    $('side').classList.remove('open');
+    render(b.dataset.v);
+  };
 });
 
-addBookingToolbar();
+/* ---------- Data load ---------- */
+async function load() {
+  setLoading(true);
+  try {
+    [B, R, RT, G, HK, MT, P, F] = await Promise.all([
+      q(db.from('bookings').select('*').order('created_at', { ascending: false })),
+      q(db.from('rooms').select('*, room_types(name)').order('room_number')),
+      q(db.from('room_types').select('*').order('name')),
+      q(db.from('guest_profiles').select('*').order('created_at', { ascending: false })),
+      q(db.from('housekeeping_tasks').select('*, rooms(room_number)').order('created_at', { ascending: false })),
+      q(db.from('maintenance_tasks').select('*, rooms(room_number)').order('created_at', { ascending: false })),
+      q(db.from('payments').select('*').order('created_at', { ascending: false })),
+      q(db.from('folios').select('*').order('created_at', { ascending: false }))
+    ]);
+  } finally {
+    setLoading(false);
+  }
+}
 
-// Make sure guests + rooms are available when opening bookings
-const originalLoadBookings = loadBookings;
-loadBookings = async function () {
-  await Promise.allSettled([
-    originalLoadBookings(),
-    G.length ? Promise.resolve() : loadGuests(),
-    R.length ? Promise.resolve() : loadRooms(),
-    RT.length ? Promise.resolve() : loadRoomTypes()
-  ]);
-};
+/* ---------- UI helpers ---------- */
+const head = (a, b) => `<div class="head"><h1>${a}</h1><div class="muted">${b}</div></div>`;
+
+function statusBadge(s) {
+  const map = {
+    pending: 'warn', confirmed: 'ok', completed: 'neutral', cancelled: 'danger',
+    available: 'ok', occupied: 'gold', maintenance: 'danger', dirty: 'warn', clean: 'ok',
+    open: 'warn', in_progress: 'gold', done: 'ok', closed: 'neutral',
+    paid: 'ok', unpaid: 'danger', partial: 'warn', failed: 'danger',
+    active: 'ok', inactive: 'neutral'
+  };
+  const cls = map[String(s || '').toLowerCase()] || 'neutral';
+  return `<span class="badge ${cls}">${esc(s || '—')}</span>`;
+}
+
+function table(headers, rows) {
+  if (!rows.length) {
+    return `<div class="card empty">No records found.</div>`;
+  }
+  return `<div class="card tablewrap"><table class="table">
+    <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+function roomOptions(selected = '') {
+  return R.map(r =>
+    `<option value="${r.id}" ${r.id === selected ? 'selected' : ''}>${esc(r.room_number)} — ${esc(r.room_types?.name || '')}</option>`
+  ).join('');
+}
+function roomTypeOptions(selected = '') {
+  return RT.map(t =>
+    `<option value="${t.id}" ${t.id === selected ? 'selected' : ''}>${esc(t.name)}</option>`
+  ).join('');
+}
+
+/* ---------- Views ---------- */
+async function dashboard() {
+  let s = {};
+  try { s = await q(db.rpc('pms_dashboard_stats')); } catch (e) { console.warn(e); }
+
+  // Fallback stats if RPC missing
+  if (!s || Object.keys(s).length === 0) {
+    s = {
+      rooms_total: R.length,
+      rooms_available: R.filter(r => r.status === 'available').length,
+      rooms_occupied: R.filter(r => r.status === 'occupied').length,
+      rooms_maintenance: R.filter(r => r.status === 'maintenance').length,
+      bookings_pending: B.filter(b => b.status === 'pending').length,
+      bookings_confirmed: B.filter(b => b.status === 'confirmed').length,
+      revenue_paid: P.filter(p => p.status === 'paid' || p.status === 'success').reduce((a, p) => a + Number(p.amount || 0), 0),
+      open_maintenance: MT.filter(m => m.status === 'open' || m.status === 'in_progress').length
+    };
+  }
+
+  $('main').innerHTML = head('Hotel Operations', 'Live property overview') +
+    `<div class="grid">
+      ${[
+        ['Total Rooms', s.rooms_total],
+        ['Available', s.rooms_available],
+        ['Occupied', s.rooms_occupied],
+        ['Maintenance', s.rooms_maintenance],
+        ['Pending Bookings', s.bookings_pending],
+        ['Confirmed', s.bookings_confirmed],
+        ['Paid Revenue', money(s.revenue_paid)],
+        ['Open Maintenance', s.open_maintenance]
+      ].map(([label, val]) =>
+        `<div class="card"><div class="muted">${label}</div><div class="stat">${val ?? 0}</div></div>`
+      ).join('')}
+    </div>
+    <div class="card">
+      <div class="muted" style="margin-bottom:8px">Quick actions</div>
+      <div class="btn-row">
+        <button class="primary" onclick="render('frontdesk')">Front Desk</button>
+        <button class="secondary" onclick="openNewBooking()">New Booking</button>
+        <button class="secondary" onclick="render('housekeeping')">Housekeeping</button>
+        <button class="secondary" onclick="render('maintenance')">Maintenance</button>
+      </div>
+    </div>`;
+}
+
+function frontdesk() {
+  const filter = (window._fdFilter || 'all');
+  let list = B;
+  if (filter === 'pending') list = B.filter(b => b.status === 'pending');
+  if (filter === 'confirmed') list = B.filter(b => b.status === 'confirmed');
+  if (filter === 'today') {
+    const today = new Date().toISOString().slice(0, 10);
+    list = B.filter(b => b.check_in === today || b.check_out === today);
+  }
+
+  $('main').innerHTML = head('Front Desk', 'Arrivals, in-house guests and departures') +
+    `<div class="toolbar">
+      <select id="fdFilter" onchange="window._fdFilter=this.value;render('frontdesk')">
+        <option value="all" ${filter==='all'?'selected':''}>All bookings</option>
+        <option value="pending" ${filter==='pending'?'selected':''}>Pending</option>
+        <option value="confirmed" ${filter==='confirmed'?'selected':''}>Confirmed / In-house</option>
+        <option value="today" ${filter==='today'?'selected':''}>Today (in/out)</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="primary" onclick="openNewBooking()">+ New Booking</button>
+      <button class="secondary" onclick="load().then(()=>render('frontdesk'))">Refresh</button>
+    </div>` +
+    table(
+      ['Ref', 'Guest', 'Stay', 'Room', 'Status', 'Payment', 'Actions'],
+      list.map(b => {
+        const room = R.find(r => r.id === b.room_id);
+        return [
+          esc(b.booking_reference || b.id?.slice(0, 8)),
+          esc(`${b.guest_first_name || ''} ${b.guest_last_name || ''}`.trim() || '—'),
+          `${esc(b.check_in)} → ${esc(b.check_out)}`,
+          esc(room?.room_number || '—'),
+          statusBadge(b.status),
+          statusBadge(b.payment_status || 'unpaid'),
+          `<div class="btn-row">
+            ${b.status !== 'confirmed' && b.status !== 'completed' ? `<button class="secondary" onclick="cin('${b.id}')">Check in</button>` : ''}
+            ${b.status === 'confirmed' ? `<button class="secondary" onclick="cout('${b.id}')">Check out</button>` : ''}
+            <button class="secondary" onclick="viewBooking('${b.id}')">View</button>
+          </div>`
+        ];
+      })
+    );
+}
+
+async function cin(id) {
+  if (!confirm('Check this guest in?')) return;
+  try {
+    setLoading(true);
+    const b = B.find(x => x.id === id);
+    await q(db.from('bookings').update({ status: 'confirmed' }).eq('id', id));
+    if (b?.room_id) {
+      await q(db.from('rooms').update({ status: 'occupied' }).eq('id', b.room_id));
+    }
+    // Try create folio if function exists
+    try { await q(db.rpc('create_folio_for_booking', { p_booking_id: id })); } catch (_) {}
+    toast('Guest checked in', 'ok');
+    await load();
+    render('frontdesk');
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function cout(id) {
+  if (!confirm('Check this guest out? Room will be marked available (or dirty).')) return;
+  try {
+    setLoading(true);
+    const b = B.find(x => x.id === id);
+    await q(db.from('bookings').update({ status: 'completed' }).eq('id', id));
+    if (b?.room_id) {
+      await q(db.from('rooms').update({ status: 'available' }).eq('id', b.room_id));
+      // Optional: create housekeeping task
+      try {
+        await q(db.from('housekeeping_tasks').insert({
+          room_id: b.room_id,
+          task_type: 'checkout_clean',
+          priority: 'high',
+          status: 'open'
+        }));
+      } catch (_) {}
+    }
+    toast('Guest checked out', 'ok');
+    await load();
+    render('frontdesk');
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+function viewBooking(id) {
+  const b = B.find(x => x.id === id);
+  if (!b) return;
+  const room = R.find(r => r.id === b.room_id);
+  openModal('Booking ' + (b.booking_reference || id.slice(0, 8)), `
+    <div class="form-grid">
+      <div class="field"><label>Guest</label><div>${esc(b.guest_first_name)} ${esc(b.guest_last_name)}</div></div>
+      <div class="field"><label>Email</label><div>${esc(b.guest_email || '—')}</div></div>
+      <div class="field"><label>Phone</label><div>${esc(b.guest_phone || '—')}</div></div>
+      <div class="field"><label>Room</label><div>${esc(room?.room_number || '—')} (${esc(room?.room_types?.name || '')})</div></div>
+      <div class="field"><label>Check-in</label><div>${esc(b.check_in)}</div></div>
+      <div class="field"><label>Check-out</label><div>${esc(b.check_out)}</div></div>
+      <div class="field"><label>Nights</label><div>${esc(b.nights || '—')}</div></div>
+      <div class="field"><label>Total</label><div>${money(b.total_amount)}</div></div>
+      <div class="field"><label>Status</label><div>${statusBadge(b.status)}</div></div>
+      <div class="field"><label>Payment</label><div>${statusBadge(b.payment_status || 'unpaid')}</div></div>
+      <div class="field full"><label>Notes</label><div>${esc(b.notes || '—')}</div></div>
+    </div>
+  `, `<button class="secondary" data-close>Close</button>`);
+}
+
+function openNewBooking() {
+  openModal('New Booking', `
+    <div class="form-grid">
+      <div class="field"><label>First name *</label><input id="nb_fn" required></div>
+      <div class="field"><label>Last name</label><input id="nb_ln"></div>
+      <div class="field"><label>Email</label><input id="nb_email" type="email"></div>
+      <div class="field"><label>Phone</label><input id="nb_phone" type="tel"></div>
+      <div class="field"><label>Check-in *</label><input id="nb_in" type="date" required></div>
+      <div class="field"><label>Check-out *</label><input id="nb_out" type="date" required></div>
+      <div class="field full"><label>Room</label>
+        <select id="nb_room"><option value="">— Select room —</option>${roomOptions()}</select>
+      </div>
+      <div class="field"><label>Room price / night</label><input id="nb_price" type="number" min="0" step="100" value="0"></div>
+      <div class="field"><label>Status</label>
+        <select id="nb_status">
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+        </select>
+      </div>
+      <div class="field full"><label>Notes</label><textarea id="nb_notes"></textarea></div>
+    </div>
+  `, `
+    <button class="secondary" data-close>Cancel</button>
+    <button class="primary" onclick="saveNewBooking()">Create booking</button>
+  `);
+}
+
+async function saveNewBooking() {
+  const fn = $('nb_fn').value.trim();
+  const cin = $('nb_in').value;
+  const cout = $('nb_out').value;
+  if (!fn || !cin || !cout) {
+    toast('First name, check-in and check-out are required', 'error');
+    return;
+  }
+  if (cout <= cin) {
+    toast('Check-out must be after check-in', 'error');
+    return;
+  }
+  const nights = Math.round((new Date(cout) - new Date(cin)) / 86400000);
+  const price = Number($('nb_price').value || 0);
+  const roomId = $('nb_room').value || null;
+
+  const ref = 'NA-' + Date.now().toString(36).toUpperCase().slice(-6);
+
+  try {
+    setLoading(true);
+    await q(db.from('bookings').insert({
+      booking_reference: ref,
+      guest_first_name: fn,
+      guest_last_name: $('nb_ln').value.trim() || null,
+      guest_email: $('nb_email').value.trim() || null,
+      guest_phone: $('nb_phone').value.trim() || null,
+      check_in: cin,
+      check_out: cout,
+      nights,
+      room_id: roomId,
+      room_price: price,
+      total_amount: price * nights,
+      status: $('nb_status').value,
+      payment_status: 'unpaid',
+      notes: $('nb_notes').value.trim() || null
+    }));
+    if (roomId && $('nb_status').value === 'confirmed') {
+      await q(db.from('rooms').update({ status: 'occupied' }).eq('id', roomId));
+    }
+    toast('Booking created: ' + ref, 'ok');
+    closeModal();
+    await load();
+    render('frontdesk');
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+function calendar() {
+  const days = [...Array(14)].map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    return d.toISOString().slice(0, 10);
+  });
+
+  let html = `<div class="card tablewrap"><table class="table"><thead><tr><th>Room</th>${
+    days.map(d => `<th>${d.slice(5)}</th>`).join('')
+  }</tr></thead><tbody>`;
+
+  R.forEach(r => {
+    html += `<tr><td><b>${esc(r.room_number)}</b><br><span class="muted">${esc(r.room_types?.name || '')}</span><br>${statusBadge(r.status)}</td>`;
+    days.forEach(d => {
+      const hits = B.filter(b =>
+        b.room_id === r.id &&
+        b.status !== 'cancelled' &&
+        d >= b.check_in && d < b.check_out
+      );
+      html += `<td>${hits.map(b =>
+        `<span class="badge gold" title="${esc(b.guest_first_name)}">${esc(b.booking_reference || '•')}</span>`
+      ).join(' ') || '—'}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+
+  $('main').innerHTML = head('Reservation Calendar', 'Room rack — next 14 days') + html;
+}
+
+function rooms() {
+  $('main').innerHTML = head('Rooms', 'Inventory and status') +
+    `<div class="toolbar">
+      <button class="primary" onclick="openRoomForm()">+ Add room</button>
+      <button class="secondary" onclick="openRoomTypeForm()">+ Room type</button>
+      <div class="spacer"></div>
+      <button class="secondary" onclick="load().then(()=>render('rooms'))">Refresh</button>
+    </div>` +
+    table(
+      ['Room', 'Type', 'Floor', 'Status', 'Actions'],
+      R.map(r => [
+        `<b>${esc(r.room_number)}</b>`,
+        esc(r.room_types?.name || '—'),
+        esc(r.floor ?? '—'),
+        statusBadge(r.status),
+        `<div class="btn-row">
+          <button class="secondary" onclick="setRoomStatus('${r.id}','available')">Available</button>
+          <button class="secondary" onclick="setRoomStatus('${r.id}','occupied')">Occupied</button>
+          <button class="secondary" onclick="setRoomStatus('${r.id}','maintenance')">Maint.</button>
+          <button class="secondary" onclick="openRoomForm('${r.id}')">Edit</button>
+        </div>`
+      ])
+    ) +
+    (RT.length ? `<div class="head" style="margin-top:24px"><h1 style="font-size:1.2rem">Room Types</h1></div>` +
+      table(['Name', 'Base rate', 'Capacity', 'Active'], RT.map(t => [
+        esc(t.name),
+        money(t.base_rate),
+        esc(t.capacity ?? '—'),
+        t.is_active === false ? statusBadge('inactive') : statusBadge('active')
+      ])) : '');
+}
+
+async function setRoomStatus(id, status) {
+  try {
+    await q(db.from('rooms').update({ status }).eq('id', id));
+    toast('Room status updated', 'ok');
+    await load();
+    render('rooms');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function openRoomForm(id) {
+  const r = id ? R.find(x => x.id === id) : null;
+  openModal(r ? 'Edit Room' : 'Add Room', `
+    <div class="form-grid">
+      <div class="field"><label>Room number *</label><input id="rm_num" value="${esc(r?.room_number || '')}" required></div>
+      <div class="field"><label>Floor</label><input id="rm_floor" type="number" value="${esc(r?.floor ?? '')}"></div>
+      <div class="field full"><label>Room type</label>
+        <select id="rm_type"><option value="">—</option>${roomTypeOptions(r?.room_type_id)}</select>
+      </div>
+      <div class="field full"><label>Status</label>
+        <select id="rm_status">
+          ${['available','occupied','maintenance','dirty'].map(s =>
+            `<option value="${s}" ${r?.status===s?'selected':''}>${s}</option>`
+          ).join('')}
+        </select>
+      </div>
+    </div>
+  `, `
+    <button class="secondary" data-close>Cancel</button>
+    <button class="primary" onclick="saveRoom('${id || ''}')">Save</button>
+  `);
+}
+
+async function saveRoom(id) {
+  const num = $('rm_num').value.trim();
+  if (!num) { toast('Room number required', 'error'); return; }
+  const payload = {
+    room_number: num,
+    floor: $('rm_floor').value ? Number($('rm_floor').value) : null,
+    room_type_id: $('rm_type').value || null,
+    status: $('rm_status').value
+  };
+  try {
+    if (id) await q(db.from('rooms').update(payload).eq('id', id));
+    else await q(db.from('rooms').insert(payload));
+    toast('Room saved', 'ok');
+    closeModal();
+    await load();
+    render('rooms');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function openRoomTypeForm() {
+  openModal('Add Room Type', `
+    <div class="form-grid">
+      <div class="field full"><label>Name *</label><input id="rt_name" required></div>
+      <div class="field"><label>Base rate (₦)</label><input id="rt_rate" type="number" min="0" step="100" value="0"></div>
+      <div class="field"><label>Capacity</label><input id="rt_cap" type="number" min="1" value="2"></div>
+    </div>
+  `, `
+    <button class="secondary" data-close>Cancel</button>
+    <button class="primary" onclick="saveRoomType()">Save</button>
+  `);
+}
+
+async function saveRoomType() {
+  const name = $('rt_name').value.trim();
+  if (!name) { toast('Name required', 'error'); return; }
+  try {
+    await q(db.from('room_types').insert({
+      name,
+      base_rate: Number($('rt_rate').value || 0),
+      capacity: Number($('rt_cap').value || 2),
+      is_active: true
+    }));
+    toast('Room type created', 'ok');
+    closeModal();
+    await load();
+    render('rooms');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function guests() {
+  $('main').innerHTML = head('Guests & CRM', 'Guest profiles and VIP information') +
+    `<div class="toolbar">
+      <button class="primary" onclick="openGuestForm()">+ Add guest</button>
+      <div class="spacer"></div>
+      <input type="search" id="guestSearch" placeholder="Search name / email / phone" oninput="filterGuests()">
+    </div>
+    <div id="guestTable"></div>`;
+  filterGuests();
+}
+
+function filterGuests() {
+  const q = ($('guestSearch')?.value || '').toLowerCase();
+  const list = !q ? G : G.filter(g =>
+    `${g.first_name} ${g.last_name} ${g.email} ${g.phone}`.toLowerCase().includes(q)
+  );
+  $('guestTable').innerHTML = table(
+    ['Name', 'Email', 'Phone', 'Country', 'VIP', 'Actions'],
+    list.map(g => [
+      esc(`${g.first_name || ''} ${g.last_name || ''}`.trim()),
+      esc(g.email || '—'),
+      esc(g.phone || '—'),
+      esc(g.country || '—'),
+      g.vip ? '⭐' : '—',
+      `<button class="secondary" onclick="openGuestForm('${g.id}')">Edit</button>
+       <button class="secondary" onclick="toggleVip('${g.id}', ${!g.vip})">${g.vip ? 'Unmark VIP' : 'Mark VIP'}</button>`
+    ])
+  );
+}
+
+function openGuestForm(id) {
+  const g = id ? G.find(x => x.id === id) : null;
+  openModal(g ? 'Edit Guest' : 'Add Guest', `
+    <div class="form-grid">
+      <div class="field"><label>First name *</label><input id="g_fn" value="${esc(g?.first_name || '')}"></div>
+      <div class="field"><label>Last name</label><input id="g_ln" value="${esc(g?.last_name || '')}"></div>
+      <div class="field"><label>Email</label><input id="g_email" type="email" value="${esc(g?.email || '')}"></div>
+      <div class="field"><label>Phone</label><input id="g_phone" value="${esc(g?.phone || '')}"></div>
+      <div class="field"><label>Country</label><input id="g_country" value="${esc(g?.country || '')}"></div>
+      <div class="field"><label>VIP</label>
+        <select id="g_vip">
+          <option value="false" ${!g?.vip?'selected':''}>No</option>
+          <option value="true" ${g?.vip?'selected':''}>Yes</option>
+        </select>
+      </div>
+      <div class="field full"><label>Notes</label><textarea id="g_notes">${esc(g?.notes || '')}</textarea></div>
+    </div>
+  `, `
+    <button class="secondary" data-close>Cancel</button>
+    <button class="primary" onclick="saveGuest('${id || ''}')">Save</button>
+  `);
+}
+
+async function saveGuest(id) {
+  const fn = $('g_fn').value.trim();
+  if (!fn) { toast('First name required', 'error'); return; }
+  const payload = {
+    first_name: fn,
+    last_name: $('g_ln').value.trim() || null,
+    email: $('g_email').value.trim() || null,
+    phone: $('g_phone').value.trim() || null,
+    country: $('g_country').value.trim() || null,
+    vip: $('g_vip').value === 'true',
+    notes: $('g_notes').value.trim() || null
+  };
+  try {
+    if (id) await q(db.from('guest_profiles').update(payload).eq('id', id));
+    else await q(db.from('guest_profiles').insert(payload));
+    toast('Guest saved', 'ok');
+    closeModal();
+    await load();
+    render('guests');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function toggleVip(id, vip) {
+  try {
+    await q(db.from('guest_profiles').update({ vip }).eq('id', id));
+    await load();
+    render('guests');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function housekeeping() {
+  $('main').innerHTML = head('Housekeeping', 'Cleaning and inspection tasks') +
+    `<div class="toolbar">
+      <button class="primary" onclick="openHKForm()">+ Create task</button>
+      <div class="spacer"></div>
+      <button class="secondary" onclick="load().then(()=>render('housekeeping'))">Refresh</button>
+    </div>` +
+    table(
+      ['Room', 'Task', 'Priority', 'Status', 'Created', 'Actions'],
+      HK.map(x => [
+        esc(x.rooms?.room_number || '—'),
+        esc(x.task_type || '—'),
+        statusBadge(x.priority || 'normal'),
+        statusBadge(x.status),
+        fmtDT(x.created_at),
+        `<div class="btn-row">
+          ${x.status !== 'done' ? `<button class="secondary" onclick="setHKStatus('${x.id}','done')">Mark done</button>` : ''}
+          ${x.status === 'open' ? `<button class="secondary" onclick="setHKStatus('${x.id}','in_progress')">Start</button>` : ''}
+        </div>`
+      ])
+    );
+}
+
+function openHKForm() {
+  openModal('New Housekeeping Task', `
+    <div class="form-grid">
+      <div class="field full"><label>Room *</label>
+        <select id="hk_room"><option value="">— Select —</option>${roomOptions()}</select>
+      </div>
+      <div class="field"><label>Task type</label>
+        <select id="hk_type">
+          <option value="cleaning">Cleaning</option>
+          <option value="checkout_clean">Checkout clean</option>
+          <option value="inspection">Inspection</option>
+          <option value="turndown">Turndown</option>
+          <option value="deep_clean">Deep clean</option>
+        </select>
+      </div>
+      <div class="field"><label>Priority</label>
+        <select id="hk_pri">
+          <option value="normal">Normal</option>
+          <option value="high">High</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div class="field full"><label>Notes</label><textarea id="hk_notes"></textarea></div>
+    </div>
+  `, `
+    <button class="secondary" data-close>Cancel</button>
+    <button class="primary" onclick="saveHK()">Create</button>
+  `);
+}
+
+async function saveHK() {
+  const roomId = $('hk_room').value;
+  if (!roomId) { toast('Select a room', 'error'); return; }
+  try {
+    await q(db.from('housekeeping_tasks').insert({
+      room_id: roomId,
+      task_type: $('hk_type').value,
+      priority: $('hk_pri').value,
+      status: 'open',
+      notes: $('hk_notes').value.trim() || null
+    }));
+    toast('Task created', 'ok');
+    closeModal();
+    await load();
+    render('housekeeping');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function setHKStatus(id, status) {
+  try {
+    await q(db.from('housekeeping_tasks').update({ status }).eq('id', id));
+    toast('Updated', 'ok');
+    await load();
+    render('housekeeping');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function maintenance() {
+  $('main').innerHTML = head('Maintenance', 'Repairs and out-of-service tracking') +
+    `<div class="toolbar">
+      <button class="primary" onclick="openMTForm()">+ New ticket</button>
+      <div class="spacer"></div>
+      <button class="secondary" onclick="load().then(()=>render('maintenance'))">Refresh</button>
+    </div>` +
+    table(
+      ['Title', 'Room', 'Priority', 'Status', 'Cost', 'Actions'],
+      MT.map(x => [
+        esc(x.title),
+        esc(x.rooms?.room_number || '—'),
+        statusBadge(x.priority || 'normal'),
+        statusBadge(x.status),
+        money(x.cost),
+        `<div class="btn-row">
+          ${x.status !== 'closed' && x.status !== 'done' ?
+            `<button class="secondary" onclick="setMTStatus('${x.id}','in_progress')">Start</button>
+             <button class="secondary" onclick="setMTStatus('${x.id}','closed')">Close</button>` : ''}
+        </div>`
+      ])
+    );
+}
+
+function openMTForm() {
+  openModal('New Maintenance Ticket', `
+    <div class="form-grid">
+      <div class="field full"><label>Title *</label><input id="mt_title" required></div>
+      <div class="field full"><label>Room (optional)</label>
+        <select id="mt_room"><option value="">— None —</option>${roomOptions()}</select>
+      </div>
+      <div class="field"><label>Priority</label>
+        <select id="mt_pri">
+          <option value="normal">Normal</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div class="field"><label>Estimated cost (₦)</label><input id="mt_cost" type="number" min="0" step="100" value="0"></div>
+      <div class="field full"><label>Description</label><textarea id="mt_desc"></textarea></div>
+    </div>
+  `, `
+    <button class="secondary" data-close>Cancel</button>
+    <button class="primary" onclick="saveMT()">Create</button>
+  `);
+}
+
+async function saveMT() {
+  const title = $('mt_title').value.trim();
+  if (!title) { toast('Title required', 'error'); return; }
+  try {
+    await q(db.from('maintenance_tasks').insert({
+      title,
+      room_id: $('mt_room').value || null,
+      priority: $('mt_pri').value,
+      cost: Number($('mt_cost').value || 0),
+      description: $('mt_desc').value.trim() || null,
+      status: 'open'
+    }));
+    toast('Ticket created', 'ok');
+    closeModal();
+    await load();
+    render('maintenance');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function setMTStatus(id, status) {
+  try {
+    await q(db.from('maintenance_tasks').update({ status }).eq('id', id));
+    toast('Updated', 'ok');
+    await load();
+    render('maintenance');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function folios() {
+  $('main').innerHTML = head('Folios & Billing', 'Guest accounts and balances') +
+    table(
+      ['Booking', 'Status', 'Total', 'Paid', 'Balance'],
+      F.map(x => {
+        const b = B.find(b => b.id === x.booking_id);
+        return [
+          esc(b?.booking_reference || x.booking_id?.slice(0, 8) || '—'),
+          statusBadge(x.status),
+          money(x.total),
+          money(x.paid),
+          money(x.balance)
+        ];
+      })
+    );
+}
+
+function payments() {
+  $('main').innerHTML = head('Payments', 'Payment ledger') +
+    `<div class="toolbar">
+      <button class="primary" onclick="openPaymentForm()">+ Record payment</button>
+    </div>` +
+    table(
+      ['Date', 'Booking', 'Amount', 'Method', 'Status', 'Reference'],
+      P.map(x => {
+        const b = B.find(b => b.id === x.booking_id);
+        return [
+          fmtDT(x.created_at),
+          esc(b?.booking_reference || '—'),
+          money(x.amount),
+          esc(x.method || '—'),
+          statusBadge(x.status),
+          esc(x.provider_reference || '—')
+        ];
+      })
+    );
+}
+
+function openPaymentForm() {
+  const bookingOpts = B.map(b =>
+    `<option value="${b.id}">${esc(b.booking_reference || b.id.slice(0,8))} — ${esc(b.guest_first_name)} (${money(b.total_amount)})</option>`
+  ).join('');
+  openModal('Record Payment', `
+    <div class="form-grid">
+      <div class="field full"><label>Booking *</label>
+        <select id="pay_booking"><option value="">— Select —</option>${bookingOpts}</select>
+      </div>
+      <div class="field"><label>Amount (₦) *</label><input id="pay_amount" type="number" min="0" step="100"></div>
+      <div class="field"><label>Method</label>
+        <select id="pay_method">
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="transfer">Bank transfer</option>
+          <option value="pos">POS</option>
+          <option value="online">Online</option>
+        </select>
+      </div>
+      <div class="field full"><label>Reference</label><input id="pay_ref" placeholder="Receipt / transaction ID"></div>
+    </div>
+  `, `
+    <button class="secondary" data-close>Cancel</button>
+    <button class="primary" onclick="savePayment()">Save</button>
+  `);
+}
+
+async function savePayment() {
+  const bookingId = $('pay_booking').value;
+  const amount = Number($('pay_amount').value || 0);
+  if (!bookingId || amount <= 0) {
+    toast('Booking and amount required', 'error');
+    return;
+  }
+  try {
+    await q(db.from('payments').insert({
+      booking_id: bookingId,
+      amount,
+      method: $('pay_method').value,
+      status: 'paid',
+      provider_reference: $('pay_ref').value.trim() || null
+    }));
+    // Mark booking payment status
+    await q(db.from('bookings').update({ payment_status: 'paid' }).eq('id', bookingId));
+    toast('Payment recorded', 'ok');
+    closeModal();
+    await load();
+    render('payments');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function rates() {
+  let a = [];
+  try {
+    a = await q(db.from('rate_rules').select('*, room_types(name)').order('start_date', { ascending: false }));
+  } catch (e) {
+    console.warn(e);
+  }
+  $('main').innerHTML = head('Rates & Promotions', 'Seasonal rates and minimum stays') +
+    `<div class="toolbar">
+      <button class="primary" onclick="openRateForm()">+ Add rate rule</button>
+    </div>` +
+    table(
+      ['Room type', 'Rule', 'Dates', 'Rate / night', 'Min nights', 'Active'],
+      a.map(x => [
+        esc(x.room_types?.name || '—'),
+        esc(x.name),
+        `${esc(x.start_date)} → ${esc(x.end_date)}`,
+        money(x.price_per_night),
+        esc(x.minimum_nights ?? 1),
+        x.is_active ? statusBadge('active') : statusBadge('inactive')
+      ])
+    );
+}
+
+function openRateForm() {
+  openModal('New Rate Rule', `
+    <div class="form-grid">
+      <div class="field full"><label>Name *</label><input id="rr_name" placeholder="e.g. Weekend rate, Christmas"></div>
+      <div class="field full"><label>Room type</label>
+        <select id="rr_type"><option value="">— Any / All —</option>${roomTypeOptions()}</select>
+      </div>
+      <div class="field"><label>Start date</label><input id="rr_start" type="date"></div>
+      <div class="field"><label>End date</label><input id="rr_end" type="date"></div>
+      <div class="field"><label>Price per night (₦)</label><input id="rr_price" type="number" min="0" step="100"></div>
+      <div class="field"><label>Minimum nights</label><input id="rr_min" type="number" min="1" value="1"></div>
+    </div>
+  `, `
+    <button class="secondary" data-close>Cancel</button>
+    <button class="primary" onclick="saveRate()">Save</button>
+  `);
+}
+
+async function saveRate() {
+  const name = $('rr_name').value.trim();
+  if (!name) { toast('Name required', 'error'); return; }
+  try {
+    await q(db.from('rate_rules').insert({
+      name,
+      room_type_id: $('rr_type').value || null,
+      start_date: $('rr_start').value || null,
+      end_date: $('rr_end').value || null,
+      price_per_night: Number($('rr_price').value || 0),
+      minimum_nights: Number($('rr_min').value || 1),
+      is_active: true
+    }));
+    toast('Rate rule created', 'ok');
+    closeModal();
+    render('rates');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function extras() {
+  let a = [];
+  try {
+    a = await q(db.from('booking_extras_catalog').select('*').order('name'));
+  } catch (e) {
+    console.warn(e);
+  }
+  $('main').innerHTML = head('Extras & Add-ons', 'Breakfast, transfers, laundry and services') +
+    `<div class="toolbar">
+      <button class="primary" onclick="openExtraForm()">+ Add extra</button>
+    </div>` +
+    table(
+      ['Name', 'Price', 'Pricing type', 'Active', 'Actions'],
+      a.map(x => [
+        esc(x.name),
+        money(x.price),
+        esc(x.pricing_type || 'fixed'),
+        x.is_active === false ? statusBadge('inactive') : statusBadge('active'),
+        `<button class="secondary" onclick="toggleExtra('${x.id}', ${x.is_active === false})">${x.is_active === false ? 'Activate' : 'Deactivate'}</button>`
+      ])
+    );
+}
+
+function openExtraForm() {
+  openModal('New Extra', `
+    <div class="form-grid">
+      <div class="field full"><label>Name *</label><input id="ex_name" placeholder="e.g. Airport transfer, Breakfast"></div>
+      <div class="field"><label>Price (₦)</label><input id="ex_price" type="number" min="0" step="100" value="0"></div>
+      <div class="field"><label>Pricing type</label>
+        <select id="ex_type">
+          <option value="fixed">Fixed</option>
+          <option value="per_night">Per night</option>
+          <option value="per_person">Per person</option>
+        </select>
+      </div>
+    </div>
+  `, `
+    <button class="secondary" data-close>Cancel</button>
+    <button class="primary" onclick="saveExtra()">Save</button>
+  `);
+}
+
+async function saveExtra() {
+  const name = $('ex_name').value.trim();
+  if (!name) { toast('Name required', 'error'); return; }
+  try {
+    await q(db.from('booking_extras_catalog').insert({
+      name,
+      price: Number($('ex_price').value || 0),
+      pricing_type: $('ex_type').value,
+      is_active: true
+    }));
+    toast('Extra created', 'ok');
+    closeModal();
+    render('extras');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function toggleExtra(id, activate) {
+  try {
+    await q(db.from('booking_extras_catalog').update({ is_active: activate }).eq('id', id));
+    render('extras');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function reports() {
+  const total = B.length;
+  const confirmed = B.filter(x => x.status === 'confirmed' || x.status === 'completed').length;
+  const revenue = P.filter(p => p.status === 'paid' || p.status === 'success')
+    .reduce((a, p) => a + Number(p.amount || 0), 0);
+
+  $('main').innerHTML = head('Reports & Analytics', 'Operational KPIs and exports') +
+    `<div class="grid">
+      <div class="card"><div class="muted">Total bookings</div><div class="stat">${total}</div></div>
+      <div class="card"><div class="muted">Confirmed / Completed</div><div class="stat">${confirmed}</div></div>
+      <div class="card"><div class="muted">Confirmation rate</div><div class="stat">${total ? Math.round(confirmed / total * 100) : 0}%</div></div>
+      <div class="card"><div class="muted">Recorded revenue</div><div class="stat">${money(revenue)}</div></div>
+    </div>
+    <div class="card">
+      <button class="primary" onclick="csv()">Export bookings CSV</button>
+    </div>`;
+}
+
+function csv() {
+  const keys = [
+    'booking_reference', 'guest_first_name', 'guest_last_name', 'guest_email',
+    'guest_phone', 'check_in', 'check_out', 'nights', 'room_price',
+    'total_amount', 'status', 'payment_status'
+  ];
+  const out = [
+    keys.join(','),
+    ...B.map(b => keys.map(k => `"${String(b[k] ?? '').replaceAll('"', '""')}"`).join(','))
+  ].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([out], { type: 'text/csv' }));
+  a.download = 'nordic-bookings.csv';
+  a.click();
+  toast('CSV downloaded', 'ok');
+}
+
+async function staff() {
+  let a = [];
+  try {
+    a = await q(db.from('staff_profiles').select('*'));
+  } catch (e) {
+    console.warn(e);
+  }
+  $('main').innerHTML = head('Staff & Permissions', 'Role foundation') +
+    table(
+      ['User ID', 'Name', 'Role', 'Active'],
+      a.map(x => [
+        esc(x.id?.slice(0, 8) || '—'),
+        esc(x.full_name || '—'),
+        esc(x.role || '—'),
+        x.is_active === false ? statusBadge('inactive') : statusBadge('active')
+      ])
+    );
+}
+
+async function audit() {
+  let a = [];
+  try {
+    a = await q(db.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(100));
+  } catch (e) {
+    console.warn(e);
+  }
+  $('main').innerHTML = head('Audit Log', 'Administrative activity trail') +
+    table(
+      ['Date', 'Action', 'Entity', 'Details'],
+      a.map(x => [
+        fmtDT(x.created_at),
+        esc(x.action),
+        esc(x.entity_type),
+        `<code style="font-size:12px">${esc(JSON.stringify(x.details || {}))}</code>`
+      ])
+    );
+}
+
+/* ---------- Router ---------- */
+function render(v) {
+  currentView = v;
+  const map = {
+    dashboard, frontdesk, calendar, rooms, guests,
+    housekeeping, maintenance, folios, payments,
+    rates, extras, reports, staff, audit
+  };
+  (map[v] || dashboard)();
+}
+
+/* ---------- Session restore ---------- */
+db.auth.getSession().then(async ({ data }) => {
+  if (data.session) {
+    const { data: u } = await db.auth.getUser();
+    const { data: a } = await db.rpc('is_admin_user');
+    if (u?.user && a) {
+      $('login').classList.add('hidden');
+      $('app').classList.remove('hidden');
+      $('who').textContent = u.user.email;
+      await load();
+      render('dashboard');
+    }
+  }
+});
+
+/* Expose functions needed by inline onclick handlers */
+Object.assign(window, {
+  render, cin, cout, viewBooking, openNewBooking, saveNewBooking,
+  openRoomForm, saveRoom, openRoomTypeForm, saveRoomType, setRoomStatus,
+  openGuestForm, saveGuest, toggleVip, filterGuests,
+  openHKForm, saveHK, setHKStatus,
+  openMTForm, saveMT, setMTStatus,
+  openPaymentForm, savePayment,
+  openRateForm, saveRate,
+  openExtraForm, saveExtra, toggleExtra,
+  csv
+});
