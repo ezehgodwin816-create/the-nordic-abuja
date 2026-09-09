@@ -790,6 +790,17 @@
               Print / save confirmation
             </button>
 
+            <button
+              type="button"
+              class="button button-dark"
+              id="payNowButton"
+              onclick="NordicPay.startFromSession()"
+            >
+              Pay now
+            </button>
+
+            <div id="paymentMessage" style="margin:8px 0 4px;font-size:14px;color:#68665f;"></div>
+
             <a
               class="button button-light"
               id="whatsappButton"
@@ -1616,6 +1627,14 @@
     })();
 
   </script>
+
+
+  <!-- Paystack (test mode) -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script>
+    window.NORDIC_PAYSTACK_PUBLIC_KEY = 'pk_test_b480176a27a72d14478858469d25067a2784e094';
+  </script>
+  <script src="js/paystack-booking.js"></script>
 
 </body>
 </html>
