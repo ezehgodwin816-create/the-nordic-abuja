@@ -1,74 +1,91 @@
-# The Nordic Abuja — Complete PMS Pack (Improved)
+# Step 5 — Live booking, payments, domain, RLS (no emails)
 
-This pack turns the original PMS skeleton into a usable Property Management System.
+## What this pack does
 
-## What improved
+| Item | Status |
+|------|--------|
+| Connect public booking → Supabase | SQL RPCs + RLS for `booking.html` |
+| Payments (Paystack) | Client helper + webhook foundation (no emails) |
+| Custom domain | Setup guide (`CUSTOM_DOMAIN.md`) |
+| Tighten RLS | Admin-only management tables; public only via RPCs |
+| Confirmation emails | **Skipped** (as requested) |
 
-- Proper modal forms instead of browser `prompt()`
-- Create / edit for bookings, rooms, room types, guests, housekeeping, maintenance, payments, rates, extras
-- Check-in / check-out workflow that updates room status and optionally creates housekeeping tasks
-- Filters, search, status badges, toasts, loading states
-- 14-day calendar rack
-- Dashboard with real (or fallback) stats
-- CSV export
-- Complete Supabase schema + RPCs
-- Edge function foundations for email + payment webhooks
+## Already on your site
 
-## Files
+Your live `booking.html` already calls:
+
+- `get_available_room_count`
+- `create_hotel_booking`
+
+with the correct Supabase URL/key. Those functions often **do not exist yet** in the database — that is why booking can fail.
+
+## Install order
+
+### 1. Run SQL in Supabase
+
+Open **SQL Editor** and run:
+
+`03_public_booking_and_rls.sql`
+
+This creates:
+
+- `get_available_room_count(...)`
+- `create_hotel_booking(...)`
+- Safer RLS (admins manage data; guests book only through the RPC)
+
+### 2. Seed rooms (required for availability)
+
+In the **PMS** (after login):
+
+1. Add **room types** with prices  
+2. Add **physical rooms** linked to those types  
+
+Without rooms, availability will always be 0.
+
+### 3. Test public booking
+
+1. Open `booking.html` on the site  
+2. Pick dates + room type + guest details  
+3. Submit  
+4. You should get a booking reference and land on `booking-success.html`  
+5. Confirm the row appears in PMS → Front Desk  
+
+### 4. Paystack (optional until you have keys)
+
+1. Create Paystack account → copy **public key** (`pk_test_...`)  
+2. Upload `js/paystack-booking.js` to the repo `js/` folder  
+3. On `booking-success.html`, before `</body>`, add:
+
+```html
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+  window.NORDIC_PAYSTACK_PUBLIC_KEY = 'pk_test_YOUR_KEY_HERE';
+</script>
+<script src="js/paystack-booking.js"></script>
+<button type="button" class="button button-dark" onclick="NordicPay.startFromSession()">
+  Pay now
+</button>
+<div id="paymentStatus"></div>
+```
+
+4. For production, deploy the Edge Function `booking-payment-webhook` and set Paystack webhook URL to it.
+
+### 5. Custom domain
+
+Follow `CUSTOM_DOMAIN.md`.
+
+## Security notes
+
+- Publishable/anon key in the browser is normal  
+- Guests must **not** get direct INSERT on `bookings` — only the RPC  
+- Never put the **service role** key in frontend files  
+- After go-live, keep only real staff in `staff_profiles`
+
+## Files in this folder
 
 ```
-pms.html
-pms.css
-pms.js
-supabase/
-  01_pms_schema.sql
-  02_pms_functions.sql
-  functions/
-    send-booking-email/index.ts
-    booking-payment-webhook/index.ts
-docs/
-  FEATURE_MATRIX.md
+03_public_booking_and_rls.sql
+js/paystack-booking.js
+CUSTOM_DOMAIN.md
 README.md
 ```
-
-## Install / setup
-
-### 1. Deploy frontend
-Copy `pms.html`, `pms.css`, `pms.js` into your GitHub Pages repo (alongside the marketing site).  
-Do **not** delete existing marketing files or images.
-
-### 2. Database
-In Supabase → SQL Editor:
-
-1. Run `supabase/01_pms_schema.sql`
-2. Run `supabase/02_pms_functions.sql`
-
-### 3. Create an admin user
-1. Supabase → Authentication → Users → Add user (email + password).
-2. Copy the user’s UUID.
-3. Run:
-
-```sql
-INSERT INTO public.staff_profiles (id, full_name, role, is_active)
-VALUES ('PASTE-USER-UUID-HERE', 'Hotel Manager', 'admin', true);
-```
-
-> During first setup the `is_admin_user()` function also allows any authenticated user.  
-> After you populate `staff_profiles`, you can tighten the function (see comments in the SQL).
-
-### 4. Open the PMS
-Visit `…/pms.html` and sign in with the admin account.
-
-### 5. Seed basic data (optional)
-Add room types and rooms from the **Rooms** screen, or via SQL.
-
-## Important notes
-
-- The Supabase **publishable** key is used in the browser (normal). Security relies on **RLS** + the admin check.
-- Before real guest data goes live: tighten RLS policies and remove the “any authenticated user is admin” fallback.
-- Payment and email edge functions are foundations — configure provider API keys before production use.
-- This pack does **not** invent hotel prices, room inventory, tax rules, or live payment credentials.
-
-## Support / next work
-
-See `docs/FEATURE_MATRIX.md` for the full checklist and recommended next steps (channel manager, public booking engine, night audit, etc.).
