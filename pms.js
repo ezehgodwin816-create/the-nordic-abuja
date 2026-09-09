@@ -1,7 +1,7 @@
 /* The Nordic Abuja — Property Management System
    Improved full frontend against Supabase
 */
-const URL_ = 'https://rzjvhfnizwckzbdawrb.supabase.co';
+const URL_ = 'https://rzjvhfnizwckzbdawrbn.supabase.co';
 const KEY  = 'sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob';
 const db   = supabase.createClient(URL_, KEY);
 
