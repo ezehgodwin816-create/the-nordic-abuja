@@ -1050,6 +1050,7 @@
 
 
   <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 
   <!-- =====================================================
@@ -1299,89 +1300,75 @@
 
         let booking = null;
 
-
         try {
-
-          const stored =
-            sessionStorage.getItem(
-              "nordic_booking_confirmation"
-            );
-
-          if (
-            stored
-          ) {
-
-            booking =
-              JSON.parse(
-                stored
-              );
-
+          const stored = sessionStorage.getItem("nordic_booking_confirmation");
+          if (stored) {
+            booking = JSON.parse(stored);
           }
-
         } catch (error) {
-
-          console.error(
-            "Could not read reservation:",
-            error
-          );
-
+          console.error("Could not read reservation:", error);
         }
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlReference = urlParams.get("reference");
 
-        /*
-         * The booking page also puts the reference
-         * in the URL. We use it as a second check.
-         */
+        if (booking) {
+          if (
+            urlReference &&
+            booking.booking_reference &&
+            urlReference !== booking.booking_reference
+          ) {
+            showMissingReservation(
+              "The confirmation link does not match the reservation stored on this device."
+            );
+            return;
+          }
+          renderReservation(booking);
+          return;
+        }
 
-        const urlParams =
-          new URLSearchParams(
-            window.location.search
-          );
-
-        const urlReference =
-          urlParams.get(
-            "reference"
-          );
-
-
-        if (
-          !booking
-        ) {
-
+        if (!urlReference) {
           showMissingReservation(
             "Your reservation details are no longer available on this device. Please contact the hotel and provide your booking reference if you have it."
           );
-
           return;
-
         }
 
+        // Fallback: load from Supabase by booking reference
+        referenceElement.textContent = urlReference;
+        fetchBookingByReference(urlReference);
+      }
 
-        /*
-         * Prevent displaying a mismatched booking
-         * if someone manually changes the URL reference.
-         */
-
-        if (
-          urlReference &&
-          booking.booking_reference &&
-          urlReference !==
-          booking.booking_reference
-        ) {
-
-          showMissingReservation(
-            "The confirmation link does not match the reservation stored on this device."
+      async function fetchBookingByReference(ref) {
+        try {
+          if (!window.supabase) {
+            throw new Error("Supabase library not loaded");
+          }
+          const db = window.supabase.createClient(
+            "https://rzjvhfnizwckzbdawrbn.supabase.co",
+            "sb_publishable_FRKM94YJWbL1lSKGCIoRkg_oWuembob"
           );
-
-          return;
-
+          const { data, error } = await db.rpc("get_booking_by_reference", {
+            p_ref: ref
+          });
+          if (error) throw error;
+          if (!data) {
+            showMissingReservation(
+              "No reservation found for reference " + ref + "."
+            );
+            return;
+          }
+          sessionStorage.setItem(
+            "nordic_booking_confirmation",
+            JSON.stringify(data)
+          );
+          renderReservation(data);
+        } catch (err) {
+          console.error(err);
+          showMissingReservation(
+            "Could not load reservation " + ref + ". " + (err.message || "")
+          );
         }
-
-
-        renderReservation(
-          booking
-        );
-
       }
 
 
