@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book · Joyous Hotel</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/joyous.css" />
+  <style>
+    .book-wrap { max-width: 480px; margin: 0 auto; padding: 24px 20px 48px; }
+    .book-wrap h1 { font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 8px; }
+    .book-wrap .note { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+    .book-wrap label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+    .book-wrap input, .book-wrap select {
+      display: block; width: 100%; margin-top: 6px; padding: 12px 14px;
+      border-radius: 12px; background: var(--card); border: 1px solid var(--line); color: var(--text);
+    }
+    .book-wrap .btn { margin-top: 8px; }
+    .msg { margin-top: 16px; padding: 12px; border-radius: 10px; font-size: 14px; display: none; }
+    .msg.show { display: block; }
+    .msg.ok { background: rgba(61,154,106,0.2); color: #8fd4a8; }
+    .msg.err { background: rgba(196,92,92,0.2); color: #f0a0a0; }
+  </style>
+</head>
+<body class="hotel-joyous">
+  <header class="app-header">
+    <a class="brand" href="index.html"><span class="brand-mark">J</span><span class="brand-text"><strong>Joyous</strong><small>Book a stay</small></span></a>
+    <a href="index.html" style="font-size:14px;color:var(--gold)">← Back</a>
+  </header>
+  <div class="book-wrap">
+    <h1>Book your stay</h1>
+    <p class="note">Choose dates and room. Payment can be completed after reservation (Paystack).</p>
+    <form id="bookForm">
+      <label>Check-in <input type="date" id="checkin" required /></label>
+      <label>Check-out <input type="date" id="checkout" required /></label>
+      <label>Room type
+        <select id="room" required>
+          <option value="">Select</option>
+          <option value="standard">Standard — from ₦15,000</option>
+          <option value="deluxe">Deluxe — from ₦22,000</option>
+          <option value="suite">Suite — from ₦35,000</option>
+        </select>
+      </label>
+      <label>Guests <input type="number" id="guests" min="1" max="4" value="2" required /></label>
+      <label>First name <input id="first" required /></label>
+      <label>Last name <input id="last" required /></label>
+      <label>Email <input type="email" id="email" required /></label>
+      <label>Phone <input id="phone" required placeholder="08xx…" /></label>
+      <button type="submit" class="btn btn-primary btn-block">Create reservation</button>
+    </form>
+    <div class="msg" id="msg"></div>
+  </div>
+  <script>
+    const today = new Date().toISOString().slice(0,10);
+    document.getElementById('checkin').min = today;
+    document.getElementById('checkout').min = today;
+    document.getElementById('bookForm').onsubmit = e => {
+      e.preventDefault();
+      const msg = document.getElementById('msg');
+      const ref = 'JH-' + Math.random().toString(36).slice(2,10).toUpperCase();
+      const data = {
+        booking_reference: ref,
+        hotel: 'joyous',
+        guest_first_name: document.getElementById('first').value,
+        guest_last_name: document.getElementById('last').value,
+        guest_email: document.getElementById('email').value,
+        guest_phone: document.getElementById('phone').value,
+        check_in: document.getElementById('checkin').value,
+        check_out: document.getElementById('checkout').value,
+        room: document.getElementById('room').value,
+        status: 'pending',
+        payment_status: 'unpaid'
+      };
+      sessionStorage.setItem('nordic_booking_confirmation', JSON.stringify(data));
+      msg.className = 'msg show ok';
+      msg.textContent = 'Reservation created. Reference: ' + ref + '. Payment can be connected next.';
+      // Later: redirect to success + Paystack
+    };
+  </script>
+</body>
+</html>
