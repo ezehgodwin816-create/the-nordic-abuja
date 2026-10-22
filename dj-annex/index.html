@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f1a" />
+  <title>DJ Annex Hotel · Abacha Road</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/annex.css" />
+</head>
+<body data-hotel="dj-annex">
+
+  <header class="topbar">
+    <a class="logo" href="index.html">
+      <span class="logo-box">DJ</span>
+      <span class="logo-text">DJ Annex<em>Hotel</em></span>
+    </a>
+    <div class="top-actions">
+      <button class="chip" id="authChip">Sign in</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <nav class="drawer" id="drawer">
+    <div class="drawer-head">
+      <strong>DJ Annex</strong>
+      <button id="closeDrawer">×</button>
+    </div>
+    <a href="index.html" class="active">Home</a>
+    <a href="rooms.html">Rooms</a>
+    <a href="booking.html">Book</a>
+    <a href="events.html">Events</a>
+    <a href="services.html">Services</a>
+    <a href="contact.html">Contact</a>
+    <a href="portal.html">My Portal</a>
+    <a href="report.html">Report Issue</a>
+    <a href="../index.html" class="back">← All Hotels</a>
+  </nav>
+  <div class="scrim" id="scrim"></div>
+
+  <main>
+    <section class="hero">
+      <div class="hero-glow"></div>
+      <p class="eyebrow">Abacha Road · Modern Stay</p>
+      <h1>Stay sharp.<br>Stay comfortable.</h1>
+      <p class="lead">Contemporary rooms, reliable power and easy access on Abacha Road. Built for travellers and professionals.</p>
+      <div class="hero-btns">
+        <a class="btn primary" href="booking.html">Check availability</a>
+        <a class="btn outline" href="rooms.html">View rooms</a>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Events</h2>
+        <a href="events.html">See all</a>
+      </div>
+      <div class="empty-card" id="eventsEmpty">
+        <p>No events right now</p>
+        <span>Check back later or ask the AI assistant</span>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><h2>Rooms</h2><a href="rooms.html">All rooms</a></div>
+      <div class="cards">
+        <article class="card">
+          <div class="ph">Room photo</div>
+          <div class="card-body">
+            <h3>Classic</h3>
+            <p>Clean, modern essentials for a solid night’s rest.</p>
+            <div class="meta"><span>From ₦18,000</span><a href="booking.html?type=classic">Book</a></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="ph">Room photo</div>
+          <div class="card-body">
+            <h3>Executive</h3>
+            <p>Extra space and a proper desk for work trips.</p>
+            <div class="meta"><span>From ₦28,000</span><a href="booking.html?type=executive">Book</a></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="ph">Room photo</div>
+          <div class="card-body">
+            <h3>Premium</h3>
+            <p>More comfort and room to stretch out.</p>
+            <div class="meta"><span>From ₦40,000</span><a href="booking.html?type=premium">Book</a></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="block why">
+      <h2>Why DJ Annex</h2>
+      <div class="why-grid">
+        <div><strong>Modern rooms</strong><span>Clean design, working AC & Wi-Fi</span></div>
+        <div><strong>Abacha Road</strong><span>Easy road access, secure entry</span></div>
+        <div><strong>24/7 desk</strong><span>Someone is always available</span></div>
+        <div><strong>AI help</strong><span>Ask anything, anytime</span></div>
+      </div>
+    </section>
+
+    <section class="block actions">
+      <a href="booking.html" class="action">📅 Book a room</a>
+      <a href="report.html" class="action">📢 Report issue</a>
+      <a href="contact.html" class="action">📞 Contact</a>
+      <a href="portal.html" class="action">👤 My portal</a>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <strong>DJ Annex Hotel</strong>
+    <span>Abacha Road · The Nordic Group</span>
+    <div><a href="../index.html">All Hotels</a> · <a href="privacy.html">Privacy</a></div>
+  </footer>
+
+  <div id="aiRoot"></div>
+
+  <div class="modal" id="authModal" hidden>
+    <div class="modal-bg" data-close></div>
+    <div class="modal-box">
+      <button class="x" data-close>×</button>
+      <h2>Sign in</h2>
+      <p class="hint">Email verification comes later. Login still checks your details.</p>
+      <form id="authForm">
+        <label>Email or phone<input type="text" id="authId" required placeholder="you@email.com" /></label>
+        <label>Password<input type="password" id="authPass" required placeholder="Password" /></label>
+        <button type="submit" class="btn primary full">Continue</button>
+      </form>
+      <p class="err" id="authError" hidden></p>
+    </div>
+  </div>
+
+  <script>
+    window.NORDIC_HOTEL = { id: 'dj-annex', name: 'DJ Annex Hotel', location: 'Abacha Road', slug: 'dj-annex', theme: 'dark' };
+  </script>
+  <script src="../shared/ai/ai-engine.js"></script>
+  <script src="js/annex.js"></script>
+</body>
+</html>
