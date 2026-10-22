@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report an Issue</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#12141a; --card:#1c1f28; --text:#eef1f6; --muted:#8b93a7; --accent:#6c8cff; --ok:#3ecf8e; --line:rgba(139,147,167,0.15); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; padding: 20px; }
+    .wrap { max-width: 480px; margin: 0 auto; }
+    h1 { font-size: 22px; margin-bottom: 6px; }
+    .sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+    input, select, textarea {
+      display: block; width: 100%; margin-top: 6px; padding: 12px;
+      border-radius: 10px; background: var(--card); border: 1px solid var(--line);
+      color: var(--text); font: inherit;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    button {
+      width: 100%; padding: 14px; border-radius: 12px; border: none;
+      background: var(--accent); color: #0f1115; font-weight: 600; font-size: 15px; cursor: pointer;
+    }
+    .success {
+      display: none; text-align: center; padding: 40px 20px;
+      background: var(--card); border-radius: 16px; border: 1px solid var(--line);
+    }
+    .success.show { display: block; animation: pop 0.4s ease; }
+    @keyframes pop {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .success .icon { font-size: 48px; margin-bottom: 12px; }
+    .success h2 { color: var(--ok); margin-bottom: 8px; }
+    .back { display: inline-block; margin-top: 20px; color: var(--accent); font-size: 14px; }
+    #formBox.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="formBox">
+      <h1>Report an issue</h1>
+      <p class="sub">Your report goes to the hotel admin and Central Command.</p>
+      <form id="reportForm">
+        <label>Hotel
+          <select id="hotel" required>
+            <option value="">Select hotel</option>
+            <option value="joyous">Joyous Hotel (Nyanya)</option>
+            <option value="dj-annex">DJ Annex Hotel (Abacha Road)</option>
+            <option value="jimmyland">Jimmyland Hotel (Mararaba)</option>
+          </select>
+        </label>
+        <label>Your name<input id="name" required placeholder="Full name" /></label>
+        <label>Phone or email<input id="contact" required placeholder="How we can reach you" /></label>
+        <label>Subject
+          <select id="subject" required>
+            <option value="">Choose</option>
+            <option>Poor service</option>
+            <option>Room condition</option>
+            <option>Safety concern</option>
+            <option>Staff behaviour</option>
+            <option>Payment issue</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>Details<textarea id="details" required placeholder="Please describe what happened…"></textarea></label>
+        <button type="submit">Send report</button>
+      </form>
+    </div>
+    <div class="success" id="success">
+      <div class="icon">✓</div>
+      <h2>Successfully sent</h2>
+      <p>Your report has been delivered to the administrative system. The hotel team (and Central Command) can see it and will follow up.</p>
+      <a class="back" href="javascript:history.back()">← Go back</a>
+    </div>
+  </div>
+  <script>
+    // Pre-select hotel if opened from a hotel site
+    const params = new URLSearchParams(location.search);
+    const h = params.get('hotel');
+    if (h) document.getElementById('hotel').value = h;
+
+    document.getElementById('reportForm').onsubmit = e => {
+      e.preventDefault();
+      // Store locally for demo; later POST to Supabase
+      const payload = {
+        hotel: document.getElementById('hotel').value,
+        name: document.getElementById('name').value,
+        contact: document.getElementById('contact').value,
+        subject: document.getElementById('subject').value,
+        details: document.getElementById('details').value,
+        date: new Date().toISOString(),
+        status: 'open'
+      };
+      try {
+        const list = JSON.parse(localStorage.getItem('nordic_reports') || '[]');
+        list.unshift(payload);
+        localStorage.setItem('nordic_reports', JSON.stringify(list));
+      } catch (_) {}
+      document.getElementById('formBox').classList.add('hidden');
+      document.getElementById('success').classList.add('show');
+    };
+  </script>
+</body>
+</html>
