@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Central Command · Nordic Group</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1115; --surf: #171a21; --card: #1e232d;
+      --text: #eef1f6; --muted: #8b93a7; --accent: #6c8cff;
+      --ok: #3ecf8e; --warn: #f0b429; --danger: #f07178;
+      --line: rgba(139,147,167,0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; color: inherit; border: none; background: none; cursor: pointer; }
+
+    /* Login */
+    #login {
+      min-height: 100dvh; display: grid; place-items: center; padding: 24px;
+    }
+    .login-card {
+      width: 100%; max-width: 380px; background: var(--surf);
+      border-radius: 16px; padding: 28px; border: 1px solid var(--line);
+    }
+    .login-card h1 { font-size: 20px; margin-bottom: 4px; }
+    .login-card p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    .login-card label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .login-card input {
+      display: block; width: 100%; margin-top: 6px; padding: 12px;
+      border-radius: 10px; background: var(--card); border: 1px solid var(--line);
+    }
+    .login-card button {
+      width: 100%; padding: 12px; border-radius: 10px; margin-top: 8px;
+      background: var(--accent); color: #0f1115; font-weight: 600;
+    }
+    .login-err { color: var(--danger); font-size: 13px; margin-top: 10px; }
+
+    /* App shell */
+    #app { display: none; }
+    #app.show { display: block; }
+    .top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--surf);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .top strong { font-size: 15px; }
+    .top span { color: var(--muted); font-size: 13px; margin-left: 8px; }
+    .top button { padding: 8px 12px; border-radius: 8px; background: var(--card); font-size: 13px; }
+
+    .layout { display: flex; min-height: calc(100dvh - 56px); }
+    .side {
+      width: 220px; background: var(--surf); border-right: 1px solid var(--line);
+      padding: 16px 12px; display: flex; flex-direction: column; gap: 2px;
+      flex-shrink: 0;
+    }
+    .side button {
+      text-align: left; padding: 10px 12px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    }
+    .side button.active, .side button:hover { background: var(--card); color: var(--accent); }
+    .main { flex: 1; padding: 20px; overflow: auto; }
+    .main h1 { font-size: 22px; margin-bottom: 4px; }
+    .main .sub { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat {
+      background: var(--card); border-radius: 12px; padding: 16px; border: 1px solid var(--line);
+    }
+    .stat b { display: block; font-size: 22px; margin-bottom: 2px; }
+    .stat span { font-size: 12px; color: var(--muted); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 500; font-size: 12px; }
+    .badge {
+      display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
+    }
+    .badge.ok { background: rgba(62,207,142,0.15); color: var(--ok); }
+    .badge.warn { background: rgba(240,180,41,0.15); color: var(--warn); }
+    .badge.danger { background: rgba(240,113,120,0.15); color: var(--danger); }
+    .badge.muted { background: var(--card); color: var(--muted); }
+
+    .toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .toolbar select, .toolbar input {
+      padding: 8px 12px; border-radius: 8px; background: var(--card); border: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .btn {
+      padding: 8px 14px; border-radius: 8px; background: var(--accent); color: #0f1115;
+      font-weight: 600; font-size: 13px;
+    }
+    .btn.ghost { background: var(--card); color: var(--text); }
+
+    .hotel-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .hotel-tabs button {
+      padding: 8px 14px; border-radius: 8px; background: var(--card); font-size: 13px;
+    }
+    .hotel-tabs button.on { background: var(--accent); color: #0f1115; font-weight: 600; }
+
+    .empty {
+      text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px;
+      background: var(--card); border-radius: 12px; border: 1px dashed var(--line);
+    }
+
+    @media (max-width: 720px) {
+      .side { display: none; }
+      .side.mobile-open { display: flex; position: fixed; inset: 0; z-index: 30; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="login">
+    <div class="login-card">
+      <h1>Central Command</h1>
+      <p>Nordic Group · All hotels, all data</p>
+      <form id="loginForm">
+        <label>Email<input type="email" id="email" required placeholder="admin@nordicgroup.ng" autocomplete="username" /></label>
+        <label>Password<input type="password" id="password" required placeholder="Password" autocomplete="current-password" /></label>
+        <button type="submit">Sign in</button>
+        <div class="login-err" id="loginErr"></div>
+      </form>
+      <p style="margin-top:16px;font-size:12px;color:var(--muted)">Demo: any email + password 4+ characters will enter (real auth later).</p>
+    </div>
+  </div>
+
+  <div id="app">
+    <header class="top">
+      <div>
+        <strong>Central Command</strong>
+        <span id="who"></span>
+      </div>
+      <div>
+        <button type="button" id="menuMobile" style="margin-right:8px">Menu</button>
+        <button type="button" id="logout">Sign out</button>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="side" id="side">
+        <button data-v="dashboard" class="active">Dashboard</button>
+        <button data-v="hotels">Hotels overview</button>
+        <button data-v="bookings">All bookings</button>
+        <button data-v="staff">All staff</button>
+        <button data-v="reports">Guest reports</button>
+        <button data-v="payments">Payments</button>
+        <button data-v="events">Events</button>
+        <button data-v="pending">Staff applications</button>
+        <button data-v="audit">Activity log</button>
+      </aside>
+      <main class="main" id="main"></main>
+    </div>
+  </div>
+
+  <script>
+    // Demo data — replace with live Supabase later
+    const HOTELS = [
+      { id: 'joyous', name: 'Joyous Hotel', location: 'Nyanya' },
+      { id: 'dj-annex', name: 'DJ Annex Hotel', location: 'Abacha Road' },
+      { id: 'jimmyland', name: 'Jimmyland Hotel', location: 'Abacha Road, Mararaba' }
+    ];
+    let bookings = [];
+    let staff = [];
+    let reports = [];
+    let payments = [];
+    let pendingStaff = [];
+    let filterHotel = 'all';
+
+    const $ = id => document.getElementById(id);
+    const main = $('main');
+
+    // Login (demo)
+    $('loginForm').onsubmit = e => {
+      e.preventDefault();
+      const email = $('email').value.trim();
+      const pass = $('password').value;
+      if (!email || pass.length < 4) {
+        $('loginErr').textContent = 'Invalid email or password.';
+        return;
+      }
+      $('login').style.display = 'none';
+      $('app').classList.add('show');
+      $('who').textContent = email;
+      render('dashboard');
+    };
+    $('logout').onclick = () => location.reload();
+
+    document.querySelectorAll('#side button').forEach(b => {
+      b.onclick = () => {
+        document.querySelectorAll('#side button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        $('side').classList.remove('mobile-open');
+        render(b.dataset.v);
+      };
+    });
+    $('menuMobile').onclick = () => $('side').classList.toggle('mobile-open');
+
+    function money(n) { return '₦' + Number(n || 0).toLocaleString('en-NG'); }
+    function badge(s) {
+      const m = { paid: 'ok', confirmed: 'ok', pending: 'warn', unpaid: 'warn', open: 'warn', resolved: 'ok', rejected: 'danger', approved: 'ok' };
+      return `<span class="badge ${m[s] || 'muted'}">${s || '—'}</span>`;
+    }
+
+    function hotelFilter() {
+      return `<div class="hotel-tabs">
+        <button class="${filterHotel==='all'?'on':''}" data-h="all">All hotels</button>
+        ${HOTELS.map(h => `<button class="${filterHotel===h.id?'on':''}" data-h="${h.id}">${h.name}</button>`).join('')}
+      </div>`;
+    }
+
+    function render(view) {
+      const map = { dashboard, hotels, bookings: viewBookings, staff: viewStaff, reports: viewReports, payments: viewPayments, events, pending, audit };
+      (map[view] || dashboard)();
+      // hotel tab clicks
+      main.querySelectorAll('[data-h]').forEach(b => {
+        b.onclick = () => { filterHotel = b.dataset.h; render(view); };
+      });
+    }
+
+    function dashboard() {
+      main.innerHTML = `
+        <h1>Dashboard</h1>
+        <p class="sub">Live overview across Joyous, DJ Annex and Jimmyland</p>
+        <div class="stats">
+          <div class="stat"><b>3</b><span>Hotels</span></div>
+          <div class="stat"><b>${bookings.length}</b><span>Bookings</span></div>
+          <div class="stat"><b>${staff.length}</b><span>Staff</span></div>
+          <div class="stat"><b>${reports.filter(r=>r.status==='open').length}</b><span>Open reports</span></div>
+          <div class="stat"><b>${money(payments.reduce((s,p)=>s+Number(p.amount||0),0))}</b><span>Payments recorded</span></div>
+          <div class="stat"><b>${pendingStaff.length}</b><span>Pending applications</span></div>
+        </div>
+        <p class="sub">Connect Supabase to see live numbers. Structure is ready for all three hotels.</p>
+        <div class="empty">No live data yet — seed rooms and bookings from each hotel admin, or connect the shared backend.</div>
+      `;
+    }
+
+    function hotels() {
+      main.innerHTML = `
+        <h1>Hotels overview</h1>
+        <p class="sub">Every property under The Nordic Group</p>
+        <div class="stats">
+          ${HOTELS.map(h => `
+            <div class="stat" style="min-width:200px">
+              <b style="font-size:16px">${h.name}</b>
+              <span>${h.location}</span>
+              <div style="margin-top:10px">
+                <a class="btn ghost" href="../${h.id === 'dj-annex' ? 'dj-annex' : h.id}/index.html" target="_blank">Open site</a>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function viewBookings() {
+      const list = filterHotel === 'all' ? bookings : bookings.filter(b => b.hotel_id === filterHotel);
+      main.innerHTML = `
+        <h1>All bookings</h1>
+        <p class="sub">Across every hotel</p>
+        ${hotelFilter()}
+        ${list.length === 0 ? '<div class="empty">No bookings yet. They will appear here once guests book from any hotel site.</div>' : `
+        <table>
+          <thead><tr><th>Ref</th><th>Hotel</th><th>Guest</th><th>Dates</th><th>Status</th><th>Payment</th></tr></thead>
+          <tbody>
+            ${list.map(b => `<tr>
+              <td>${b.ref || '—'}</td>
+              <td>${b.hotel || '—'}</td>
+              <td>${b.guest || '—'}</td>
+              <td>${b.dates || '—'}</td>
+              <td>${badge(b.status)}</td>
+              <td>${badge(b.payment)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      `;
+    }
+
+    function viewStaff() {
+      const list = filterHotel === 'all' ? staff : staff.filter(s => s.hotel_id === filterHotel);
+      main.innerHTML = `
+        <h1>All staff</h1>
+        <p class="sub">Every team member across the group (KYC data stored for compliance)</p>
+        ${hotelFilter()}
+        ${list.length === 0 ? '<div class="empty">No staff records yet. Approved staff from each hotel will show here.</div>' : `
+        <table>
+          <thead><tr><th>Name</th><th>Hotel</th><th>Role</th><th>Status</th><th>Phone</th></tr></thead>
+          <tbody>
+            ${list.map(s => `<tr>
+              <td>${s.name || '—'}</td>
+              <td>${s.hotel || '—'}</td>
+              <td>${s.role || '—'}</td>
+              <td>${badge(s.status)}</td>
+              <td>${s.phone || '—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      `;
+    }
+
+    function viewReports() {
+      const list = filterHotel === 'all' ? reports : reports.filter(r => r.hotel_id === filterHotel);
+      main.innerHTML = `
+        <h1>Guest reports</h1>
+        <p class="sub">Complaints and issues from all hotels — Central Command sees everything</p>
+        ${hotelFilter()}
+        ${list.length === 0 ? '<div class="empty">No reports yet. Guest submissions from any hotel appear here.</div>' : `
+        <table>
+          <thead><tr><th>Date</th><th>Hotel</th><th>Guest</th><th>Subject</th><th>Status</th></tr></thead>
+          <tbody>
+            ${list.map(r => `<tr>
+              <td>${r.date || '—'}</td>
+              <td>${r.hotel || '—'}</td>
+              <td>${r.guest || '—'}</td>
+              <td>${r.subject || '—'}</td>
+              <td>${badge(r.status)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      `;
+    }
+
+    function viewPayments() {
+      main.innerHTML = `
+        <h1>Payments</h1>
+        <p class="sub">Ledger across the group (Paystack + manual)</p>
+        ${payments.length === 0 ? '<div class="empty">No payments recorded yet.</div>' : `
+        <table>
+          <thead><tr><th>Date</th><th>Hotel</th><th>Booking</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
+          <tbody>
+            ${payments.map(p => `<tr>
+              <td>${p.date || '—'}</td>
+              <td>${p.hotel || '—'}</td>
+              <td>${p.ref || '—'}</td>
+              <td>${money(p.amount)}</td>
+              <td>${p.method || '—'}</td>
+              <td>${badge(p.status)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      `;
+    }
+
+    function events() {
+      main.innerHTML = `
+        <h1>Events</h1>
+        <p class="sub">Programmes and shows across all hotels</p>
+        <div class="empty">No events published yet. Hotel admins can add events; they will list here and on each hotel homepage.</div>
+      `;
+    }
+
+    function pending() {
+      main.innerHTML = `
+        <h1>Staff applications</h1>
+        <p class="sub">New staff sign-ups wait here until a hotel admin or Central Command approves them. Full KYC fields are stored for compliance.</p>
+        ${pendingStaff.length === 0 ? '<div class="empty">No pending applications.</div>' : `
+        <table>
+          <thead><tr><th>Name</th><th>Hotel</th><th>Role applied</th><th>Submitted</th><th>Action</th></tr></thead>
+          <tbody>
+            ${pendingStaff.map((s,i) => `<tr>
+              <td>${s.name}</td>
+              <td>${s.hotel}</td>
+              <td>${s.role}</td>
+              <td>${s.date}</td>
+              <td>
+                <button class="btn" onclick="approveStaff(${i})">Approve</button>
+                <button class="btn ghost" onclick="rejectStaff(${i})">Reject</button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      `;
+    }
+
+    function audit() {
+      main.innerHTML = `
+        <h1>Activity log</h1>
+        <p class="sub">Important actions across the platform</p>
+        <div class="empty">Audit entries will appear here once the backend is connected.</div>
+      `;
+    }
+
+    window.approveStaff = function(i) {
+      const s = pendingStaff.splice(i, 1)[0];
+      if (s) { s.status = 'approved'; staff.push(s); }
+      render('pending');
+    };
+    window.rejectStaff = function(i) {
+      pendingStaff.splice(i, 1);
+      render('pending');
+    };
+  </script>
+</body>
+</html>
