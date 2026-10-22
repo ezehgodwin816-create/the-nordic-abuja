@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a0a12" />
+  <title>Jimmyland Hotel · Abacha Road, Mararaba</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/jimmy.css" />
+</head>
+<body data-hotel="jimmyland">
+
+  <header class="bar">
+    <a class="brand" href="index.html">
+      <span class="mark">JL</span>
+      <span>Jimmyland<em>Hotel</em></span>
+    </a>
+    <div class="bar-right">
+      <button class="sign" id="authChip">Sign in</button>
+      <button class="burger" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <nav class="panel" id="panel">
+    <div class="panel-top">
+      <strong>Jimmyland</strong>
+      <button id="closePanel">×</button>
+    </div>
+    <a href="index.html" class="on">Home</a>
+    <a href="rooms.html">Rooms</a>
+    <a href="booking.html">Book a stay</a>
+    <a href="events.html">Events</a>
+    <a href="dining.html">Restaurant</a>
+    <a href="contact.html">Contact</a>
+    <a href="portal.html">My Portal</a>
+    <a href="report.html">Report an issue</a>
+    <a href="../index.html" class="dim">← All Hotels</a>
+  </nav>
+  <div class="shade" id="shade"></div>
+
+  <main>
+    <section class="splash">
+      <p class="tag">Abacha Road · Mararaba</p>
+      <h1>Live a little.<br>Stay a lot.</h1>
+      <p class="sub">Friendly rooms, good food and a lively spot on Abacha Road. Welcome to Jimmyland.</p>
+      <div class="btns">
+        <a class="b primary" href="booking.html">Book now</a>
+        <a class="b ghost" href="rooms.html">See rooms</a>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-top"><h2>Events</h2><a href="events.html">All</a></div>
+      <div class="blank" id="eventsEmpty">
+        <p>No events available</p>
+        <span>New programmes will show here</span>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-top"><h2>Our rooms</h2><a href="rooms.html">View all</a></div>
+      <div class="grid">
+        <article class="tile">
+          <div class="pic">Photo</div>
+          <div class="info">
+            <h3>Standard</h3>
+            <p>Comfortable and straightforward.</p>
+            <div class="row"><span>From ₦16,000</span><a href="booking.html">Book</a></div>
+          </div>
+        </article>
+        <article class="tile">
+          <div class="pic">Photo</div>
+          <div class="info">
+            <h3>Deluxe</h3>
+            <p>More space, same warm welcome.</p>
+            <div class="row"><span>From ₦25,000</span><a href="booking.html">Book</a></div>
+          </div>
+        </article>
+        <article class="tile">
+          <div class="pic">Photo</div>
+          <div class="info">
+            <h3>Family</h3>
+            <p>Room for everyone to settle in.</p>
+            <div class="row"><span>From ₦38,000</span><a href="booking.html">Book</a></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="sec highlights">
+      <h2>What you get</h2>
+      <ul>
+        <li><strong>Restaurant & lounge</strong> — Local and everyday meals</li>
+        <li><strong>Event space</strong> — Celebrations and small gatherings</li>
+        <li><strong>Secure parking</strong> — Peace of mind on Abacha Road</li>
+        <li><strong>AI concierge</strong> — Answers about rooms, events and more</li>
+      </ul>
+    </section>
+
+    <section class="sec shortcuts">
+      <a href="booking.html">📅 Book</a>
+      <a href="report.html">📢 Report</a>
+      <a href="contact.html">📞 Call us</a>
+      <a href="portal.html">👤 Portal</a>
+    </section>
+  </main>
+
+  <footer class="end">
+    <strong>Jimmyland Hotel</strong>
+    <span>Abacha Road, Mararaba · Nordic Group</span>
+    <div><a href="../index.html">All Hotels</a></div>
+  </footer>
+
+  <div id="aiRoot"></div>
+
+  <div class="sheet" id="authModal" hidden>
+    <div class="sheet-bg" data-close></div>
+    <div class="sheet-box">
+      <button class="close-x" data-close>×</button>
+      <h2>Sign in</h2>
+      <p class="note">Full email tools coming soon. Wrong details still fail.</p>
+      <form id="authForm">
+        <label>Email or phone<input id="authId" required placeholder="you@email.com" /></label>
+        <label>Password<input type="password" id="authPass" required placeholder="Password" /></label>
+        <button type="submit" class="b primary full">Continue</button>
+      </form>
+      <p class="fail" id="authError" hidden></p>
+    </div>
+  </div>
+
+  <script>
+    window.NORDIC_HOTEL = { id: 'jimmyland', name: 'Jimmyland Hotel', location: 'Abacha Road, Mararaba', slug: 'jimmyland', theme: 'vibrant' };
+  </script>
+  <script src="../shared/ai/ai-engine.js"></script>
+  <script src="js/jimmy.js"></script>
+</body>
+</html>
