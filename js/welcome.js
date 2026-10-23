@@ -66,11 +66,11 @@
 
   function finishLoader() {
     if (!loader) return;
-    loader.classList.add('is-done');
+    loader.classList.add('done');
     document.body.classList.add('app-ready');
     if (main) {
       main.classList.remove('hidden');
-      // Staggered reveal is handled by CSS .animate-in delays
+      main.classList.add('visible');
     }
     setTimeout(() => {
       loader.style.display = 'none';
@@ -170,7 +170,7 @@
 
   // Safety: never block UI forever
   setTimeout(() => {
-    if (loader && !loader.classList.contains('is-done')) {
+    if (loader && !loader.classList.contains('done')) {
       setProgress(100);
       finishLoader();
     }
