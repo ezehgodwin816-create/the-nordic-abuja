@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://ezehgodwin816-create.github.io/the-nordic-abuja/sitemap.xml
