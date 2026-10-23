@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="The Nordic Group — Joyous Hotel, DJ Annex & Jimmyland. Three unique hotels. One intelligent platform." />
+  <title>The Nordic Group · Welcome</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/welcome.css" />
+</head>
+<body>
+
+  <!-- ========== LOADING SCREEN ========== -->
+  <div id="loader" class="loader">
+    <div class="loader-inner">
+      <div class="loader-logo">
+        <span class="logo-mark">N</span>
+      </div>
+      <div class="loader-text">
+        <span class="loader-brand">THE NORDIC GROUP</span>
+        <span class="loader-status" id="loaderStatus">Preparing your experience…</span>
+      </div>
+      <div class="loader-bar">
+        <div class="loader-bar-fill" id="loaderFill"></div>
+      </div>
+      <div class="loader-percent" id="loaderPercent">0%</div>
+    </div>
+    <div class="loader-particles" id="loaderParticles"></div>
+  </div>
+
+  <!-- ========== CONTINUOUS BACKGROUND ========== -->
+  <div class="bg-layer">
+    <div class="bg-gradient"></div>
+    <div class="bg-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="orb orb-4"></div>
+    </div>
+    <canvas id="bgCanvas" class="bg-canvas"></canvas>
+    <div class="bg-noise"></div>
+  </div>
+
+  <!-- ========== MAIN CONTENT (hidden until loaded) ========== -->
+  <main id="main" class="main hidden">
+
+    <!-- Welcome hero -->
+    <section class="welcome-hero">
+      <div class="welcome-badge animate-in">
+        <span class="pulse-dot"></span>
+        Multi-Hotel Platform · Abuja & Nasarawa
+      </div>
+
+      <h1 class="welcome-title animate-in delay-1">
+        <span class="title-line">Welcome to</span>
+        <span class="title-main">The Nordic Group</span>
+      </h1>
+
+      <p class="welcome-sub animate-in delay-2">
+        Three distinct hotels. One intelligent ecosystem.<br />
+        Choose where your journey begins.
+      </p>
+
+      <div class="welcome-scroll animate-in delay-3">
+        <span>Select a hotel</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- Hotel selection cards -->
+    <section class="hotel-grid" id="hotelGrid">
+
+      <!-- 1. Joyous Hotel -->
+      <a href="joyous/index.html" class="hotel-card joyous-card animate-in delay-4" data-hotel="joyous">
+        <div class="card-glow"></div>
+        <div class="card-media">
+          <div class="card-placeholder joyous-ph">
+            <span class="ph-icon">◆</span>
+            <span class="ph-label">Joyous</span>
+          </div>
+          <div class="card-badge">Nyanya · Abuja</div>
+        </div>
+        <div class="card-body">
+          <h2>Joyous Hotel</h2>
+          <p class="card-tagline">Warm hospitality in the heart of Nyanya</p>
+          <ul class="card-features">
+            <li>Comfortable rooms & suites</li>
+            <li>Restaurant & lounge</li>
+            <li>Events & meetings</li>
+            <li>24/7 intelligent concierge</li>
+          </ul>
+          <span class="card-cta">Enter Joyous <span>→</span></span>
+        </div>
+      </a>
+
+      <!-- 2. DJ Annex -->
+      <a href="dj-annex/index.html" class="hotel-card annex-card animate-in delay-5" data-hotel="dj-annex">
+        <div class="card-glow"></div>
+        <div class="card-media">
+          <div class="card-placeholder annex-ph">
+            <span class="ph-icon">▲</span>
+            <span class="ph-label">DJ Annex</span>
+          </div>
+          <div class="card-badge">Abacha Road</div>
+        </div>
+        <div class="card-body">
+          <h2>DJ Annex Hotel</h2>
+          <p class="card-tagline">Modern stay on Abacha Road</p>
+          <ul class="card-features">
+            <li>Contemporary rooms</li>
+            <li>Business-friendly</li>
+            <li>Secure & convenient</li>
+            <li>Smart AI assistant</li>
+          </ul>
+          <span class="card-cta">Enter DJ Annex <span>→</span></span>
+        </div>
+      </a>
+
+      <!-- 3. Jimmyland -->
+      <a href="jimmyland/index.html" class="hotel-card jimmyland-card animate-in delay-6" data-hotel="jimmyland">
+        <div class="card-glow"></div>
+        <div class="card-media">
+          <div class="card-placeholder jemmy-ph">
+            <span class="ph-icon">●</span>
+            <span class="ph-label">Jimmyland</span>
+          </div>
+          <div class="card-badge">Abacha Road · Mararaba</div>
+        </div>
+        <div class="card-body">
+          <h2>Jimmyland Hotel</h2>
+          <p class="card-tagline">Vibrant hospitality on Abacha Road</p>
+          <ul class="card-features">
+            <li>Spacious rooms</li>
+            <li>Restaurant & nightlife</li>
+            <li>Events & celebrations</li>
+            <li>Always-on AI concierge</li>
+          </ul>
+          <span class="card-cta">Enter Jimmyland <span>→</span></span>
+        </div>
+      </a>
+    </section>
+
+    <!-- Footer strip -->
+    <footer class="welcome-footer animate-in delay-7">
+      <div class="footer-left">
+        <span class="footer-logo">N</span>
+        <span>The Nordic Group · Multi-Hotel Platform</span>
+      </div>
+      <div class="footer-right">
+        <a href="super-admin/index.html" class="footer-link">Platform Admin</a>
+        <span class="dot">·</span>
+        <span>Secure · Unified · Intelligent</span>
+      </div>
+    </footer>
+  </main>
+
+  <script src="js/welcome.js"></script>
+</body>
+</html>
