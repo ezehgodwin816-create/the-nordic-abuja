@@ -1,13 +1,11 @@
 /**
  * The Nordic Group — Welcome Experience
- * Loading sequence + continuous background animation + hotel cards reveal
  */
 (function () {
   'use strict';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- LOADING SEQUENCE ---------- */
   const loader = document.getElementById('loader');
   const loaderFill = document.getElementById('loaderFill');
   const loaderPercent = document.getElementById('loaderPercent');
@@ -24,11 +22,43 @@
 
   let progress = 0;
   let statusIndex = 0;
+  let finished = false;
 
   function setProgress(p) {
     progress = Math.min(100, Math.max(0, p));
     if (loaderFill) loaderFill.style.width = progress + '%';
     if (loaderPercent) loaderPercent.textContent = Math.round(progress) + '%';
+  }
+
+  function finishLoader() {
+    if (finished) return;
+    finished = true;
+
+    if (loader) {
+      loader.classList.add('done');
+      loader.style.opacity = '0';
+      loader.style.visibility = 'hidden';
+      loader.style.pointerEvents = 'none';
+    }
+
+    document.body.classList.add('app-ready');
+
+    if (main) {
+      main.classList.remove('hidden');
+      main.classList.add('visible');
+      main.style.opacity = '1';
+      main.style.pointerEvents = 'auto';
+    }
+
+    // Make every animated block visible
+    document.querySelectorAll('.animate-in').forEach(function (el) {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+
+    setTimeout(function () {
+      if (loader) loader.style.display = 'none';
+    }, 700);
   }
 
   function runLoader() {
@@ -39,11 +69,10 @@
     }
 
     const start = performance.now();
-    const duration = 2200;
+    const duration = 2000;
 
     function tick(now) {
       const t = Math.min(1, (now - start) / duration);
-      // Ease-out cubic
       const eased = 1 - Math.pow(1 - t, 3);
       setProgress(eased * 100);
 
@@ -58,26 +87,12 @@
       } else {
         setProgress(100);
         if (loaderStatus) loaderStatus.textContent = 'Done';
-        setTimeout(finishLoader, 380);
+        setTimeout(finishLoader, 300);
       }
     }
     requestAnimationFrame(tick);
   }
 
-  function finishLoader() {
-    if (!loader) return;
-    loader.classList.add('done');
-    document.body.classList.add('app-ready');
-    if (main) {
-      main.classList.remove('hidden');
-      main.classList.add('visible');
-    }
-    setTimeout(() => {
-      loader.style.display = 'none';
-    }, 700);
-  }
-
-  /* ---------- CONTINUOUS BACKGROUND CANVAS ---------- */
   function initCanvas() {
     const canvas = document.getElementById('bgCanvas');
     if (!canvas || reduceMotion) return;
@@ -107,7 +122,6 @@
 
     function draw() {
       ctx.clearRect(0, 0, w, h);
-      // soft connections
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.vx;
@@ -117,7 +131,7 @@
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(183, 139, 85, ${p.a})`;
+        ctx.fillStyle = 'rgba(183, 139, 85, ' + p.a + ')';
         ctx.fill();
 
         for (let j = i + 1; j < particles.length; j++) {
@@ -129,7 +143,7 @@
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(q.x, q.y);
-            ctx.strokeStyle = `rgba(183, 139, 85, ${0.08 * (1 - dist / 140)})`;
+            ctx.strokeStyle = 'rgba(183, 139, 85, ' + (0.08 * (1 - dist / 140)) + ')';
             ctx.lineWidth = 1;
             ctx.stroke();
           }
@@ -141,16 +155,15 @@
     resize();
     createParticles();
     draw();
-    window.addEventListener('resize', () => {
+    window.addEventListener('resize', function () {
       resize();
       createParticles();
     }, { passive: true });
   }
 
-  /* ---------- CARD HOVER GLOW ---------- */
   function setupCards() {
-    document.querySelectorAll('.hotel-card').forEach(card => {
-      card.addEventListener('pointermove', (e) => {
+    document.querySelectorAll('.hotel-card').forEach(function (card) {
+      card.addEventListener('pointermove', function (e) {
         if (reduceMotion) return;
         const rect = card.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -161,18 +174,14 @@
     });
   }
 
-  /* ---------- INIT ---------- */
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', function () {
     runLoader();
     initCanvas();
     setupCards();
   });
 
-  // Safety: never block UI forever
-  setTimeout(() => {
-    if (loader && !loader.classList.contains('done')) {
-      setProgress(100);
-      finishLoader();
-    }
-  }, 4500);
+  // Force show after 3.5s no matter what
+  setTimeout(function () {
+    finishLoader();
+  }, 3500);
 })();
