@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking confirmed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1115; --card: #1a1e28; --text: #eef1f6; --muted: #8b93a7;
+      --accent: #c9a26b; --ok: #3ecf8e; --line: rgba(139,147,167,0.18);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; padding: 24px 18px; }
+    .card {
+      max-width: 420px; margin: 0 auto; background: var(--card);
+      border-radius: 16px; padding: 28px 22px; border: 1px solid var(--line); text-align: center;
+    }
+    .icon { font-size: 48px; margin-bottom: 12px; }
+    h1 { font-size: 22px; margin-bottom: 8px; color: var(--ok); }
+    .ref { font-size: 18px; font-weight: 700; letter-spacing: 0.04em; margin: 16px 0; }
+    .detail { text-align: left; font-size: 14px; margin: 20px 0; }
+    .detail div { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .detail span:first-child { color: var(--muted); }
+    .btn {
+      display: block; width: 100%; padding: 14px; border: none; border-radius: 12px;
+      background: var(--accent); color: #0f1115; font-weight: 600; font-size: 15px; cursor: pointer; margin-top: 12px;
+    }
+    .btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--text); }
+    .note { font-size: 13px; color: var(--muted); margin-top: 16px; }
+    .paid { color: var(--ok); font-weight: 600; margin-top: 12px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">✓</div>
+    <h1>Reservation created</h1>
+    <p style="color:var(--muted);font-size:14px">Your stay is reserved. Pay now to confirm, or pay at the hotel.</p>
+    <div class="ref" id="ref">—</div>
+    <div class="detail" id="detail"></div>
+    <button class="btn" id="payBtn">Pay with Paystack</button>
+    <p class="paid" id="paidMsg">Payment recorded. Thank you!</p>
+    <a class="btn ghost" href="index.html" style="margin-top:10px;text-align:center">Back to hotel</a>
+    <p class="note">Add your Paystack public key in shared/js/config.js when ready. Without it, the button will tell you payment is not configured yet — booking still works.</p>
+  </div>
+
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../shared/js/config.js"></script>
+  <script src="../shared/js/booking-engine.js"></script>
+  <script src="../shared/js/paystack-booking.js"></script>
+  <script>
+    const b = NordicBooking.loadConfirmation();
+    if (!b) {
+      document.querySelector('.card').innerHTML = '<p>No booking found. <a href="booking.html">Start again</a></p>';
+    } else {
+      document.getElementById('ref').textContent = b.booking_reference;
+      document.getElementById('detail').innerHTML = `
+        <div><span>Hotel</span><span>${b.hotel_name || ''}</span></div>
+        <div><span>Guest</span><span>${b.guest_first_name} ${b.guest_last_name}</span></div>
+        <div><span>Dates</span><span>${b.check_in} → ${b.check_out}</span></div>
+        <div><span>Room</span><span>${b.room_name || b.room_type}</span></div>
+        <div><span>Nights</span><span>${b.nights}</span></div>
+        <div><span>Total</span><span>${NordicBooking.money(b.total_amount)}</span></div>
+        <div><span>Status</span><span>${b.payment_status || 'unpaid'}</span></div>
+      `;
+      if (b.payment_status === 'paid') {
+        document.getElementById('payBtn').style.display = 'none';
+        document.getElementById('paidMsg').style.display = 'block';
+      }
+      document.getElementById('payBtn').onclick = () => {
+        if (typeof NordicPay !== 'undefined' && NordicPay.start) {
+          NordicPay.start({
+            email: b.guest_email,
+            amountNaira: b.total_amount,
+            reference: b.booking_reference,
+            bookingId: b.id || null,
+            onSuccess: function () {
+              b.payment_status = 'paid';
+              sessionStorage.setItem('nordic_booking_confirmation', JSON.stringify(b));
+              document.getElementById('payBtn').style.display = 'none';
+              document.getElementById('paidMsg').style.display = 'block';
+            }
+          });
+        } else {
+          // Inline fallback using same pattern as your working site
+          const key = window.NORDIC_PAYSTACK_PUBLIC_KEY || '';
+          if (!key) {
+            alert('Payment is not configured yet. Add your Paystack public key in shared/js/config.js');
+            return;
+          }
+          if (typeof PaystackPop === 'undefined') {
+            alert('Paystack script not loaded.');
+            return;
+          }
+          PaystackPop.setup({
+            key: key,
+            email: b.guest_email,
+            amount: Math.round(Number(b.total_amount) * 100),
+            currency: 'NGN',
+            ref: b.booking_reference + '-' + Date.now(),
+            callback: function () {
+              b.payment_status = 'paid';
+              sessionStorage.setItem('nordic_booking_confirmation', JSON.stringify(b));
+              document.getElementById('payBtn').style.display = 'none';
+              document.getElementById('paidMsg').style.display = 'block';
+            },
+            onClose: function () {}
+          }).openIframe();
+        }
+      };
+    }
+  </script>
+</body>
+</html>

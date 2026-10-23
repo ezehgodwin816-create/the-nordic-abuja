@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact · DJ Annex Hotel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: Inter, system-ui, sans-serif; background: #0f1115; color: #eef1f6; margin: 0; padding: 20px; max-width: 480px; }
+    a { color: #c9a26b; } h1 { font-size: 24px; } .sub { color: #8b93a7; margin-bottom: 20px; }
+    .card { background: #1a1e28; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(139,147,167,0.15); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <p><a href="index.html">← Back</a></p>
+  <h1>Contact</h1>
+  <p class="sub">DJ Annex Hotel</p>
+  <div class="card">
+    <strong>Front desk</strong>
+    <p style="color:#8b93a7;margin-top:6px">Phone and WhatsApp numbers — add when ready</p>
+  </div>
+  <div class="card">
+    <strong>Email</strong>
+    <p style="color:#8b93a7;margin-top:6px">Placeholder — connect when email limit allows</p>
+  </div>
+  <div class="card">
+    <strong>Location</strong>
+    <p style="margin-top:6px" id="loc"></p>
+  </div>
+  <p style="margin-top:16px"><a href="report.html">Report an issue →</a></p>
+  <script src="../shared/js/config.js"></script>
+  <script src="../shared/js/booking-engine.js"></script>
+  <script>
+    document.getElementById('loc').textContent = NordicBooking.getHotel('dj-annex').location;
+  </script>
+</body>
+</html>
