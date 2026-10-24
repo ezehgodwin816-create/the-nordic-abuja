@@ -51,6 +51,7 @@
     .modal-box textarea { width: 100%; min-height: 80px; padding: 10px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); margin: 10px 0; }
     @media (max-width: 700px) { .side { display: none; } .side.open { display: block; position: fixed; inset: 0; z-index: 20; width: 100%; } }
   </style>
+  <script src="../shared/js/auth.js"></script>
 </head>
 <body>
   <div id="login">
@@ -63,7 +64,7 @@
         <button type="submit">Sign in</button>
         <div class="err" id="loginErr"></div>
       </form>
-      <p style="margin-top:12px;font-size:12px;color:var(--muted)">Demo: any email + password 4+ characters.</p>
+      <p style="margin-top:12px;font-size:12px;color:var(--muted)">Demo: admin.joyous@nordic.ng / admin123 (or admin.annex / admin.jimmy)</p>
     </div>
   </div>
 
@@ -115,8 +116,25 @@
 
     $('loginForm').onsubmit = e => {
       e.preventDefault();
+      const email = $('email').value.trim();
       const pass = $('password').value;
-      if (!$('email').value.trim() || pass.length < 4) {
+      if (window.NordicAuth) {
+        const r = NordicAuth.login(email, pass, 'admin');
+        if (!r.ok) {
+          $('loginErr').textContent = r.error || 'Invalid admin login.';
+          return;
+        }
+        if (r.session.role !== 'admin' && r.session.role !== 'super') {
+          $('loginErr').textContent = 'This page is for hotel admins.';
+          NordicAuth.logout();
+          return;
+        }
+        if (r.session.role === 'admin' && r.session.hotelId && r.session.hotelId !== hotelId) {
+          $('loginErr').textContent = 'Wrong hotel admin account for this property.';
+          NordicAuth.logout();
+          return;
+        }
+      } else if (!email || pass.length < 4) {
         $('loginErr').textContent = 'Invalid email or password.';
         return;
       }
@@ -124,7 +142,10 @@
       $('app').classList.add('show');
       render('dashboard');
     };
-    $('logout').onclick = () => location.reload();
+    $('logout').onclick = () => {
+      if (window.NordicAuth) NordicAuth.logout();
+      location.reload();
+    };
     $('menuBtn').onclick = () => $('side').classList.toggle('open');
     document.querySelectorAll('#side button').forEach(b => {
       b.onclick = () => {
