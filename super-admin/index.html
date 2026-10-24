@@ -47,6 +47,7 @@
     .hotel-tabs button.on { background: var(--accent); color: #0f1115; font-weight: 600; }
     @media (max-width: 720px) { .side { display: none; } .side.mobile-open { display: flex; flex-direction: column; position: fixed; inset: 0; z-index: 30; width: 100%; } }
   </style>
+  <script src="../shared/js/auth.js"></script>
 </head>
 <body>
   <div id="login">
@@ -59,7 +60,7 @@
         <button type="submit">Sign in</button>
         <div class="err" id="loginErr"></div>
       </form>
-      <p style="margin-top:16px;font-size:12px;color:var(--muted)">Demo: any email + password 4+ characters.</p>
+      <p style="margin-top:16px;font-size:12px;color:var(--muted)">Demo: super@nordic.ng / super123</p>
     </div>
   </div>
   <div id="app">
@@ -95,7 +96,14 @@
     const main = $('main');
     $('loginForm').onsubmit = e => {
       e.preventDefault();
-      if (!$('email').value.trim() || $('password').value.length < 4) {
+      if (window.NordicAuth) {
+        const r = NordicAuth.login($('email').value, $('password').value, 'super');
+        if (!r.ok || r.session.role !== 'super') {
+          $('loginErr').textContent = r.error || 'Central Command credentials required.';
+          return;
+        }
+        sessionStorage.setItem('nordic_super', '1');
+      } else if (!$('email').value.trim() || $('password').value.length < 4) {
         $('loginErr').textContent = 'Invalid email or password.';
         return;
       }
