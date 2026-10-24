@@ -52,6 +52,9 @@
     @media (max-width: 700px) { .side { display: none; } .side.open { display: block; position: fixed; inset: 0; z-index: 20; width: 100%; } }
   </style>
   <script src="../shared/js/auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../shared/js/config.js"></script>
+  <script src="../shared/js/auth.js"></script>
 </head>
 <body>
   <div id="login">
@@ -114,36 +117,31 @@
     const main = $('main');
     let replyTarget = null;
 
-    $('loginForm').onsubmit = e => {
+    $('loginForm').onsubmit = async e => {
       e.preventDefault();
       const email = $('email').value.trim();
       const pass = $('password').value;
-      if (window.NordicAuth) {
-        const r = NordicAuth.login(email, pass, 'admin');
+      $('loginErr').textContent = 'Signing in via Supabase...';
+      try {
+        const r = await NordicAuth.login(email, pass, 'admin');
         if (!r.ok) {
           $('loginErr').textContent = r.error || 'Invalid admin login.';
           return;
         }
-        if (r.session.role !== 'admin' && r.session.role !== 'super') {
-          $('loginErr').textContent = 'This page is for hotel admins.';
-          NordicAuth.logout();
+        if (!r.session.isAdmin && r.session.role !== 'admin' && r.session.role !== 'super') {
+          await NordicAuth.logout();
+          $('loginErr').textContent = 'Not an administrator in staff_profiles.';
           return;
         }
-        if (r.session.role === 'admin' && r.session.hotelId && r.session.hotelId !== hotelId) {
-          $('loginErr').textContent = 'Wrong hotel admin account for this property.';
-          NordicAuth.logout();
-          return;
-        }
-      } else if (!email || pass.length < 4) {
-        $('loginErr').textContent = 'Invalid email or password.';
-        return;
+        $('login').style.display = 'none';
+        $('app').classList.add('show');
+        render('dashboard');
+      } catch (err) {
+        $('loginErr').textContent = err.message || 'Login error';
       }
-      $('login').style.display = 'none';
-      $('app').classList.add('show');
-      render('dashboard');
     };
-    $('logout').onclick = () => {
-      if (window.NordicAuth) NordicAuth.logout();
+    $('logout').onclick = async () => {
+      await NordicAuth.logout();
       location.reload();
     };
     $('menuBtn').onclick = () => $('side').classList.toggle('open');
