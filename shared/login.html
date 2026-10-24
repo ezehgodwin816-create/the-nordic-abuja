@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign in · The Nordic Group</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #120e0a; --card: #1e1610; --text: #f7f0e6; --muted: #b9a890;
@@ -19,7 +20,6 @@
     .card {
       width: 100%; max-width: 400px; background: var(--card);
       border: 1px solid var(--line); border-radius: 20px; padding: 28px 22px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
     }
     .logo { text-align: center; margin-bottom: 18px; }
     .logo span {
@@ -29,9 +29,7 @@
     }
     h1 { font-size: 20px; text-align: center; margin-bottom: 4px; }
     .sub { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 18px; }
-    .roles {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px;
-    }
+    .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
     .roles button {
       padding: 10px 8px; border-radius: 12px; border: 1px solid var(--line);
       background: transparent; color: var(--muted); font: inherit; font-size: 12px;
@@ -41,7 +39,7 @@
       background: rgba(212,165,116,0.15); color: var(--gold); border-color: var(--gold);
     }
     label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
-    input, select {
+    input {
       display: block; width: 100%; margin-top: 6px; padding: 12px 14px;
       border-radius: 12px; border: 1px solid var(--line); background: #2c2118;
       color: var(--text); font: inherit; outline: none;
@@ -52,14 +50,13 @@
       background: linear-gradient(135deg, #d4a574, #c4894a); color: #1a120b;
       font-weight: 700; font-size: 15px; cursor: pointer;
     }
-    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.6; cursor: wait; }
     .err { color: var(--danger); font-size: 13px; margin-top: 10px; min-height: 1.2em; }
     .hint {
       margin-top: 18px; padding: 12px; border-radius: 12px;
       background: rgba(212,165,116,0.08); border: 1px solid var(--line);
-      font-size: 11px; color: var(--muted); line-height: 1.45;
+      font-size: 12px; color: var(--muted); line-height: 1.45;
     }
-    .hint strong { color: var(--gold); }
     .back { display: block; text-align: center; margin-top: 16px; color: var(--muted); font-size: 13px; text-decoration: none; }
   </style>
 </head>
@@ -67,7 +64,7 @@
   <div class="card">
     <div class="logo"><span>N</span></div>
     <h1>Sign in</h1>
-    <p class="sub" id="roleSub">Choose your role and enter details</p>
+    <p class="sub">Uses your Supabase accounts (same as original Nordic)</p>
 
     <div class="roles" id="roles">
       <button type="button" data-role="guest" class="active">Guest</button>
@@ -81,79 +78,86 @@
         <input type="email" id="email" required autocomplete="username" placeholder="you@email.com" />
       </label>
       <label>Password
-        <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••" />
+        <input type="password" id="password" required autocomplete="current-password" placeholder="Your Supabase password" />
       </label>
-      <button type="submit" class="btn">Continue</button>
+      <button type="submit" class="btn" id="submitBtn">Continue</button>
       <div class="err" id="err"></div>
     </form>
 
-    <div class="hint" id="hint"></div>
+    <div class="hint">
+      Sign-in goes to <strong>Supabase Auth</strong> (same project as your first Nordic site).
+      Staff / admin must exist in <strong>staff_profiles</strong> with the correct role.
+      Guests can register with the button below if needed.
+      <br /><br />
+      <button type="button" id="regBtn" style="background:none;border:none;color:#d4a574;font-weight:600;cursor:pointer;padding:0">Create guest account</button>
+    </div>
     <a class="back" href="../index.html">← Back to hotels</a>
   </div>
 
+  <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
   <script>
     (function () {
       var role = new URLSearchParams(location.search).get('role') || 'guest';
       var roles = document.getElementById('roles');
       var err = document.getElementById('err');
-      var hint = document.getElementById('hint');
-      var roleSub = document.getElementById('roleSub');
-
-      var hints = {
-        guest: 'Guests: use any email + password (4+ characters). Wrong/empty password fails.',
-        staff: 'Demo staff:<br><strong>staff.joyous@nordic.ng</strong> / staff123<br><strong>staff.annex@nordic.ng</strong> / staff123<br><strong>staff.jimmy@nordic.ng</strong> / staff123',
-        admin: 'Demo hotel admin:<br><strong>admin.joyous@nordic.ng</strong> / admin123<br><strong>admin.annex@nordic.ng</strong> / admin123<br><strong>admin.jimmy@nordic.ng</strong> / admin123',
-        super: 'Central Command (sees all hotels):<br><strong>super@nordic.ng</strong> / super123'
-      };
-      var labels = {
-        guest: 'Sign in as guest',
-        staff: 'Staff sign in',
-        admin: 'Hotel Admin sign in',
-        super: 'Central Command sign in'
-      };
+      var btn = document.getElementById('submitBtn');
 
       function setRole(r) {
         role = r;
         roles.querySelectorAll('button').forEach(function (b) {
           b.classList.toggle('active', b.getAttribute('data-role') === r);
         });
-        hint.innerHTML = hints[r] || '';
-        roleSub.textContent = labels[r] || 'Sign in';
         err.textContent = '';
       }
-
       roles.addEventListener('click', function (e) {
-        var btn = e.target.closest('[data-role]');
-        if (btn) setRole(btn.getAttribute('data-role'));
+        var b = e.target.closest('[data-role]');
+        if (b) setRole(b.getAttribute('data-role'));
       });
       setRole(role);
 
-      // Already logged in?
-      var s = NordicAuth.getSession();
-      if (s && s.role !== 'guest') {
-        var red = NordicAuth.redirectFor(s);
-        if (red) location.replace(red);
-      }
+      // Resume session
+      NordicAuth.getSession().then(function (s) {
+        if (s && s.role !== 'guest') {
+          var red = NordicAuth.redirectFor(s);
+          if (red) location.replace(red);
+        }
+      });
 
-      document.getElementById('form').onsubmit = function (e) {
+      document.getElementById('form').onsubmit = async function (e) {
         e.preventDefault();
         err.textContent = '';
-        var result = NordicAuth.login(
-          document.getElementById('email').value,
-          document.getElementById('password').value,
-          role
-        );
-        if (!result.ok) {
-          err.textContent = result.error || 'Login failed.';
-          return;
+        btn.disabled = true;
+        btn.textContent = 'Signing in...';
+        try {
+          var result = await NordicAuth.login(
+            document.getElementById('email').value,
+            document.getElementById('password').value,
+            role
+          );
+          if (!result.ok) {
+            err.textContent = result.error || 'Login failed.';
+            btn.disabled = false;
+            btn.textContent = 'Continue';
+            return;
+          }
+          if (result.redirect) location.href = result.redirect;
+          else location.href = '../index.html';
+        } catch (ex) {
+          err.textContent = ex.message || 'Network error';
+          btn.disabled = false;
+          btn.textContent = 'Continue';
         }
-        if (result.redirect) {
-          location.href = result.redirect;
-        } else {
-          // Guest → home
-          location.href = '../index.html';
-        }
+      };
+
+      document.getElementById('regBtn').onclick = async function () {
+        var email = document.getElementById('email').value.trim();
+        var pass = document.getElementById('password').value;
+        err.textContent = '';
+        var r = await NordicAuth.register(email, pass);
+        err.style.color = r.ok ? '#3ecf8e' : '';
+        err.textContent = r.ok ? (r.message || 'Registered.') : (r.error || 'Failed');
+        if (r.ok && r.session) location.href = '../index.html';
       };
     })();
   </script>
