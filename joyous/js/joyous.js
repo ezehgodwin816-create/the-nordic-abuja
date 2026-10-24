@@ -45,12 +45,13 @@
       authLabel.textContent = 'Sign in';
     }
   }
-  refreshAuthUI();
-  if (window.NordicAuth && NordicAuth.loadStaffCache) {
-    NordicAuth.loadStaffCache('joyous').then(function () {
-      if (window.NordicAI) { /* staff available for AI */ }
-    });
-  }
+  // Non-blocking — do not delay first tap
+  setTimeout(function () {
+    refreshAuthUI();
+    if (window.NordicAuth && NordicAuth.loadStaffCache) {
+      NordicAuth.loadStaffCache('joyous');
+    }
+  }, 50);
 
   function openModal() {
     if (!authModal) {
