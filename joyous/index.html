@@ -243,16 +243,23 @@
     <div class="modal-card">
       <button type="button" class="modal-close" data-close>×</button>
       <h2 id="authTitle">Sign in</h2>
-      <p class="modal-note">Email verification & password reset will be enabled soon. Login still checks your details.</p>
+      <p class="modal-note">Choose your role. Wrong password fails. Email reset comes later.</p>
+      <div class="auth-roles" id="authRoles">
+        <button type="button" data-role="guest" class="active">Guest</button>
+        <button type="button" data-role="staff">Staff</button>
+        <button type="button" data-role="admin">Admin</button>
+        <button type="button" data-role="super">Central Command</button>
+      </div>
+      <p class="modal-note" id="authRoleNote">Guests: any email + password (4+ chars).</p>
       <form id="authForm">
-        <label>Email or phone
-          <input type="text" id="authId" required placeholder="you@email.com or 08xx…" autocomplete="username" />
+        <label>Email
+          <input type="email" id="authId" required placeholder="you@email.com" autocomplete="username" />
         </label>
         <label>Password
           <input type="password" id="authPass" required placeholder="Your password" autocomplete="current-password" />
         </label>
         <button type="submit" class="btn btn-primary btn-block">Continue</button>
-        <p class="auth-switch">New here? <button type="button" id="switchToRegister">Create account</button></p>
+        <p class="auth-switch">New guest? <button type="button" id="switchToRegister">First sign-in creates account</button></p>
         <p class="auth-forgot"><button type="button" id="forgotBtn">Forgot password?</button> <small>(coming soon)</small></p>
       </form>
       <div id="authError" class="form-error" hidden></div>
@@ -268,6 +275,7 @@
       theme: 'warm'
     };
   </script>
+  <script src="../shared/js/auth.js"></script>
   <script src="../shared/ai/ai-engine.js"></script>
   <script src="js/joyous.js"></script>
 </body>
