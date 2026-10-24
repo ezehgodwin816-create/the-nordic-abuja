@@ -1,5 +1,5 @@
 /**
- * Joyous Hotel — App shell
+ * Joyous Hotel — App shell + multi-role login
  */
 (function () {
   'use strict';
@@ -29,67 +29,107 @@
   closeNav?.addEventListener('click', closeNavFn);
   backdrop?.addEventListener('click', closeNavFn);
 
-  /* Auth chip + modal (UI only — real auth later) */
+  /* Auth */
   const authChip = $('#authChip');
   const authModal = $('#authModal');
   const authForm = $('#authForm');
   const authError = $('#authError');
   const authLabel = $('#authLabel');
+  const roleTabs = $('#authRoles');
 
-  let session = null;
-  try {
-    session = JSON.parse(localStorage.getItem('nordic_guest_session') || 'null');
-  } catch (_) {}
+  let authRole = 'guest';
+
+  function session() {
+    if (window.NordicAuth) return NordicAuth.getSession();
+    try { return JSON.parse(localStorage.getItem('nordic_session_v2') || 'null'); } catch (e) { return null; }
+  }
 
   function updateAuthUI() {
-    if (session && session.name) {
-      authLabel.textContent = session.name.split(' ')[0];
+    const s = session();
+    if (s && s.name) {
+      const tag = s.role === 'guest' ? '' : ' · ' + s.role;
+      authLabel.textContent = (s.name.split(' ')[0] || s.name) + tag;
     } else {
       authLabel.textContent = 'Sign in';
     }
   }
   updateAuthUI();
 
+  function openModal() {
+    if (!authModal) return;
+    authModal.hidden = false;
+    authModal.style.display = 'flex';
+    if (authError) { authError.hidden = true; authError.textContent = ''; }
+  }
+  function closeModal() {
+    if (!authModal) return;
+    authModal.hidden = true;
+    authModal.style.display = 'none';
+  }
+
   authChip?.addEventListener('click', () => {
-    if (session) {
-      if (confirm('Sign out?')) {
-        localStorage.removeItem('nordic_guest_session');
-        session = null;
+    const s = session();
+    if (s) {
+      if (confirm('Sign out ' + (s.name || '') + '?')) {
+        if (window.NordicAuth) NordicAuth.logout();
+        else localStorage.removeItem('nordic_session_v2');
         updateAuthUI();
       }
       return;
     }
-    authModal.hidden = false;
-    authError.hidden = true;
+    openModal();
   });
 
   authModal?.querySelectorAll('[data-close]').forEach(el => {
-    el.addEventListener('click', () => { authModal.hidden = true; });
+    el.addEventListener('click', closeModal);
+  });
+
+  roleTabs?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-role]');
+    if (!btn) return;
+    authRole = btn.getAttribute('data-role');
+    roleTabs.querySelectorAll('[data-role]').forEach(b => b.classList.toggle('active', b === btn));
+    const note = $('#authRoleNote');
+    if (note) {
+      const notes = {
+        guest: 'Guests: any email + password (4+ chars).',
+        staff: 'Staff demo: staff.joyous@nordic.ng / staff123',
+        admin: 'Admin demo: admin.joyous@nordic.ng / admin123',
+        super: 'Central Command: super@nordic.ng / super123'
+      };
+      note.textContent = notes[authRole] || '';
+    }
   });
 
   authForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     const id = $('#authId')?.value.trim();
-    const pass = $('#authPass')?.value;
-    // Simulated validation — will fail on empty / obviously wrong
-    if (!id || !pass || pass.length < 4) {
-      authError.textContent = 'Invalid details. Please check and try again.';
+    const pass = $('#authPass')?.value || '';
+    if (!window.NordicAuth) {
+      authError.textContent = 'Auth system not loaded. Refresh the page.';
       authError.hidden = false;
       return;
     }
-    // Demo success path (replace with real auth later)
-    session = { name: id.includes('@') ? id.split('@')[0] : id, id };
-    localStorage.setItem('nordic_guest_session', JSON.stringify(session));
+    const result = NordicAuth.login(id, pass, authRole);
+    if (!result.ok) {
+      authError.textContent = result.error || 'Login failed.';
+      authError.hidden = false;
+      return;
+    }
     updateAuthUI();
-    authModal.hidden = true;
+    closeModal();
+    if (result.redirect) {
+      location.href = result.redirect;
+    }
   });
 
   $('#forgotBtn')?.addEventListener('click', () => {
-    alert('Password reset will be available soon. Please contact the hotel for now.');
+    alert('Password reset will be available soon. Contact the hotel for now.');
   });
 
-  /* Events — empty state is default; can be filled later from backend */
-  // NordicAI.setEvents([...]) when live data exists
+  $('#switchToRegister')?.addEventListener('click', () => {
+    alert('Guest accounts are created automatically on first sign-in with any new email.');
+  });
 
   /* Header scroll */
   const header = $('#appHeader');
