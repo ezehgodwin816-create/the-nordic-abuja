@@ -9,7 +9,7 @@
   <style>
     :root {
       --bg: #120e0a; --card: #1e1610; --text: #f7f0e6; --muted: #b9a890;
-      --gold: #d4a574; --line: rgba(212,165,116,0.22); --danger: #e07a7a;
+      --gold: #d4a574; --line: rgba(212,165,116,0.22); --danger: #e07a7a; --ok: #3ecf8e;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -21,14 +21,20 @@
       width: 100%; max-width: 400px; background: var(--card);
       border: 1px solid var(--line); border-radius: 20px; padding: 28px 22px;
     }
-    .logo { text-align: center; margin-bottom: 18px; }
+    .logo { text-align: center; margin-bottom: 14px; }
     .logo span {
       display: inline-grid; place-items: center; width: 48px; height: 48px;
       border-radius: 14px; background: linear-gradient(135deg, #d4a574, #c4894a);
       color: #1a120b; font-weight: 700; font-size: 20px;
     }
     h1 { font-size: 20px; text-align: center; margin-bottom: 4px; }
-    .sub { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+    .sub { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+    .status {
+      text-align: center; font-size: 12px; margin-bottom: 14px; padding: 8px;
+      border-radius: 10px; background: rgba(255,255,255,0.04);
+    }
+    .status.ok { color: var(--ok); }
+    .status.bad { color: var(--danger); }
     .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
     .roles button {
       padding: 10px 8px; border-radius: 12px; border: 1px solid var(--line);
@@ -50,10 +56,10 @@
       background: linear-gradient(135deg, #d4a574, #c4894a); color: #1a120b;
       font-weight: 700; font-size: 15px; cursor: pointer;
     }
-    .btn:disabled { opacity: 0.6; cursor: wait; }
-    .err { color: var(--danger); font-size: 13px; margin-top: 10px; min-height: 1.2em; }
+    .btn:disabled { opacity: 0.65; cursor: wait; }
+    .err { color: var(--danger); font-size: 13px; margin-top: 10px; line-height: 1.4; }
     .hint {
-      margin-top: 18px; padding: 12px; border-radius: 12px;
+      margin-top: 16px; padding: 12px; border-radius: 12px;
       background: rgba(212,165,116,0.08); border: 1px solid var(--line);
       font-size: 12px; color: var(--muted); line-height: 1.45;
     }
@@ -64,7 +70,8 @@
   <div class="card">
     <div class="logo"><span>N</span></div>
     <h1>Sign in</h1>
-    <p class="sub">Uses your Supabase accounts (same as original Nordic)</p>
+    <p class="sub">Supabase Auth (same project as original Nordic)</p>
+    <div class="status" id="connStatus">Checking connection…</div>
 
     <div class="roles" id="roles">
       <button type="button" data-role="guest" class="active">Guest</button>
@@ -78,16 +85,15 @@
         <input type="email" id="email" required autocomplete="username" placeholder="you@email.com" />
       </label>
       <label>Password
-        <input type="password" id="password" required autocomplete="current-password" placeholder="Your Supabase password" />
+        <input type="password" id="password" required autocomplete="current-password" placeholder="Your password" />
       </label>
       <button type="submit" class="btn" id="submitBtn">Continue</button>
       <div class="err" id="err"></div>
     </form>
 
     <div class="hint">
-      Sign-in goes to <strong>Supabase Auth</strong> (same project as your first Nordic site).
-      Staff / admin must exist in <strong>staff_profiles</strong> with the correct role.
-      Guests can register with the button below if needed.
+      Use the <strong>same email/password</strong> as in Supabase Dashboard → Authentication → Users
+      (or the account that worked on your old admin page).
       <br /><br />
       <button type="button" id="regBtn" style="background:none;border:none;color:#d4a574;font-weight:600;cursor:pointer;padding:0">Create guest account</button>
     </div>
@@ -102,6 +108,7 @@
       var roles = document.getElementById('roles');
       var err = document.getElementById('err');
       var btn = document.getElementById('submitBtn');
+      var conn = document.getElementById('connStatus');
 
       function setRole(r) {
         role = r;
@@ -116,19 +123,37 @@
       });
       setRole(role);
 
-      // Resume session
-      NordicAuth.getSession().then(function (s) {
-        if (s && s.role !== 'guest') {
-          var red = NordicAuth.redirectFor(s);
-          if (red) location.replace(red);
-        }
-      });
+      // Non-blocking connection check
+      if (window.NordicAuth && NordicAuth.ping) {
+        NordicAuth.ping().then(function (p) {
+          if (p.ok) {
+            conn.textContent = 'Connected to Supabase';
+            conn.className = 'status ok';
+          } else {
+            conn.textContent = 'Cannot reach Supabase — ' + (p.error || 'check project / network');
+            conn.className = 'status bad';
+          }
+        });
+      } else {
+        conn.textContent = 'Auth script loaded';
+        conn.className = 'status';
+      }
+
+      // Resume session without blocking first paint
+      setTimeout(function () {
+        NordicAuth.getSession().then(function (s) {
+          if (s && s.role !== 'guest') {
+            var red = NordicAuth.redirectFor(s);
+            if (red) location.replace(red);
+          }
+        });
+      }, 100);
 
       document.getElementById('form').onsubmit = async function (e) {
         e.preventDefault();
         err.textContent = '';
         btn.disabled = true;
-        btn.textContent = 'Signing in...';
+        btn.textContent = 'Signing in…';
         try {
           var result = await NordicAuth.login(
             document.getElementById('email').value,
@@ -141,20 +166,24 @@
             btn.textContent = 'Continue';
             return;
           }
+          btn.textContent = 'Success…';
           if (result.redirect) location.href = result.redirect;
           else location.href = '../index.html';
         } catch (ex) {
-          err.textContent = ex.message || 'Network error';
+          err.textContent = (ex && ex.message) || 'Network error';
           btn.disabled = false;
           btn.textContent = 'Continue';
         }
       };
 
       document.getElementById('regBtn').onclick = async function () {
-        var email = document.getElementById('email').value.trim();
-        var pass = document.getElementById('password').value;
         err.textContent = '';
-        var r = await NordicAuth.register(email, pass);
+        btn.disabled = true;
+        var r = await NordicAuth.register(
+          document.getElementById('email').value,
+          document.getElementById('password').value
+        );
+        btn.disabled = false;
         err.style.color = r.ok ? '#3ecf8e' : '';
         err.textContent = r.ok ? (r.message || 'Registered.') : (r.error || 'Failed');
         if (r.ok && r.session) location.href = '../index.html';
