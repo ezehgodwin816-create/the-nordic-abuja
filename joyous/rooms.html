@@ -8,29 +8,43 @@
   <style>
     body { font-family: Inter, system-ui, sans-serif; background: #0f1115; color: #eef1f6; margin: 0; padding: 20px; }
     a { color: #c9a26b; } h1 { font-size: 24px; } .sub { color: #8b93a7; margin-bottom: 20px; }
-    .card { background: #1a1e28; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(139,147,167,0.15); }
-    .ph { height: 120px; background: #252a36; border-radius: 10px; display: grid; place-items: center; color: #8b93a7; font-size: 13px; margin-bottom: 12px; }
+    .card { background: #1a1e28; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(139,147,167,0.15); overflow: hidden; }
+    .card img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; display: block; margin-bottom: 12px; background: #252a36; }
     .btn { display: inline-block; margin-top: 10px; padding: 10px 16px; background: #c9a26b; color: #0f1115; border-radius: 10px; font-weight: 600; text-decoration: none; font-size: 14px; }
   </style>
 </head>
 <body>
   <p><a href="index.html">← Back</a></p>
   <h1>Rooms</h1>
-  <p class="sub">Joyous Hotel — photo placeholders for you to fill</p>
+  <p class="sub">Joyous Hotel · Nyanya</p>
   <div id="list"></div>
   <script src="../shared/js/config.js"></script>
   <script src="../shared/js/booking-engine.js"></script>
   <script>
-    const hotel = NordicBooking.getHotel('joyous');
-    document.getElementById('list').innerHTML = hotel.rooms.map(r => `
+    const photos = {
+      standard: 'images/joyous-room-standard.jpg',
+      deluxe: 'images/joyous-room-deluxe.jpg',
+      suite: 'images/joyous-room-suite.jpg'
+    };
+    const hotel = (window.NordicBooking && NordicBooking.getHotel)
+      ? NordicBooking.getHotel('joyous')
+      : { rooms: [
+          { id: 'standard', name: 'Standard', desc: 'Clean, comfortable and well-lit.', price: 15000 },
+          { id: 'deluxe', name: 'Deluxe', desc: 'More space and extra comfort.', price: 22000 },
+          { id: 'suite', name: 'Suite', desc: 'Spacious living area.', price: 35000 }
+        ]};
+    document.getElementById('list').innerHTML = hotel.rooms.map(r => {
+      const key = (r.id || r.name || '').toLowerCase();
+      const src = photos[key] || photos.standard;
+      return `
       <div class="card">
-        <div class="ph">Room photo</div>
+        <img src="${src}" alt="${r.name}" />
         <strong>${r.name}</strong>
-        <p style="color:#8b93a7;font-size:14px;margin:6px 0">${r.desc}</p>
-        <div>From ₦${r.price.toLocaleString('en-NG')} / night</div>
-        <a class="btn" href="booking.html">Book</a>
-      </div>
-    `).join('');
+        <p style="color:#8b93a7;font-size:14px;margin:6px 0">${r.desc || ''}</p>
+        <div>From ₦${Number(r.price || 0).toLocaleString('en-NG')} / night</div>
+        <a class="btn" href="booking.html?type=${key}">Book</a>
+      </div>`;
+    }).join('');
   </script>
 </body>
 </html>
