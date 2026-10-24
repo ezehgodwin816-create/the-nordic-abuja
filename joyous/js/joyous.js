@@ -1,13 +1,11 @@
 /**
- * Joyous Hotel — App shell + multi-role login
+ * Joyous — shell + Supabase login (no local passwords)
  */
 (function () {
   'use strict';
 
   const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  /* Nav */
   const sideNav = $('#sideNav');
   const backdrop = $('#navBackdrop');
   const menuToggle = $('#menuToggle');
@@ -16,47 +14,49 @@
   function openNav() {
     sideNav?.classList.add('open');
     backdrop?.classList.add('show');
-    sideNav?.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
   }
   function closeNavFn() {
     sideNav?.classList.remove('open');
     backdrop?.classList.remove('show');
-    sideNav?.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   }
   menuToggle?.addEventListener('click', openNav);
   closeNav?.addEventListener('click', closeNavFn);
   backdrop?.addEventListener('click', closeNavFn);
 
-  /* Auth */
   const authChip = $('#authChip');
   const authModal = $('#authModal');
   const authForm = $('#authForm');
   const authError = $('#authError');
   const authLabel = $('#authLabel');
   const roleTabs = $('#authRoles');
-
   let authRole = 'guest';
 
-  function session() {
-    if (window.NordicAuth) return NordicAuth.getSession();
-    try { return JSON.parse(localStorage.getItem('nordic_session_v2') || 'null'); } catch (e) { return null; }
-  }
-
-  function updateAuthUI() {
-    const s = session();
+  async function refreshAuthUI() {
+    if (!window.NordicAuth) {
+      if (authLabel) authLabel.textContent = 'Sign in';
+      return;
+    }
+    const s = await NordicAuth.getSession();
     if (s && s.name) {
-      const tag = s.role === 'guest' ? '' : ' · ' + s.role;
-      authLabel.textContent = (s.name.split(' ')[0] || s.name) + tag;
+      authLabel.textContent = s.name.split(' ')[0] + (s.role !== 'guest' ? ' · ' + s.role : '');
     } else {
       authLabel.textContent = 'Sign in';
     }
   }
-  updateAuthUI();
+  refreshAuthUI();
+  if (window.NordicAuth && NordicAuth.loadStaffCache) {
+    NordicAuth.loadStaffCache('joyous').then(function () {
+      if (window.NordicAI) { /* staff available for AI */ }
+    });
+  }
 
   function openModal() {
-    if (!authModal) return;
+    if (!authModal) {
+      location.href = '../shared/login.html';
+      return;
+    }
     authModal.hidden = false;
     authModal.style.display = 'flex';
     if (authError) { authError.hidden = true; authError.textContent = ''; }
@@ -67,71 +67,67 @@
     authModal.style.display = 'none';
   }
 
-  authChip?.addEventListener('click', () => {
-    const s = session();
+  authChip?.addEventListener('click', async () => {
+    const s = window.NordicAuth ? await NordicAuth.getSession() : null;
     if (s) {
-      if (confirm('Sign out ' + (s.name || '') + '?')) {
-        if (window.NordicAuth) NordicAuth.logout();
-        else localStorage.removeItem('nordic_session_v2');
-        updateAuthUI();
+      if (confirm('Sign out ' + (s.email || s.name) + '?')) {
+        await NordicAuth.logout();
+        await refreshAuthUI();
       }
       return;
     }
     openModal();
   });
 
-  authModal?.querySelectorAll('[data-close]').forEach(el => {
-    el.addEventListener('click', closeModal);
-  });
+  authModal?.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeModal));
 
   roleTabs?.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-role]');
     if (!btn) return;
     authRole = btn.getAttribute('data-role');
     roleTabs.querySelectorAll('[data-role]').forEach(b => b.classList.toggle('active', b === btn));
-    const note = $('#authRoleNote');
-    if (note) {
-      const notes = {
-        guest: 'Guests: any email + password (4+ chars).',
-        staff: 'Staff demo: staff.joyous@nordic.ng / staff123',
-        admin: 'Admin demo: admin.joyous@nordic.ng / admin123',
-        super: 'Central Command: super@nordic.ng / super123'
-      };
-      note.textContent = notes[authRole] || '';
-    }
   });
 
-  authForm?.addEventListener('submit', (e) => {
+  authForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = $('#authId')?.value.trim();
     const pass = $('#authPass')?.value || '';
     if (!window.NordicAuth) {
-      authError.textContent = 'Auth system not loaded. Refresh the page.';
+      authError.textContent = 'Auth not loaded. Refresh page.';
       authError.hidden = false;
       return;
     }
-    const result = NordicAuth.login(id, pass, authRole);
+    const submitBtn = authForm.querySelector('[type=submit]');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Signing in...'; }
+    const result = await NordicAuth.login(id, pass, authRole);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Continue'; }
     if (!result.ok) {
-      authError.textContent = result.error || 'Login failed.';
+      authError.textContent = result.error || 'Login failed';
       authError.hidden = false;
       return;
     }
-    updateAuthUI();
+    await refreshAuthUI();
     closeModal();
-    if (result.redirect) {
-      location.href = result.redirect;
-    }
+    if (result.redirect) location.href = result.redirect;
   });
 
   $('#forgotBtn')?.addEventListener('click', () => {
-    alert('Password reset will be available soon. Contact the hotel for now.');
+    alert('Password reset uses Supabase. Enable email reset in your Supabase Auth settings, or reset from the Supabase dashboard.');
   });
 
-  $('#switchToRegister')?.addEventListener('click', () => {
-    alert('Guest accounts are created automatically on first sign-in with any new email.');
+  $('#switchToRegister')?.addEventListener('click', async () => {
+    const id = $('#authId')?.value.trim();
+    const pass = $('#authPass')?.value || '';
+    const r = await NordicAuth.register(id, pass);
+    authError.hidden = false;
+    authError.style.color = r.ok ? '#3ecf8e' : '';
+    authError.textContent = r.ok ? (r.message || 'Registered') : (r.error || 'Failed');
+    if (r.ok && r.session) {
+      await refreshAuthUI();
+      closeModal();
+    }
   });
 
-  /* Header scroll */
   const header = $('#appHeader');
   window.addEventListener('scroll', () => {
     header?.classList.toggle('scrolled', window.scrollY > 20);
